@@ -1,0 +1,1209 @@
+.\" use: pic | tbl | eqn | ditroff -me
+.\"
+.\"	"@(#)bibmac.me	2.2	9/9/83";
+.de IP
+.ip \\$1 \\$2
+..
+.de LP
+.lp
+..
+.\"	@(#)bmac.std	2.2	9/9/83;
+.\" standard format troff commands
+.\" citation formatting strings
+.ds [[ [
+.ds ]] ]
+.ds ], ,\|
+.ds ]- -
+.ds [. " \&
+.ds .] .
+.ds [, " \&
+.ds ,] ,
+.ds [? " \&
+.ds ?] ?
+.ds [: " \&
+.ds :] :
+.ds [; " \&
+.ds ;] ;
+.ds [! " \&
+.ds !] !
+.ds [" " \&
+.ds "] \&"
+.ds [' " \&
+.ds '] '
+.ds [< " \&
+.ds >]
+.\" reference formmating strings
+.ds a] " \&
+.ds b] , \&
+.ds c] , \&
+.ds n] "\& and \&
+.ds m] "\& and \&
+.ds p] .
+.\" reference formmating macros
+.de s[   \" start reference
+.nh
+.IP [\\*([F] 5m
+..
+.de e[   \" end reference
+.[-
+..
+.de []   \" start to display collected references
+.LP
+..
+.de ][   \" choose format
+.ie !"\\*([J"" \{\
+.    ie !"\\*([V"" .nr t[ 1    \" journal
+.    el            .nr t[ 5    \" conference paper
+.\}
+.el .ie !"\\*([B"" .nr t[ 3    \" article in book
+.el .ie !"\\*([R"" .nr t[ 4    \" technical report
+.el .ie !"\\*([I"" .nr t[ 2    \" book
+.el                .nr t[ 0    \" other
+.\\n(t[[
+..
+.de 0[   \" other
+.s[
+.if !"\\*([A"" \\*([A\\c
+.if !"\\*([T"" , \\*([T\\c
+.if !"\\*([V"" , Vol. \\*([V\\c
+.if !"\\*([O"" , \\*([O\\c
+.if !"\\*([D"" , \\*([D\\c
+\&.
+.e[
+..
+.de 1[ \" journal article
+.s[
+.if !"\\*([A"" \\*([A,
+.if !"\\*([T""  \\*([T,
+\\fI\\*([J \\*([V\\fP\c
+.if !"\\*([N"" ,\\*([N
+.if !"\\*([D"" (\\*([D)\c
+.if !"\\*([P"" , \\*([P\c
+.if !"\\*([I"" , \\*([I\c
+\\&.
+.if !"\\*([O"" \\*([O.
+.e[
+..
+.de 2[ \" book
+.s[
+.ie !"\\*([A"" \\*([A,
+.el .if !"\\*([E"" \{\
+.       ie \\n([E-1 \\*([E, eds.,
+.       el \\*([E, ed.,\}
+.if !"\\*([T"" \\fI\\*([T\\fP,
+.rm a[
+.if !"\\*([I"" .ds a[ \\*([I
+.if !"\\*([C"" \{\
+.       if !"\\*(a["" .as a[ , \\&
+.       as a[ \\*([C\}
+.if !"\\*([D"" \{\
+.       if !"\\*(a["" .as a[ , \\&
+.       as a[ \\*([D\}
+\\*(a[.
+.if !"\\*([G"" Gov. ordering no. \\*([G.
+.if !"\\*([O"" \\*([O.
+.e[
+..
+.de 3[ \" article in book
+.s[
+.if !"\\*([A"" \\*([A,
+.if !"\\*([T"" \\*([T,
+in \\fI\\*([B\\fP\c
+.if !"\\*([V"" , vol. \\*([V
+.if !~\\*([E~~ \{\
+.       ie , \\n([E-1  \\*([E (editors)\c
+.       el , \\*([E (editor)\c\}
+.if !"\\*([I"" , \\*([I\c
+.if !"\\*([C"" , \\*([C\c
+.if !"\\*([D"" , \\*([D\c
+.if !"\\*([P"" , \\*([P\c
+\\&.
+.if !"\\*([O"" \\*([O.
+.e[
+..
+.de 4[ \" report
+.s[
+.if !"\\*([A"" \\*([A,
+.if !~\\*([E~~ \{\
+.       ie \\n([E-1 \\*([E, editors.
+.       el \\*([E, editor.\}
+\\*([T,
+\\*([R\c
+.if !"\\*([G"" \& (\\*([G)\c
+.if !"\\*([I"" , \\*([I\c
+.if !"\\*([C"" , \\*([C\c
+.if !"\\*([D"" , \\*([D\c
+\\&.
+.if !"\\*([O"" \\*([O.
+.e[
+..
+.de 5[ \" conference paper
+.s[
+.if !"\\*([A"" \\*([A,
+.if !"\\*([T"" \\*([T,
+\\fI\\*([J\\fP,
+.if !"\\*([C"" \\*([C,
+.if !"\\*([D"" \\*([D\c
+.if !"\\*([P"" , \\*([P\c
+\\&.
+.if !"\\*([O"" \\*([O.
+.e[
+..
+.de [-   \" clean up after yourself
+.rm [A [B [C [D
+.rm [E [F [G
+.rm [I [J [K
+.rm [N [O [P
+.rm [R [T
+.rm [V [W
+..
+.\"	@(#)bmac.std	2.2	8/24/83;
+.\" standard format troff commands
+.\" citation formatting strings
+.ds [[ [
+.ds ]] ]
+.ds ], ,\|
+.ds ]- -
+.ds [. " \&
+.ds .] .
+.ds [, " \&
+.ds ,] ,
+.ds [< " \&
+.ds >]
+.\" reference formmating strings
+.ds c] , \&
+.ds n] "" and \&
+.ds m] "" and \&
+.ds a] " \&
+.\" reference formmating macros
+.de s[   \" start reference
+.nh
+.IP [\\*([F] 5m
+..
+.de e[   \" end reference
+.[-
+..
+.de []   \" start to display collected references
+.SH
+References
+.LP
+..
+.de ][   \" choose format
+.ie !"\\*([J"" \{\
+.    ie !"\\*([V"" .nr t[ 1    \" journal
+.    el            .nr t[ 5    \" conference paper
+.\}
+.el .ie !"\\*([B"" .nr t[ 3    \" article in book
+.el .ie !"\\*([R"" .nr t[ 4    \" technical report
+.el .ie !"\\*([I"" .nr t[ 2    \" book
+.el                .nr t[ 0    \" other
+.\\n(t[[
+..
+.de 0[   \" other
+.s[
+.if !"\\*([A"" \\*([A,
+.if !"\\*([T"" \\*([T,
+.if !"\\*([O"" \\*([O\c
+.if !"\\*([D"" , \\*([D\c
+\&.
+.e[
+..
+.de 1[ \" journal article
+.s[
+.if !"\\*([A"" \\*([A,
+.if !"\\*([T"" \\*([T,
+\\fI\\*([J \\*([V\\fP,
+.if !"\\*([N"" \\*([N
+.if !"\\*([D"" (\\*([D),
+.if !"\\*([P"" \\*([P\c
+.if !"\\*([I"" , \\*([I\c
+\\&.
+.if !"\\*([O"" \\*([O.
+.e[
+..
+.de 2[ \" book
+.s[
+.ie !"\\*([A"" \\*([A,
+.el .if !"\\*([E"" \{\
+.       ie \\n([E-1 \\*([E, eds.,
+.       el \\*([E, ed.,\}
+.if !"\\*([T"" \\fI\\*([T\\fP,
+.rm a[
+.if !"\\*([I"" .ds a[ \\*([I
+.if !"\\*([C"" \{\
+.       if !"\\*(a["" .as a[ , \\&
+.       as a[ \\*([C\}
+.if !"\\*([D"" \{\
+.       if !"\\*(a["" .as a[ , \\&
+.       as a[ \\*([D\}
+\\*(a[.
+.if !"\\*([G"" Gov. ordering no. \\*([G.
+.if !"\\*([O"" \\*([O.
+.e[
+..
+.de 3[ \" article in book
+.s[
+.if !"\\*([A"" \\*([A,
+.if !"\\*([T"" \\*([T,
+in \\fI\\*([B\\fP,
+.if !"\\*([V"" vol. \\*([V,
+.if !"\\*([E"" \\*([E (ed.),
+.if !"\\*([I"" \\*([I,
+.if !"\\*([C"" \\*([C,
+.if !"\\*([D"" \\*([D\c
+.if !"\\*([P"" , \\*([P\c
+\\&.
+.if !"\\*([O"" \\*([O.
+.e[
+..
+.de 4[ \" report
+.s[
+.if !"\\*([A"" \\*([A,
+\\*([T,
+\\*([R\c
+.if !"\\*([G"" \& (\\*([G)\c
+.if !"\\*([I"" , \\*([I\c
+.if !"\\*([C"" , \\*([C\c
+.if !"\\*([D"" , \\*([D\c
+\\&.
+.if !"\\*([O"" , \\*([O.
+.e[
+..
+.de 5[ \" conference paper
+.s[
+.if !"\\*([A"" \\*([A,
+.if !"\\*([T"" \\*([T,
+\\fI\\*([J\\fP,
+.if !"\\*([C"" \\*([C\c
+.if !"\\*([D"" , \\*([D\c
+.if !"\\*([P"" , \\*([P\c
+\\&.
+.if !"\\*([O"" , \\*([O.
+.e[
+..
+.de [-   \" clean up after yourself
+.rm [A [B [C [D
+.rm [E [F [G
+.rm [I [J [K
+.rm [N [O [P
+.rm [R [T
+.rm [V [W
+..
+.if t \{ \
+.pl 29.7c	\" page length
+.po 2.5c	\" page offset (left margin)
+.ll 16.5c	\" line length
+.lt 16.5c	\" title length
+.nr LL 16.5c
+.nr )l 29.7c
+.nr hm 2c
+.nr $r 9	\" factor for vertical spacing
+.nr $R \n($r
+.sz 12		\" font size
+.nr pp 12
+.nr sp 12
+.nr tp 12
+.nr fp 10
+.hc ~		\" hyphenation character
+.		\" Umlauts and sharp s
+.ds A \(A:
+.ds O \(O:
+.ds U \(U:
+.ds a \(a:
+.ds o \(o:
+.ds u \(u:
+.ds s \(ss
+.		\"  UMLAUT  \*:u, etc.
+.ds : \v'-0.6m'\h'(1u-(\\n(.fu%2u))*0.13m+0.06m'\z.\h'0.2m'\z.\h'-((1u-(\\n(.fu%2u))*0.13m+0.26m)'\v'0.6m'
+.\}
+.if n \{ \
+.po 0		\" page offset (left margin)
+.ll 78		\" line length
+.lt 78		\" title length
+.nr $r 4	\" factor for vertical spacing
+.nr $R \n($r
+.hc ~		\" hyphenation character
+.		\" Umlaute und scharfes s
+.ds A Ae
+.ds O Oe
+.ds U Ue
+.ds a ae
+.ds o oe
+.ds u ue
+.ds s sz
+.\}
+.de _
+\&\\$1\l'|0\(ul'\\$2
+..
+.de FT		\" font for programs
+.ft C
+.sz -2
+..
+.de FR
+.ft R
+.sz +2
+..
+.de []		\" start to display collected references
+.uh References
+.lp
+..
+.de $0		\" collect table of contents
+.(x
+.ta 2c
+.ie '\\$2''	\\$1
+.el \\$2.	\\$1
+.)x
+..
+.de np
+.nr $p +1
+.ip \\n($p.
+..
+.de SH
+.sp 0.5
+.in -3
+.r \\$1
+.sp 0.5
+.in +3
+..
+.de PP
+.sp 0.5
+..
+.de IP
+.ip \\$1 \\$2
+..
+.de I
+.i \\$1
+..
+.de TH
+..
+.EQ
+delim off
+.EN
+.hc ~
+.ds ], , 
+.b " "
+.sp 1c
+.ta 9c
+.ft R
+.sz 12
+\l'17.1c'
+.nf
+
+
+	Toolbox Introduction
+
+
+	J. Grosch
+
+
+\l'17.1c'
+.sp 12.5c
+\l'17.1c'
+.ft H
+.nf
+	GESELLSCHAFT F\*UR MATHEMATIK
+	UND DATENVERARBEITUNG MBH
+
+	FORSCHUNGSSTELLE F\*UR
+	PROGRAMMSTRUKTUREN
+	AN DER UNIVERSIT\*AT KARLSRUHE
+.r
+\l'17.1c'
+.bp
+.oh '''%'
+.eh '''%'
+.ce 99
+.sz 20
+.b " "
+.sp 2
+Project
+.sp
+.b "Compiler Generation"
+.sp
+.sz 12
+\l'15c'
+.sp
+.sz 16
+.b "Toolbox Introduction"
+.sp 2
+Josef Grosch
+.sp 2
+.sz 14
+Aug. 3, 1992
+.sp
+.sz 12
+\l'15c'
+.sp 2
+Report No. 25
+.sp 2
+Copyright \(co 1992 GMD
+.sp 2
+Gesellschaft f\*ur Mathematik und Datenverarbeitung mbH
+Forschungsstelle an der Universit\*at Karlsruhe
+Vincenz-Prie\*snitz-Str. 1
+D-7500 Karlsruhe
+.ce 0
+.fi
+.bp 1
+.ce 99
+.b "Toolbox Introduction"
+.\" .sp 2
+.\" Josef Grosch
+.\" GMD Forschungsstelle an der Universit\*at Karlsruhe
+.\" Vincenz-Prie\*snitz-Str. 1, D-7500 Karlsruhe, Germany
+.\" grosch@karlsruhe.gmd.de
+.ce 0
+.uh Abstract
+.lp
+This document introduces into the usage of the Karlsruhe Toolbox for Compiler Construction.
+It should be read by those who effectively want to use the toolbox as first document.
+Those who want to learn about the toolbox and its contents in general are referred
+to the document "A Toolbox for Compiler Construction".
+.lp
+This document gives an overview about the documentation of the toolbox. It describes
+how the individual tools interact in order to generate a complete compiler. The general
+structure of a makefile to control the tools is discussed.
+.(z L
+.ce
+Table 1: Document Set
+.sp 0.5
+.TS
+center box;
+l | l | n.
+Filename	Title	Pages
+_
+intro	Toolbox Introduction	12
+toolbox	A Tool Box for Compiler Construction	11
+werkzeuge	Werkzeuge f\*ur den \*Ubersetzerbau	12
+reuse	Reusable Software - A Collection of Modula-2-Modules	24
+reuseC	Reusable Software - A Collection of C-Modules	12
+prepro	Preprocessors	14
+rex	Rex - A Scanner Generator	32
+scanex	Selected Examples of Scanner Specifications	21
+scangen	Efficient Generation of Table-Driven Scanners	15
+lalr-ell	The Parser Generators Lalr and Ell	43
+lalr	Lalr - A Generator for Efficient Parsers	22
+ell	Efficient and Comfortable Error Recovery in Recursive Descent Parsers	15
+highspeed	Generators for High-Speed Front-Ends	12
+autogen	Automatische Generierung effizienter Compiler	10
+ast	Ast - A Generator for Abstract Syntax Trees	36
+toolsupp	Tool Support for Data Structures	11
+ag	Ag - An Attribute Evaluator Generator	27
+ooags	Object-Oriented Attribute Grammars	10
+multiple	Multiple Inheritance in Object-Oriented Attribute Grammars	10
+puma	Puma - A Generator for the Transformation of Attributed Trees	29
+trafo	Transformation of Attributed Trees Using Pattern Matching	16
+minilax	Specification of a MiniLAX-Interpreter	35
+begmanual	BEG - a Back End Generator - User Manual	71
+mtc	Entwurf und Implementierung eines \*Ubersetzers von Modula-2 nach C	105
+estra	Spezifikation und Implementierung der Transformation attributierter B\*aume	79
+.TE
+.)z
+.sh 1 "Document Overview"
+.lp
+The documentation of the Karlsruhe Toolbox for Compiler Construction consists of separate
+user's manuals for the individual tools and additional papers describing further aspects such
+as implementation details, examples, and applications.
+The documents are written in English. For a few of them there are German versions as well.
+Only the two master thesis about \fIestra\fP and \fImtc\fP exist in German, only.
+.sh 2 Format
+.lp
+The documents exist in two formats: Postscript and troff. These are distinguished by the file
+suffixes .ps and .me. The troff files need processing with \fIpic\fP and the device independent
+version of troff called \fIditroff\fP using me-macros by commands like
+.(b
+.FT
+pic | tbl | eqn | ditroff -me
+.)b
+Depending on the format the documents are located in the directories doc.ps or doc.me.
+.sh 2 Documents
+.lp
+Table 1 lists the titles of the documents, the corresponding filenames (without suffix),
+and the number of pages.
+.sh 2 Outlines
+.lp
+In the following the contents of every document is outlined shortly:
+.ip "Toolbox Introduction"
+An introduction for effective users of the toolbox which should be consulted first.
+It gives an overview about the document set and describes how the tools interact.
+.ip "A Tool Box for Compiler Construction"
+Explains the contents of the toolbox and the underlying design. The individual tools are
+sketched shortly and some application experiences are reported.
+.ip "Werkzeuge f\*ur den \*Ubersetzerbau"
+A German version of the previous document.
+.ip "Reusable Software - A Collection of Modula-2-Modules"
+Describes a library of general routines written in Modula-2 which are oriented towards
+compiler construction. The output of some tools has to be linked with this library.
+.ip "Reusable Software - A Collection of C-Modules"
+Describes a library of general routines written in C which are oriented towards
+compiler construction. The output of some tools has to be linked with this library.
+.ip "Preprocessors"
+Describes several preprocessors for the extraction of scanner specifications out of parser
+specifications and for the conversion of \fIlex\fP/\fIyacc\fP input to \fIrex\fP/\fIlalr\fP
+input or vice versa. There are seven preprocessors:
+.(b
+cg -xz	converts an attribute grammar to \fIlalr\fP input
+rpp	combines a grammar and a scanner specification to \fIrex\fP input
+l2r	converts \fIlex\fP input to \fIrex\fP input
+y2l	converts \fIyacc\fP input to \fIlalr\fP input
+r2l	converts \fIrex\fP input to \fIlex\fP input
+cg -u	converts an attribute grammar to \fIyacc\fP input
+bnf	converts a grammar from EBNF to BNF
+.)b
+.ip "Rex - A Scanner Generator"
+The user's manual for the scanner generator \fIrex\fP.
+.ip "Selected Examples of Scanner Specifications"
+A collection of scanner specifications for \fIrex\fP dealing mostly with pathological cases.
+.ip "Efficient Generation of Table-Driven Scanners"
+Describes internals of the scanner generator \fIrex\fP like the so-called tunnel
+automaton and the linear time algorithm for constant regular expressions.
+.ip "The Parser Generators Lalr and Ell"
+The user's manual for the LALR(1) parser generator \fIlalr\fP and the
+LL(1) parser generator \fIell\fP. It describes among other things the input language common to both
+generators.
+.ip "Lalr - A Generator for Efficient Parsers"
+Describes details of the implementation of the parsers generated by \fIlalr\fP and further
+outstanding features of this tool.
+.ip "Efficient and Comfortable Error Recovery in Recursive Descent Parsers"
+Describes the implementation of the parsers generated by \fIell\fP especially with respect to
+automatic error recovery.
+.ip "Generators for High-Speed Front-Ends"
+A summary of the highlights of the scanner and parser generators and a comparison to
+\fIlex\fP/\fIyacc\fP and \fIflex\fP/\fIbison\fP.
+.ip "Automatische Generierung effizienter Compiler"
+A German version of the previous document.
+.ip "Ast - A Generator for Abstract Syntax Trees"
+The user's manual of \fIast\fP, a tool supporting the definition and manipulation of attributed
+trees and graphs.
+.ip "Tool Support for Data Structures"
+Also describes \fIast\fP, but less precise than the previous document.
+.ip "Ag - An Attribute Evaluator Generator"
+The user's manual of \fIag\fP, a generator for evaluators of ordered attribute grammars (OAG).
+.ip "Object-Oriented Attribute Grammars"
+Also describes \fIag\fP, like the previous document, with emphasis on the object-oriented
+features.
+.ip "Multiple Inheritance in Object-Oriented Attribute Grammars"
+Extends the object-oriented attribute grammars described in the previous document to
+multiple inheritance.
+.ip "Spezifikation und Implementierung der Transformation attributierter B\*aume"
+Diploma thesis in German about the design and implementation of \fIestra\fP, a generator for the
+transformation of attributed trees.
+.ip "Puma - A Generator for the Transformation of Attributed Trees"
+The user's manual of \fIpuma\fP, a tool for the 
+transformation of attributed trees which is based on pattern matching and unification.
+.ip "Transformation of Attributed Trees Using Pattern Matching"
+Also describes \fIpuma\fP using a more introductory style and compares it to similar tools.
+.ip "Specification of a MiniLAX-Interpreter"
+The annotated input to generate a compiler for the example language MiniLAX.
+.ip "BEG - a Back End Generator - User Manual"
+The user's manual of the back-end-generator \fIbeg\fP.
+.ip "Entwurf und Implementierung eines \*Ubersetzers von Modula-2 nach C"
+Diploma thesis in German about the design and implementation of the Modula-to-C translator
+\fImtc\fP.
+.lp
+For readers intending to use the tools the following documents are of primary interest:
+.(b
+.ta 3c
+intro	Toolbox Introduction
+toolbox	A Tool Box for Compiler Construction
+prepro	Preprocessors
+rex	Rex - A Scanner Generator
+lalr-ell	The Parser Generators Lalr and Ell
+ast	Ast - A Generator for Abstract Syntax Trees
+ag	Ag - An Attribute Evaluator Generator
+puma	Puma - A Generator for the Transformation of Attributed Trees
+begmanual	BEG - a Back End Generator - User Manual
+.)b
+.(z
+.PS
+linewid	= linewid * 1.2
+boxwid	= boxwid * 1.7
+boxht	= boxht * 1.2
+circlerad = circlerad * 1.2
+bh	= boxht * 1.7
+bw	= boxwid * 0.5
+
+	right
+
+S1:	box wid bw height bh invis
+SP:	box wid boxwid * 1.6 "Scanner spec:" "regular expressions"
+	arrow
+T:	circle "rex"
+	arrow
+I1:	box "Scanner"
+
+S2:	box at S1 - (0, bh) wid bw height bh invis
+P:	box wid boxwid * 1.6 "Parser spec:" "concrete syntax (grammar)" "mapping: concrete \(-> abstract"
+	arrow
+	circle "lalr" "ell"
+	arrow
+I2:	box "Parser"
+
+S3:	box at S2 - (0, bh) wid bw height bh invis
+	box wid boxwid * 1.6 "Tree spec:" "abstract syntax" "(grammar)"
+	arrow
+	circle "ast"
+	arrow
+I3:	box "Tree"
+
+S4:	box at S3 - (0, bh) wid bw height bh invis
+	box wid boxwid * 1.6 "Semantics spec:" "attribute grammar"
+	arrow
+	circle "ag"
+	arrow
+I4:	box "Semantics"
+
+S5:	box at S4 - (0, bh) wid bw height bh invis
+	box wid boxwid * 1.6 "Trafo spec:" "mapping:" "abstract \(-> intermediate"
+	arrow
+	circle "puma"
+	arrow
+I5:	box "Trafo"
+
+S6:	box at S5 - (0, bh) wid bw height bh invis
+	box wid boxwid * 1.6 "Intermediate spec:" "intermediate language" "(grammar)"
+	arrow
+	circle "ast"
+	arrow
+I6:	box "Intermediate"
+
+S7:	box at S6 - (0, bh) wid bw height bh invis
+	box wid boxwid * 1.6 "Codegenerator spec:" "mapping:" "intermediate \(-> machine"
+	arrow
+	circle "beg"
+	arrow
+I7:	box "Codegenerator"
+
+	box invis "Specification" at SP + (0, bh)
+	box invis "Tool" at T + (0, bh)
+	box invis "Compiler" "Module" at I1 + (0, bh)
+
+	line from I1.n up boxht * 0.9 <-
+	arrow from I1.s to I2.n
+	arrow from I2.s to I3.n
+	arrow from I3.s to I4.n <->
+	arc from I3.se to I5.ne at I4 -> cw
+	arrow from I5.s to I6.n
+	arrow from I6.s to I7.n
+	arrow from I7.s down boxht * 0.9
+.PE
+.sp 0.5
+.ce
+Fig. 1: Compiler Structure
+.)z
+.ne 2c
+Of secondary interest might be:
+.(b
+.ta 3c
+reuse	Reusable Software - A Collection of Modula-2-Modules
+scanex	Selected Examples of Scanner Specifications
+.)b
+The other documents either describe internals of the tools or are excerpts of the above.
+.sh 1 "Generating a Compiler"
+.lp
+A compiler usually consists of several modules where every module handles a certain task.
+The toolbox gives very much freedom for the design of a compiler and supports various
+structures.
+.pp
+Figure 1 presents our preferred compiler structure. In the right column are the main modules
+that constitute a compiler. The left column contains the necessary specifications. In
+between there are the tools which are controlled by the specifications and which produce the
+modules. The arrows represent the data flow in part during generation time and in part during
+run time of the compiler.
+.pp
+In principle the compiler model works as follows: A scanner and a parser read the source,
+check the concrete syntax, and construct an abstract syntax tree. They may perform several
+normalizations, simplifications, or transformations in order to keep the abstract syntax
+relatively simple. Semantic analysis is performed on the abstract syntax tree. Optionally
+attributes for code generation may be computed. Afterwards the abstract syntax tree is
+transformed into an intermediate representation. The latter is the input of the code generator
+which finally produces the machine code.
+.pp
+The picture in Figure 1 is relatively abstract by just listing the main tasks of a compiler.
+Every task is generated by a tool out of a separate specification which is oriented towards
+the problem at hand. The generation processes seem to be independent of each other.
+.(z
+.PS
+scale	= 2.54
+boxwid	= 2.0
+boxht	= 1.0
+circlerad = 0.75
+linewid	= 1.2
+lineht	= 0.75
+
+	right
+SC:	box ".scan"
+	arrow
+RPP:	circle "rpp"
+	arrow
+	box ".rex"
+	arrow
+REX:	circle "rex"
+	arrow
+
+PA:	box ".pars" at SC + (0, -4)
+	arrow
+XZ:	circle "cg -xz"
+	arrow
+	box ".lalr"
+	arrow
+LALR:	circle "lalr" "bnf"
+	arrow
+
+	arrow at XZ.n up
+	box "Scanner" ".rpp"
+	arrow
+
+	right
+DOT:	box ".ell" at PA + (0, -2)
+ELL:	circle "ell" at LALR + (0, -2)
+	arrow
+	arrow from DOT.e to ELL.w
+
+	down
+AG:	circle "ag/cg" at XZ + (0, -4)
+	arrow
+STORE:	box ".ST"
+	arrow
+AST:	circle "ast/cg"
+	arrow
+	box ".TS"
+	arrow
+PUMA:	circle "puma"
+
+	box ".cg" at STORE + (-3, 0)
+	arrow from last box.ne to AG.sw
+	arrow from last box.se to AST.nw
+	box ".puma" at PUMA + (-3, 0)
+	arrow from last box.e to PUMA.w
+
+SO:	box "Source" at REX + (3, 0); arrow right at last box.e
+SCA:	box "Scanner" at last box + (0, -2); arrow right at last box.e
+PA:	box "Parser" at last box + (0, -2); arrow right at last box.e
+ER:	box "Errors" at last box + (0, -2); arrow right at last box.e
+EV:	box "Eval" at last box + (0, -2); arrow right at last box.e
+SU:	box "Support" at last box + (0, -2); arrow right at last box.e
+TR:	box "Tree" at last box + (0, -2); arrow right at last box.e
+RE:	box "Reuse" at last box + (0, -2); arrow right at last box.e
+TRA:	box "Trafo" at last box + (0, -2); arrow right at last box.e
+
+	arrow from REX.se to SCA.nw
+	arrow from LALR.se to ER.nw
+	arrow from ELL.ne to PA.sw
+	arrow from AG.e to EV.w
+	arrow from AST.e to TR.w
+	arrow from PUMA.e to TRA.w
+
+	down
+	arrow from SO + (boxwid * 0.5 + linewid, 0) to TRA + (boxwid * 0.5 + linewid, -1.5)
+	circle "compile" "+ link"
+	arrow
+	box ".exe"
+.PE
+.sp
+.ce
+Fig. 2: Interaction and data flow among the tools
+.)z
+.pp
+For a real user a more closer look than the one of Figure 1 is necessary. Figure 2
+describes the actual interaction among the tools.
+It describes the data flow starting from specifications and ending in
+an executable compiler. Boxes represent files, circles represent tools, and arrows show the
+data flow. The input specifications are contained in the files at the left-hand side.
+The tools generate modules containing source code in the implementation languages
+C or Modula-2. This modules are shown at the right-hand side. Every module conists
+of two files with the following suffixes:
+.ta 2c
+.ip "implementation language C:"
+\&.h	header or interface file
+.br
+\&.c	implementation part
+.ip "implementation language Modula-2:"
+\&.md	definition module
+.br
+\&.mi	implementation module
+.pp
+Files outside the left- and right-hand side columns contain intermediate data.
+The various kinds of information in the files are distinguished by different file types
+as explained in Table 2.
+The few dependencies between tools are shown by the data flow via intermediate files. 
+These dependencies are explained in more detail in the next sections.
+.(b L
+.sp 0.5
+.ce
+Table 2: File Types
+.sp 0.5
+.TS
+center box;
+l | l.
+Suffix	Meaning
+_
+\&.pars	scanner and parser specification (including S-attribution)
+\&.scan	rest of scanner specification
+\&.rpp	intermediate data: scanner description extracted from .pars
+\&.rex	scanner specification understood by \fIrex\fP
+\&.lalr	parser specification understood by \fIlalr\fP
+\&.ell	input for \fIell\fP (= input for \fPlalr\fP with EBNF constructs)
+\&.cg	input for \fIast\fP and \fIag\fP
+\&.puma	input for \fIpuma\fP
+\&.ST	intermediate data: storage assignment for attributes
+\&.TS	intermediate data: description of attributed tree
+_
+\&.h	C source: header or interface file
+\&.c	C source: implementation part
+\&.md	Modula-2 source: definition module
+\&.mi	Modula-2 source: implementation module
+\&.exe	compiled and linked executable compiler
+.TE
+.)b
+.sh 2 "Scanning and Parsing"
+.lp
+Two parser generators are contained in the toolbox. First, the user has to decide which one
+to use. I will not start arguing here in favour of one or the other grammar class.
+If I am asked, I recommend to use \fIlalr\fP. Both parser generators and their common
+input language (types .lalr and .ell) are documented in
+"The Parser Generators Lalr and Ell".
+From the syntactic point of view both tools understand almost the same input language. The
+only incompatibility concerns the different notation to access attributes. From the semantic
+point of view there are of course differences with respect to the grammar class and the kind
+of attribution evaluable during parsing. Whereas \fIlalr\fP accepts LALR(1) grammars and is able to
+evaluate and S-attribution (SAG), \fIell\fP accepts LL(1) grammars and is able to evaluate an
+L-attribution (LAG). Both, \fIlalr\fP and \fIell\fP generate a module with the default
+name \fIParser\fP which serves as basename for the file name, too. This module name can be
+chosen freely using an appropriate directive in the input of the parser generators.
+Both parser generators can also supply a module called \fIErrors\fP. This is a
+simple prototype for handling error messages that just prints the messages.
+However, it is recommended to use the more comfortable module \fIErrors\fP from the library
+.i reuse .
+In simple cases, this module is just linked to the user's program. If modifications are
+necessary this module should be copied from the library along with its companion module
+.i Positions
+into the user's directory. The module
+.i Positions
+defines a data structure to describe source positions.
+.pp
+The scanner generator \fIrex\fP and its input language (type .rex) are documented in
+"Rex - A Scanner Generator".
+\fIrex\fP generates a module with the default name \fIScanner\fP which serves as basename
+for the file name, too.
+.i rex
+can also generate a module called \fISource\fP which
+isolates the task of providing input for the scanner.
+By default it reads from a file or from standard input.
+Again, it is recommended to use the module \fISource\fP from the library
+.i reuse .
+In simple cases, this module is just linked to the user's program. If modifications are
+necessary or the module should provide input for a scanner with a name different to
+.i Scanner
+then this module must be requested from
+.i rex .
+.pp
+It is possible to combine several scanners and parsers either generated by
+.i lalr
+or
+.i ell
+into one program as long as different module names are chosen.
+.pp
+If the parser generator \fIell\fP is to be used, the inputs of \fIrex\fP and \fIell\fP have
+to be specified in the languages directly understood by these tools (types .rex and .ell).
+If the parser generator \fIlalr\fP is to be used, a more comfortable kind of input language is
+available. It is possible to extract most of a scanner specification out of a parser grammar.
+Therefore it is recommended to specify scanner and parser by two files of types .scan and
+\&.pars. Further advantageous of this approach are that concrete syntax, abstract syntax, and
+attribute grammar are written in one common language (types .pars and .cg) and that the
+attribution to be evaluated during parsing is written using named attributes.
+This attribution is checked for completeness and whether it obeys the SAG property.
+The language to describe concrete and abstract syntax is documented in:
+"Ast - A Generator for Abstract Syntax Trees".
+The addition of attribute declarations and attribute computations are documented in:
+"Ag - An Attribute Evaluator Generator".
+The use of this language especially as input for scanner and parser
+generation is documented in:
+"Preprocessors".
+This document also describes the preprocessors \fIcg -xz\fP and \fIrpp\fP. \fIcg -xz\fP
+converts input of type .pars into input directly understood by \fIlalr\fP (type .lalr)
+and it extracts most of the scanner specification which is written on the intermediate file
+named Scanner.rpp. The \fIrex\fP preprocessor \fIrpp\fP merges this extracted scanner
+specification with additional parts provided by the user (type .scan) and produces
+input directly understood by \fIrex\fP. The language in files of type .scan is an extension
+of the input language of \fIrex\fP. These extensions are also documented in:
+"Preprocessors".
+.(z L
+.sp 0.5
+.ce
+Table 3: Library Units Needed by Generated Modules
+.sp 0.5
+.TS
+center box;
+l | l | l | l.
+Tool	Module	C	Modula-2
+_
+rex	Source	System	System
+rex	Scanner	System, Source	System, Checks, Memory, Strings, IO,
+			Position, Source
+lalr	Parser	Memory, DynArray, Sets,	System, DynArray, Sets, Strings
+		Errors	Positions, Errors
+lalr	Errors	System, Sets, Idents,	System, Strings, Idents, Sets, IO,
+		Positions	Positions
+ell	Parser	Errors	System, Strings, Positions, Errors
+ell	Errors	System, Sets, Idents,	System, Strings, Idents, Sets, IO,
+		Positions	Positions
+reuse	Errors	System, Memory, Sets,	System, Memory, Strings, StringMem,
+		Idents, Positions	Idents, Sets, IO, Positions, Sort
+ast	Tree	System, General, Memory,	System, General, Memory, DynArray,
+		DynArray, StringMem,	IO, Layout, StringMem, Strings,
+	 	Idents, Sets, Positions	Idents, Texts, Sets, Positions
+ag	Eval	-	-
+puma	Trafo	System	System, IO
+.TE
+.)z
+.sh 2 "Semantic Analysis and Transformation"
+.lp
+Our preferred compiler design constructs an abstract syntax tree as underlying data structure
+for semantic analysis. Afterwards this tree is usually mapped to some kind of intermediate
+language by a phase termed transformation.
+.pp
+The syntax tree as central data structure is managed by the module \fITree\fP. This module
+is generated by the tool \fIast\fP out of a specification in a file of type .cg.
+The tool \fIast\fP and its input language are documented in:
+"Ast - A Generator for Abstract Syntax Trees".
+The construction of trees is usually done during parsing. It is specified within the semantic
+actions of the input of the parser generator.
+.pp
+One possibility for the specification of semantic analysis is the use of an attribute grammar.
+The tool \fIag\fP generates an evaluator module (named \fIEval\fP by default) out of an
+attribute grammar. As this tool also has to know the structure of the abstract syntax tree
+both, \fIast\fP and \fIag\fP usually process the same input file.
+The tool \fIag\fP and the extensions to the input language of \fIast\fP for attribute
+grammars are documented in:
+"Ag - An Attribute Evaluator Generator".
+.pp
+The optimizer of \fIag\fP decides how to implement attributes. They can be either stored
+in the tree or in global stacks or global variables. This information is communicated
+from \fIag\fP to \fIast\fP in files of type .ST. (This feature is not implemented yet.)
+.pp
+The tool \fIpuma\fP generates transformers (named \fITrafo\fP by default) that map
+attributed trees to arbitrary output. As this tool also has to know about the structure
+of the tree this information is communicated from \fIast\fP to \fIpuma\fP via a file
+of type .TS. The tool \fIpuma\fP and its input language are documented in:
+"Puma - A Generator for the Transformation of Attributed Trees".
+.pp
+The names of the modules produced by the tools \fIast\fP, \fIag\fP, and \fIpuma\fP can be
+controlled by directives in the
+input. Figure 2 uses the default names. By chosing different names it is possible
+to combine several tree modules, attribute evaluators, and transformers in one program.
+.(z L
+.sp 0.5
+.ce
+Table 4: Modules in the Library Reuse
+.sp 0.5
+.TS
+box center;
+l | l | c | c.
+Module	Task	C	Modula-2
+_
+Memory	dynamic storage (heap) with free lists          	y	y
+Heap	dynamic storage (heap) without free lists          	-	y
+DynArray	dynamic and flexible arrays                    	y	y
+Strings	string handling                                        	-	y
+StringMem	string memory                              	y	y
+Idents	identifier table - unambiguous encoding of strings	y	y
+Lists	lists of arbitrary objects                             	-	y
+Texts	texts are lists of strings (lines)                    	-	y
+Sets	sets of scalar values (without run time checks)        	y	y
+SetsC	sets of scalar values (with run time checks)          	-	y
+Relations	binary relations between scalar values         	-	y
+IO	buffered input and output                              	-	y
+StdIO	buffered IO for standard files                    	-	y
+Layout	more routines for input and output                    	-	y
+Positions	handling of source positions	y	y
+Errors	error handler for parsers and compilers	y	y
+Source	provides input for scanners	y	y
+Sort	quicksort for arrays with elements of arbitrary type	-	y
+System	interface to the operating system	y	y
+General	miscellaneous functions                              	y	y
+.TE
+.)z
+.sh 2 "Compiling and Linking"
+.lp
+All the source modules generated by the tools have to be compiled by a compiler appropriate
+for the implementation language (C or Modula-2). Additional hand-written modules can be added
+as necessary. In Figure 2 the module \fISupport\fP indicates this possibility.
+In the last step all binaries have to be linked together with a few modules of the
+library \fIreuse\fP to yield an executable compiler.
+.pp
+The use of modules from the library \fIreuse\fP depends on the implementation language and
+the used tools. There is a C and a Modula-2 version of this library.
+The Modula-2 version is documented in:
+"Reusable Software - A Collection of Modula-2-Modules".
+The C version is documented in:
+"Reusable Software - A Collection of C-Modules".
+Table 3 lists the library units needed by tool generated modules.
+Additionally the user may engage further modules from this library for various tasks.
+Table 4 lists the modules that might be of interest. The right-hand side columns describe the
+availability of the modules with regard to the implementation language.
+.sh 1 Makefile
+.lp
+The tools of the toolbox are conveniently controlled by the UNIX program make and an
+appropriate makefile -
+at least under the UNIX operating system. This eases the invocation of the tools and minimizes
+the amount of regeneration after changes. Figure 2 can be used to derive a makefile because
+it describes most of the dependencies among tools and files. The following makefiles control
+the generation of compilers for the example language MiniLAX in the target languages C and
+Modula-2.
+The annotated specification of this language is documented in:
+"Specification of a MiniLAX-Interpreter".
+The makefiles are examples a user can start with.
+.pp
+The makefiles in the next sections deviate in the following from the fundamental structure
+presented in Figure 2:
+.ip -
+The attribute evaluator module is called \fISemantics\fP instead of \fIEval\fP.
+.ip -
+The transformation module is called \fIICode\fP instead of \fITrafo\fP.
+.ip -
+The hand-written modules are called \fIICodeInter\fP and \fIminilax\fP.
+The latter constitutes the main program.
+.ip -
+There are two support modules for semantic analysis called \fIDefinitions\fP and \fITypes\fP.
+These are generated by tools (\fIast/cg\fP and \fIpuma\fP), too.
+.sh 2 C
+.lp
+The macro LIB specifies the directory where the compiled library \fIreuse\fP is located. The
+name of this library is \fIlibreuse.a\fP.
+The -I flag in the macro CFLAGS specifies the directory where the header files
+of the library modules are located.
+.pp
+The first command (target minilax) is for linking the compiled modules to an executable
+compiler. The succeeding entries describe the dependencies during the generation phase and
+the invocation of the tools.
+The dependencies before the target lint are those needed during compilation.
+.sp
+.nf
+.FT
+LIB     = $(HOME)/lib
+INCDIR  = $(LIB)/include
+CFLAGS  = -I$(INCDIR)
+CC      = cc
+
+SOURCES = Scanner.h Scanner.c Parser.h Parser.c Tree.h Tree.c \\
+          Semantics.h Semantics.c Types.h Types.c Definitions.h Definitions.c \\
+          ICode.h ICode.c ICodeInter.h ICodeInter.c minilax.c
+
+BINS    = minilax.o Scanner.o Parser.o Tree.o \\
+          Types.o Definitions.o Semantics.o ICode.o ICodeInter.o
+.bp
+minilax:        $(BINS)
+        $(CC) $(CFLAGS) $(BINS) $(LIB)/libreuse.a -o minilax -lm 
+
+Scanner.rpp Parser.lalr:        minilax.pars
+        cg -cxzj minilax.pars;
+
+minilax.rex:    minilax.scan Scanner.rpp
+        rpp < minilax.scan > minilax.rex;
+
+Scanner.h Scanner.c:    minilax.rex
+        rex -cd minilax.rex;
+
+Parser.h Parser.c:      Parser.lalr
+        lalr -c -d Parser.lalr;
+
+Tree.h Tree.c:  minilax.cg
+        cg -cdimRDI0 minilax.cg;
+
+Semantics.h Semantics.c:        minilax.cg
+        cg -cDI0 minilax.cg;
+
+Definitions.h Definitions.c Definitions.TS:     Definitions.cg
+        cg -cdim4 Definitions.cg;
+
+Tree.TS:        minilax.cg
+        echo SELECT AbstractSyntax Output | cat - minilax.cg | cg -c4
+
+Types.h Types.c:        Types.puma Tree.TS
+        puma -cdipk Types.puma;
+
+ICode.h ICode.c:        ICode.puma Tree.TS Definitions.TS
+        puma -cdi ICode.puma;
+
+Parser.o:       Parser.h Scanner.h Tree.h Types.h Definitions.h
+Semantics.o:    Semantics.h Tree.h Definitions.h Types.h
+Tree.o:         Tree.h
+Definitions.o:  Definitions.h Tree.h
+Types.o:        Tree.h Types.h
+ICode.o:        Tree.h Types.h ICodeInter.h
+minilax.o:      Scanner.h Parser.h Tree.h Semantics.h Definitions.h ICode.h \\
+                ICodeInter.h Types.o
+
+lint:   $(SOURCES)
+        lint -I$(HOME)/reuse/c -u *.c
+
+clean:
+        rm -f Scan*.? Parser.? Tree.? Sema*.? Defi*.? Types.? ICode.? *.TS
+        rm -f core _Debug minilax *Tab mini*.rex Parser.lalr Scan*.rpp yy*.w *.o
+
+\&.c.o:
+        $(CC) $(CFLAGS) -c $*.c;
+.FR
+.fi
+.bp
+.sh 2 Modula-2
+.lp
+The first command (target minilax) describes compilation and linking using the GMD Modula-2
+compiler MOCKA. This compiler does its own dependency analysis among the sources. Therefore
+the makefile does not contain any dependency descriptions between sources and binaries.
+The -d flag of the compiler call mc specifies the directory where the library \fI reuse\fP is
+located. The rest of the makefile describes the generation phase and the invocation of the
+tools.
+.sp
+.nf
+.FT
+SOURCES = Scanner.md Scanner.mi Parser.md Parser.mi \\
+          Tree.md Tree.mi Semantics.md Semantics.mi \\
+          Types.md Types.mi Definitions.md Definitions.mi \\
+          ICode.md ICode.mi ICodeInter.md ICodeInter.mi minilax.mi
+
+minilax:        $(SOURCES)
+        echo p minilax | mc -d ../../reuse/src
+
+Scanner.rpp Parser.lalr:        minilax.pars
+        cg -xzj minilax.pars;
+
+minilax.rex:    minilax.scan Scanner.rpp
+        rpp < minilax.scan > minilax.rex;
+
+Scanner.md Scanner.mi Scanner.Tab:      minilax.rex
+        rex -d minilax.rex;
+
+Parser.md Parser.mi Parser.Tab: Parser.lalr
+        lalr -d Parser.lalr;
+
+Tree.md Tree.mi:        minilax.cg
+        cg -dimRDI0 minilax.cg;
+
+Semantics.md Semantics.mi:      minilax.cg
+        cg -DI0 minilax.cg;
+
+Definitions.md Definitions.mi Definitions.TS:   Definitions.cg
+        cg -dim4 Definitions.cg;
+
+Tree.TS:        minilax.cg
+        echo SELECT AbstractSyntax Output | cat - minilax.cg | cg -4
+
+Types.md Types.mi:      Types.puma Tree.TS
+        puma -dipk Types.puma;
+
+ICode.md ICode.mi:      ICode.puma Tree.TS Definitions.TS
+        puma -di ICode.puma;
+
+clean:
+        rm -f Scan*.m? Parser.m? Tree.m? Sema*.m? Defi*.m? Types.m? ICode.m?
+        rm -f core *.TS *.[dimor] _Debug minilax *Tab mini*.rex Parser.lalr Scan*.rpp
+.FR
+.fi
+
+.bp 1
+.lp
+.b Contents
+.sp
+.xp

@@ -1,0 +1,258 @@
+
+This bulletin is sent to people that  have  ordered  Cocktail  from  GMD
+Karlsruhe,  are using it, or had email interaction with me.  Cocktail is
+the Compiler-Compiler Toolbox developed at GMD Karlsruhe.
+
+
+       This is to announce that professional support for Cocktail
+                is now available from its main creator.
+
+
+What is Cocktail?
+
+Cocktail is the Compiler-Compiler Toolbox developed  at  GMD  Karlsruhe.
+The  Cocktail  tools lay emphasis on practical usability and efficiency.
+The tools generate compiler parts out of specifications that are as  ef-
+ficient as hand-written ones. The use of tools significantly reduces the
+construction effort and increases the reliability of the generated  com-
+pilers.  The toolbox supports almost all phases of compiler construction
+by more or less independent tools that generate C, C++, Modula-2, or (in
+part)  Eiffel  source  code.   Cocktail runs on all variants of Unix, as
+well as under Linux, MS-DOS and OS/2 and  contains  the  following  main
+tools:
+
+   - Rex     scanner generator
+   - Lalr    LALR(1) parser generator
+   - Ell     LL(1) parser generator
+   - Ast     generator for abstract syntax trees
+   - Ag      generator for attribute evaluators
+   - Puma    transformation of attributed trees using pattern matching
+
+
+
+Support for Cocktail
+
+Support for Cocktail is available in two forms: First, users of Cocktail
+can be supported with activities such as:
+
+   - Consulting
+   - Training
+   - Maintenance
+   - Updates
+   - Development (e. g. new target languages, modified or new tools)
+   - Research
+
+Second, application projects using the Cocktail toolbox can  be  carried
+out.   This  will  be  projects  which  in  general involve some kind of
+language processors such as:
+
+   - Compilers (for standard languages or special purpose languages)
+   - Compiler Parts (grammars e. g. for Fortran 90 or Cobol 85,
+                Syntax-Analyzers, Front-Ends, Code-Generators)
+   - Language Design
+   - Source-to-Source Translators (e. g. Modula-2 to C)
+   - Dialect Conversion (e. g. DEC-Fortran to ANSI-Fortran)
+   - Programming Convention Checkers
+   - Software Complexity Measures
+     ...
+
+
+
+Maintenance
+
+Software maintenance includes new releases of the software, new versions
+of  the documentation, description of updates, and processing of written
+trouble reports or suggestions over a period of 12 months. I will  reply
+to  written reports with a written response and correct reproducible er-
+rors within a reasonable time.  On request, hot-line service can be  of-
+fered.
+
+
+Legal Status
+
+Cocktail has been developed during the last years at the Karlsruhe  sub-
+sidiary  of  GMD - the German National Research Center for Computer Sci-
+ence.  Although Cocktail was supplied in  the  past  with  the  complete
+source code, it is copyrighted software, not public domain.  Cocktail as
+well as its output could be used for  any  purpose,  whether  education,
+research,  or  commercial  application.  The Cocktail toolbox was unsup-
+ported software - without warranty  and  maintenance.   GMD  assumed  no
+responsibility for the use or reliability of its software.  All versions
+of Cocktail up to Version 9309 can still be used under these  conditions
+- as unsupported software.
+
+Now Cocktail will be professionally supported by its main creator.   Fu-
+ture versions of Cocktail will be distributed under a license agreement.
+There will be two kinds of license agreements:  The  commercial  license
+allows  the  use  of Cocktail and of its output for any purpose, whether
+education, research, or commercial application.   The  research  license
+allows  the  use  of  Cocktail and of its output only for non-commercial
+usage such as education and research.  The licenses  allow  the  use  of
+Cocktail  on  any platform and from any number of users within one site.
+Maintenance is available for Cocktail from Version 9311.
+
+
+Products
+
+The table below lists the available software.  The  Cocktail  tools  are
+available  either  as  single  tools or as the complete toolbox. Several
+tools come with support programs: For example the scanner generator  rex
+is  distributed  with  the programs rpp, l2r, and r2l. The library reuse
+and the collection of scanner and parser specifications "specs"  is  au-
+tomatically  included with every tool.  The tools are distributed in the
+form of obfuscated C sources thus guaranteeing portability over  a  wide
+range  of  platforms.   The  software  is supplied with documentation in
+machine-readable formats: Postscript, troff, or ASCII. On request, docu-
+mentation can be supplied on paper.
+
+Product   Description
+
+cocktail  Compiler-Compiler Toolbox
+   rex    Scanner Generator
+   lalr   LALR(1) Parser Generator (will be replaced by lark)
+   ell    LL(1) Recursive Descent Parser Generator
+   ast    Generator for Abstract Syntax Trees
+   ag     Generator for Attribute Evaluators
+   puma   Transformation of Attributed Trees based on Pattern Matching
+   reuse  Library of Reusable Modules
+   specs  Example Grammars for Cocktail for: Ada, C, C++, Modula-2,
+          Modula-3, Oberon, Oberon-2, Occam, Pascal, Sather, Sql
+
+rex       Scanner Generator
+   rpp    Rex PreProcessor
+   l2r    Transforms Lex input to Rex input
+   r2l    Transforms Rex input to Lex input
+
+lalr      LALR(1) Parser Generator
+   bnf    Transforms Grammars from Extended BNF to Plain BNF
+   lpp    Lalr PreProcessor
+   y2l    Transforms Yacc input to Lalr input
+   l2cg   Transforms Lalr input to Ag   input
+
+lark      LR(1) Parser Generator (available Nov. 1993)
+   bnf    Transforms Grammars from Extended BNF to Plain BNF
+   lpp    Lark PreProcessor
+   y2l    Transforms Yacc input to Lark input
+   l2cg   Transforms Lark input to Ag   input
+
+ell       LL(1) Recursive Descent Parser Generator
+
+ast       Generator for Abstract Syntax Trees
+
+ag        Generator for Attribute Evaluators
+
+puma      Transformation of Attributed Trees based on Pattern Matching
+
+reuse     Library of Reusable Modules
+   src    Library of Reusable Modules in Modula-2
+   c      Library of Reusable Modules in C
+
+specs     Example Grammars for Cocktail for: Ada, C, C++, Modula-2,
+          Modula-3, Oberon, Oberon-2, Occam, Pascal, Sather, Sql
+
+mtc-1     Modula-2 to C Translator (global pointers)
+
+mtc-2     Modula-2 to C Translator (static links)
+
+cobol85   Scanner and Parser Specification for Cobol 85
+
+ftn90     Scanner and Parser Specification for Fortran 90
+
+ftn77     Scanner and Parser Specification for Fortran 77
+
+
+New Features
+
+With respect to Version 9209 the next release of Cocktail (Version 9311)
+will have the following new features:
+
+- The tools rex, lalr, and ell do not generate table files any more  for
+  the target language Modula-2. Instead, an initialization code based on
+  compressed strings is used. Consequently, all tools do not need  table
+  files  any more and the problem whether these files are configured for
+  little-endian  or  big-endian  machines  is  eliminated.  The   target
+  'bin.conv' has been removed from all Makefiles.
+
+- The tools rex and lalr  can  generate  scanners  and  parsers  in  the
+  language Eiffel.
+
+- A restriction in the size of the grammars processed by lalr  has  been
+  removed allowing the generation of parsers for really huge grammars.
+
+- Lark is a complete  new  implementation  of  a  parser  generator  for
+  LALR(1)  and  LR(1)  grammars. It is compatible with lalr and will re-
+  place lalr in the future. It features:
+  + processes LALR(1) and LR(1) grammars
+  + fast generation of information about LR-conflicts
+  + trace of parsing steps during run-time available
+  + supports named attributes as well as the $i notation
+  + semantic predicates control parsing by conditions
+  + support for backtracking parsing
+  + includes bnf - no preprocessing necessary
+
+-  As  a  first  step  to  list-processing  ast  generates  a  procedure
+  ForallTREE  that  allows to perform an operation for all elements of a
+  list.
+
+- Besides evaluators based on recursive procedures, ag can now  generate
+  evaluators  based  on  a stack automaton. This results in a tremendous
+  reduction of the stack consumption. The recursive evaluators  are  now
+  optimized with elimination of tail recursion.
+
+- The code generated by puma is optimized with elimination of  tail  re-
+  cursion, too.
+
+- Two versions of the Modula-2 to C Translator are available. One  prob-
+  lem  in translating Modula-2 to C is that nested procedure definitions
+  have to be transformed into unnested procedures and that  a  mechanism
+  to access intermediate-level variables is necessary. mtc-1 uses global
+  pointers to access intermediate-level variables. This does  not  allow
+  the  use  of  coroutines. mtc-2 uses static links and introduces addi-
+  tional procedure parameters and thus allows the use of coroutines.
+
+
+Prices
+
+All prices are valid for purchase orders received until Dec.  31,  1993.
+The  prices are in DM, 1 US$ = 1.60 DM. Add 15% sales tax (MwSt) for all
+orders placed within Germany.
+
+Product       Commercial    Research      Software
+              License       License       Maintenance
+
+cocktail        20000          2500          4000
+rex              4000           500           800
+lalr             4000           500           800
+lark             4000           500           800
+ell              4000           500           800
+ast              4000           500           800
+ag               4000           500           800
+puma             4000           500           800
+mtc-1            4000           500           800
+mtc-2            4000           500           800
+cobol85          1500           300           300
+ftn90            1500           300           300
+ftn77             500           200           100
+
+
+Further Information
+
+GMD  will  be  closing  its   Karlsruhe   subsidiary   (Forschungsstelle
+Karlsruhe)  by  the  end  of the year 1993. This is one reason for me to
+found a company and continue the work on Cocktail on a commercial basis.
+Moreover,  I might lose e-mail access at the end of this year - at least
+my business address will change.
+
+For more information please contact:
+
+
+   Dr.-Ing. Josef Grosch
+
+   GMD Forschungsstelle
+   Vincenz-Priesznitz-Str. 1                Hagsfelder Allee 16
+   D-76131 Karlsruhe                        D-76131 Karlsruhe
+   Germany                                  Germany
+
+   Tel: +49-721-6622-26                     Tel: +49-721-697061
+   Fax: +49-721-6622-968
+   E-Mail: grosch@karlsruhe.gmd.de

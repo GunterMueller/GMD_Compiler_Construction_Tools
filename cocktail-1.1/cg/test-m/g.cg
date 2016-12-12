@@ -1,0 +1,21 @@
+TREE IMPORT {
+FROM Idents	IMPORT tIdent;
+TYPE  MyInt = INTEGER;
+}
+
+GLOBAL {
+FROM Idents	IMPORT tIdent;
+FROM StdIO	IMPORT WriteI, WriteC;
+# define closeINTEGER(a)	WriteI (a, 0); WriteC (' ');
+}
+
+RULE
+
+Node	= [Mark] [Ident: tIdent] [Hex: MyInt] <
+  Node0	= .
+  Node1	= Child1: Node .
+  Node2	= Child1: Node Child2: Node .
+> .
+n	= <
+  m	= [m] .
+> .

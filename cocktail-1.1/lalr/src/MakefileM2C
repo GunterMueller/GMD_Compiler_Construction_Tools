@@ -1,0 +1,158 @@
+                # Modula-2 library
+LIB	= ../../reuse/src
+FRONT	= ../../front/src
+
+                # options for modula compiler
+MFLAGS	= -nobounds -norange -M. -M$(FRONT) -M$(LIB)
+
+                # option to name linked program
+OUT	= ; mv a.out
+
+MD	= m2c $(MFLAGS)		# command to compile definition module
+MI	= m2c $(MFLAGS)		# command to compile implementation module
+MP	= m2c $(MFLAGS)		# command to compile program module
+ML	= m2c $(MFLAGS) -e	# command to link program
+
+ED	= .def	# extension for definition module
+EI	= .mod	# extension for implementation module
+EP	= .mod	# extension for program module
+ES	= .sym	# extension for symbol file (compiled definition)
+EO	= .o	# extension for object file (compiled implementation)
+
+SD	= .def	# compiler suffix for definition module
+SI	= .mod	# compiler suffix for implementation module
+SP	= .mod	# compiler suffix for program module
+
+all	:
+
+# HEAD
+
+ArgCheck$(ES)	: ArgCheck$(ED)	; $(MD) ArgCheck$(SD)
+
+ArgCheck$(EO)	: ArgCheck$(EI)	; $(MI) ArgCheck$(SI)
+ArgCheck$(EO)	: ArgCheck$(ES)
+ArgCheck$(EO)	: Check$(ES)
+ArgCheck$(EO)	: Debug$(ES)
+ArgCheck$(EO)	: Default$(ES)
+ArgCheck$(EO)	: Gen$(ES)
+
+Automaton$(ES)	: Automaton$(ED)	; $(MD) Automaton$(SD)
+
+Automaton$(EO)	: Automaton$(EI)	; $(MI) Automaton$(SI)
+Automaton$(EO)	: Automaton$(ES)
+Automaton$(EO)	: Continue$(ES)
+
+Check$(ES)	: Check$(ED)	; $(MD) Check$(SD)
+
+Check$(EO)	: Check$(EI)	; $(MI) Check$(SI)
+Check$(EO)	: Check$(ES)
+Check$(EO)	: Automaton$(ES)
+Check$(EO)	: Debug$(ES)
+
+Compress$(ES)	: Compress$(ED)	; $(MD) Compress$(SD)
+Compress$(ES)	: Automaton$(ES)
+Compress$(ES)	: Gen$(ES)
+
+Compress$(EO)	: Compress$(EI)	; $(MI) Compress$(SI)
+Compress$(EO)	: Compress$(ES)
+Compress$(EO)	: Automaton$(ES)
+Compress$(EO)	: Gen$(ES)
+
+Continue$(ES)	: Continue$(ED)	; $(MD) Continue$(SD)
+Continue$(ES)	: Automaton$(ES)
+
+Continue$(EO)	: Continue$(EI)	; $(MI) Continue$(SI)
+Continue$(EO)	: Continue$(ES)
+Continue$(EO)	: Automaton$(ES)
+Continue$(EO)	: Gen$(ES)
+
+Debug$(ES)	: Debug$(ED)	; $(MD) Debug$(SD)
+Debug$(ES)	: Automaton$(ES)
+
+Debug$(EO)	: Debug$(EI)	; $(MI) Debug$(SI)
+Debug$(EO)	: Debug$(ES)
+Debug$(EO)	: Automaton$(ES)
+Debug$(EO)	: Continue$(ES)
+
+Default$(ES)	: Default$(ED)	; $(MD) Default$(SD)
+Default$(ES)	: Automaton$(ES)
+Default$(ES)	: Gen$(ES)
+
+Default$(EO)	: Default$(EI)	; $(MI) Default$(SI)
+Default$(EO)	: Default$(ES)
+Default$(EO)	: Automaton$(ES)
+Default$(EO)	: Gen$(ES)
+
+Final$(ES)	: Final$(ED)	; $(MD) Final$(SD)
+
+Final$(EO)	: Final$(EI)	; $(MI) Final$(SI)
+Final$(EO)	: Final$(ES)
+Final$(EO)	: Automaton$(ES)
+Final$(EO)	: Gen$(ES)
+
+Gen$(ES)	: Gen$(ED)	; $(MD) Gen$(SD)
+Gen$(ES)	: Automaton$(ES)
+
+Gen$(EO)	: Gen$(EI)	; $(MI) Gen$(SI)
+Gen$(EO)	: Gen$(ES)
+Gen$(EO)	: ArgCheck$(ES)
+Gen$(EO)	: Automaton$(ES)
+Gen$(EO)	: Compress$(ES)
+Gen$(EO)	: Continue$(ES)
+Gen$(EO)	: Default$(ES)
+Gen$(EO)	: Final$(ES)
+Gen$(EO)	: GenLang$(ES)
+
+GenLang$(ES)	: GenLang$(ED)	; $(MD) GenLang$(SD)
+
+GenLang$(EO)	: GenLang$(EI)	; $(MI) GenLang$(SI)
+GenLang$(EO)	: GenLang$(ES)
+GenLang$(EO)	: Automaton$(ES)
+GenLang$(EO)	: Compress$(ES)
+GenLang$(EO)	: ArgCheck$(ES)
+GenLang$(EO)	: Gen$(ES)
+
+Infos$(ES)	: Infos$(ED)	; $(MD) Infos$(SD)
+
+Infos$(EO)	: Infos$(EI)	; $(MI) Infos$(SI)
+Infos$(EO)	: Infos$(ES)
+Infos$(EO)	: Automaton$(ES)
+Infos$(EO)	: Compress$(ES)
+Infos$(EO)	: Gen$(ES)
+
+LR$(ES)	: LR$(ED)	; $(MD) LR$(SD)
+
+LR$(EO)	: LR$(EI)	; $(MI) LR$(SI)
+LR$(EO)	: LR$(ES)
+LR$(EO)	: Automaton$(ES)
+
+Lookahead$(ES)	: Lookahead$(ED)	; $(MD) Lookahead$(SD)
+
+Lookahead$(EO)	: Lookahead$(EI)	; $(MI) Lookahead$(SI)
+Lookahead$(EO)	: Lookahead$(ES)
+Lookahead$(EO)	: Automaton$(ES)
+Lookahead$(EO)	: Check$(ES)
+
+Reduce$(ES)	: Reduce$(ED)	; $(MD) Reduce$(SD)
+
+Reduce$(EO)	: Reduce$(EI)	; $(MI) Reduce$(SI)
+Reduce$(EO)	: Reduce$(ES)
+Reduce$(EO)	: Automaton$(ES)
+
+all	: lalr
+lalr$(EO)	: lalr$(EP)	; $(MP) lalr$(SP)
+lalr$(EO)	: ArgCheck$(ES)
+lalr$(EO)	: Automaton$(ES)
+lalr$(EO)	: Check$(ES)
+lalr$(EO)	: Gen$(ES)
+lalr$(EO)	: Infos$(ES)
+lalr$(EO)	: Lookahead$(ES)
+lalr$(EO)	: LR$(ES)
+lalr$(EO)	: Reduce$(ES)
+
+lalr	: lalr$(EO) Reduce$(EO) Automaton$(EO) Continue$(EO) Gen$(EO) GenLang$(EO) ArgCheck$(EO) Default$(EO) Debug$(EO) Check$(EO) Compress$(EO) Final$(EO) LR$(EO) Lookahead$(EO) Infos$(EO)	; $(ML) lalr $(OUT) lalr
+
+# TAIL
+
+# CLEAN	:	; rm -f core *.[dimor] ERRORS LISTING
+CLEAN	:	; rm -f core *.sym *.o

@@ -1,0 +1,79 @@
+.TH MPP 1 "" "GMD-Forschungsstelle-Karlsruhe"
+.SH NAME
+mpp    a modula preprocessor
+.SH SYNOPSIS
+mpp 
+.SH DESCRIPTION
+Doing i/o in MODULA-2 is very long-winded in comparison to C, because
+procedures with a variable count of parameters cannot be expressed in terms of
+MODULA-2. The only usable way for doing i/o in MODULA-2 is to call a procedure
+for each unit to be read or written.
+
+The disadvantage of this solution is that programs with a lot of input or
+output become unreadable. To solve this problem a modula preprocessor (mpp) has
+been developed. Using mpp i/o can be described easily.
+
+Instead of
+.nf
+
+	WriteS (StdOutput, 'length = ');
+	WriteI (StdOutput, length, 1);
+	WriteS (StdOutput, ' m');
+	WriteNl (StdOutput);
+
+.fi
+you can write the mpp instruction
+
+	. length = {I length} m
+
+if the mpp definitions
+.nf
+
+	.. %	WriteS (StdOutput, '%');
+	.. I	WriteI (StdOutput, %, 1);
+	.. $	WriteNl (StdOutput);
+
+.fi
+precede.
+
+Mpp is working line oriented, it treats only lines starting with a dot. If the
+second character is a dot too, a macro is defined else some macros are called.
+
+The first non blank character after the two dots of a macro definition is used
+as macro name. The macro body which reaches to the end of the line, starts with
+the next non blank character.
+
+Each macro call is extended to the body of the according macro definition
+whereby the character '%' in the macro body is substituted by the parameter of
+the macro call.
+
+To call macros lines starting with a single dot are used. If the next
+character is non blank the macro named by this character is called with the
+rest of the line (without leading blank characters) as argument.
+
+If there are blank characters after the dot, the rest of the line is splitted
+in parts inside and outside of braces. Parts outside braces produce a call of
+the macro named by '%'. Parts inside braces produce a call of the macro named
+by the character immediately after the opening brace. To handle the start and
+end of a line there are two special macros which are called with an empty
+argument.  The macro '^' is called before the macro instruction is executed
+the macro '$' is called after execution.
+
+To avoid very long lines, you may split a macro instruction. By using the escape
+character ('\e') at the end of a line you can suppress the call of '$' at the
+end of the line and the call of '^' at the next mpp instruction.
+.nf
+
+	. length =\e
+	. {I length}\e
+	. m
+
+.fi
+These mpp instructions have nearly the same effect as the lines in our first
+example. There is only one difference: the produced MODULA-2 instructions are
+distributed on three lines instead of one.
+
+Within a line the escape character ('\e') can be used to flag the
+characters '\e', '{', '}', '%', blank, and tab. If these characters are flagged
+they are handled like normal characters. This may be used to avoid skipping
+of blanks and tabs or to represent the characters '{', '}', or '\e' themselves.

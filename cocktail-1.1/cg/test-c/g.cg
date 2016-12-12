@@ -1,0 +1,19 @@
+TREE IMPORT {
+# include "Idents.h"
+typedef int MyInt;
+}
+
+GLOBAL {
+# define closeint(a)	(void) printf ("%d ", a);
+}
+
+RULE
+
+Node	= [Mark] [Ident: tIdent] [Hex: MyInt] <
+  Node0	= .
+  Node1	= Child1: Node .
+  Node2	= Child1: Node Child2: Node .
+> .
+n	= <
+  m	= [m] .
+> .

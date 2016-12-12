@@ -1,0 +1,83 @@
+cg -cxzj minilax.pars;
+"minilax.pars",  16,  1: Information copy rule insertions synthesized: 1
+"minilax.pars",  16,  1: Information grammar is in normal form
+"minilax.pars",  16,  1: Information grammar is SAG
+rpp < minilax.scan > minilax.rex;
+rex -cd minilax.rex;
+Warning: in start state STD the default action may be triggered by:
+ \0 \1 \2 \3 \4 \5 \6 \7 \8 \11 \12 \13 \14 \15 \16 \17
+ \18 \19 \20 \21 \22 \23 \24 \25 \26 \27 \28 \29 \30 \31 '!' '"'
+ '#' '$' '%' '&' ''' '-' '/' '=' '>' '?' '@' '\' '^' '_' '`' '{'
+ '|' '}' '~'
+lalr -c -d Parser.lalr;
+Information state is not LALR(1) - state 42
+Information repaired read reduce conflict on  '<' '+' '*'
+Information state is not LALR(1) - state 44
+Information repaired read reduce conflict on  '<' '+' '*'
+Information state is not LALR(1) - state 46
+Information repaired read reduce conflict on  '<' '+' '*'
+Information state is not LALR(1) - state 49
+Information repaired read reduce conflict on  '<' '+' '*'
+  8 information(s)
+cg -cdimRDI0 minilax.cg;
+"minilax.cg",  23,  1: Information copy rule insertions inherited: 63
+"minilax.cg",  23,  1: Information copy rule insertions synthesized: 2
+"minilax.cg",  23,  1: Information copy rule insertions threaded: 18
+"minilax.cg",  23,  1: Information grammar is not in normal form
+"minilax.cg",  23,  1: Information grammar is OAG
+cg -cdim4 Definitions.cg;
+echo SELECT AbstractSyntax Output | cat - minilax.cg | cg -c4
+puma -cdi ICode.puma;
+ 19, 33: Warning     user-type required
+ 36, 34: Warning     user-type required
+113, 25: Warning     user-type required
+puma -cdipk Types.puma;
+134,  0: Warning     unreachable code
+139,  0: Warning     unreachable code
+144,  0: Warning     unreachable code
+149,  0: Warning     unreachable code
+149,  0: Warning     unreachable code
+cc -I/zone2/grosch/lib.sparc/include -c Types.c;
+cc -I/zone2/grosch/lib.sparc/include -c minilax.c;
+cc -I/zone2/grosch/lib.sparc/include -c Scanner.c;
+cc -I/zone2/grosch/lib.sparc/include -c Parser.c;
+cc -I/zone2/grosch/lib.sparc/include -c Tree.c;
+cc -I/zone2/grosch/lib.sparc/include -c Definitions.c;
+cc -I/zone2/grosch/lib.sparc/include -c Semantics.c;
+cc -I/zone2/grosch/lib.sparc/include -c ICode.c;
+cc -I/zone2/grosch/lib.sparc/include -c ICodeInter.c;
+cc -I/zone2/grosch/lib.sparc/include minilax.o Scanner.o Parser.o Tree.o  Types.o Definitions.o Semantics.o ICode.o ICodeInter.o /zone2/grosch/lib.sparc/libreuse.a -o minilax -lm 
+time minilax < in1
+Memory   51216  Tree   20480  Defs       0
+Memory   71704  Tree   20480  Defs   20480
+    3.14000E+00
+    4.14000E+00
+    5.14000E+00
+    2.14000E+00
+    1.14000E+00
+    1.14000E+00
+    4.14000E+00
+    5.14000E+00
+    2.14000E+00
+    3.14000E+00
+    1.14000E+00
+    2.14000E+00
+    5.14000E+00
+    4.14000E+00
+    3.14000E+00
+    1.14000E+00
+    2.14000E+00
+    3.14000E+00
+    4.14000E+00
+    5.14000E+00
+    1.14000E+00
+    2.14000E+00
+    3.14000E+00
+    4.14000E+00
+    5.14000E+00
+    1
+        0.4 real         0.0 user         0.1 sys  
+time minilax < in5
+Memory  686344  Tree  655360  Defs       0
+Memory  788784  Tree  696320  Defs   61440
+        2.2 real         1.7 user         0.3 sys  

@@ -1,0 +1,1329 @@
+(* $Id: Scanner.mi,v 2.10 1992/08/18 09:05:32 grosch rel grosch $ *)
+
+IMPLEMENTATION MODULE Scanner;
+ 
+IMPORT SYSTEM, Checks, System, General, Positions, IO, DynArray, Strings, Source;
+(* line 43 "puma.rex" *)
+
+FROM SYSTEM	IMPORT ADR;
+FROM StringMem	IMPORT PutString;
+FROM Strings	IMPORT tString, Concatenate, Char, SubString,
+			AssignEmpty, Length, WriteL;
+FROM Idents	IMPORT tIdent, MakeIdent, NoIdent, GetStringRef;
+FROM Texts	IMPORT MakeText, Append;
+FROM Sets	IMPORT IsElement;
+FROM Tree	IMPORT Options, ErrorCount;
+FROM Positions	IMPORT tPosition;
+
+IMPORT Errors;
+
+VAR NestingLevel: INTEGER; Position, StringPos: tPosition;
+
+PROCEDURE ErrorAttribute (Token: INTEGER; VAR pAttribute: tScanAttribute);
+BEGIN
+ pAttribute.Position := Attribute.Position;
+ CASE Token OF
+ | (* Ident *) 1: 
+ pAttribute.Ident.Ident	:= NoIdent	;
+ ;
+ | (* Operator *) 2: 
+ pAttribute.Operator.Ident	:= NoIdent	;
+ ;
+ | (* IncOperator *) 3: 
+ pAttribute.IncOperator.Ident	:= NoIdent	;
+ ;
+ | (* TargetBlock *) 4: 
+ MakeText (pAttribute.TargetBlock.Text); ;
+ ;
+ | (* String *) 5: 
+ pAttribute.String.StringRef	:= GetStringRef (NoIdent);
+ ;
+ | (* Number *) 6: 
+ pAttribute.Number.StringRef	:= GetStringRef (NoIdent);
+ ;
+ | (* TargetCode *) 7: 
+ pAttribute.TargetCode.StringRef	:= GetStringRef (NoIdent);
+ ;
+ | (* WhiteSpace *) 8: 
+ pAttribute.WhiteSpace.StringRef	:= GetStringRef (NoIdent);
+ ;
+ | (* '::' *) 9: 
+ pAttribute.yy9.StringRef	:= GetStringRef (NoIdent);
+ ;
+ ELSE
+ END;
+END ErrorAttribute;
+
+
+PROCEDURE Error (Text: ARRAY OF CHAR; Position: tPosition);
+   BEGIN
+      Errors.Message (Text, Errors.Error, Position);
+      INC (ErrorCount);
+   END Error;
+
+PROCEDURE ErrorI (Text: ARRAY OF CHAR; Position: tPosition; Ident: tIdent);
+   BEGIN
+      Errors.MessageI (Text, Errors.Error, Position, Errors.Ident, ADR (Ident));
+      INC (ErrorCount);
+   END ErrorI;
+
+PROCEDURE Warning (Text: ARRAY OF CHAR; Position: tPosition);
+   BEGIN
+      IF NOT IsElement (ORD ('s'), Options) THEN
+	 Errors.Message (Text, Errors.Warning, Position);
+      END;
+   END Warning;
+
+PROCEDURE WarningI (Text: ARRAY OF CHAR; Position: tPosition; Ident: tIdent);
+   BEGIN
+      IF NOT IsElement (ORD ('s'), Options) THEN
+	 Errors.MessageI (Text, Errors.Warning, Position, Errors.Ident, ADR (Ident));
+      END;
+   END WarningI;
+
+ 
+CONST
+   yyTabSpace		= 8;
+   yyDNoState		= 0;
+   yyFileStackSize	= 16;
+   yyInitBufferSize	= 1024 * 8 + 256;
+yyFirstCh	= 0C;
+yyLastCh	= 177C;
+yyEolCh	= 12C;
+yyEobCh	= 177C;
+yyDStateCount	= 209;
+yyTableSize	= 2236;
+yyEobState	= 65;
+yyDefaultState	= 66;
+STD	= 1;
+comment	= 3;
+Str1	= 5;
+Str2	= 7;
+CStr1	= 9;
+CStr2	= 11;
+targetcode	= 13;
+expr	= 15;
+ 
+TYPE
+   yyTableElmt		= SHORTCARD;
+   yyStateRange		= yyTableElmt [0 .. yyDStateCount];
+   yyTableRange		= yyTableElmt [0 .. yyTableSize];
+   yyCombType		= RECORD Check, Next: yyStateRange; END;
+   yyCombTypePtr	= POINTER TO yyCombType;
+   yytChBufferPtr	= POINTER TO ARRAY [0 .. 1000000] OF CHAR;
+   yyChRange		= [yyFirstCh .. yyLastCh];
+
+VAR
+   yyBasePtr		: ARRAY yyStateRange	OF LONGCARD	;
+   yyDefault		: ARRAY yyStateRange	OF yyStateRange	;
+   yyComb		: ARRAY yyTableRange	OF yyCombType	;
+   yyEobTrans		: ARRAY yyStateRange	OF yyStateRange	;
+   yyToLower, yyToUpper	: ARRAY yyChRange	OF CHAR		;
+
+   yyStateStack		: POINTER TO ARRAY [0 .. 1000000] OF yyStateRange;
+   yyStateStackSize	: LONGINT;
+   yyStartState		: yyStateRange;
+   yyPreviousStart	: yyStateRange;
+   yyCh			: CHAR;
+ 
+   yySourceFile		: System.tFile;
+   yyEof		: BOOLEAN;
+   yyChBufferPtr	: yytChBufferPtr;
+   yyChBufferStart	: INTEGER;
+   yyChBufferSize	: LONGINT;
+   yyChBufferIndex	: INTEGER;
+   yyBytesRead		: INTEGER;
+   yyLineCount		: CARDINAL;
+   yyLineStart		: INTEGER;
+
+   yyFileStackPtr	: SHORTCARD;
+   yyFileStack		: ARRAY [1 .. yyFileStackSize] OF RECORD
+   			     SourceFile		: System.tFile;
+			     Eof		: BOOLEAN;
+   			     ChBufferPtr	: yytChBufferPtr;
+			     ChBufferStart	: INTEGER;
+			     ChBufferSize	: LONGINT;
+   			     ChBufferIndex	: INTEGER;
+   			     BytesRead		: INTEGER;
+   			     LineCount		: CARDINAL;
+   			     LineStart		: INTEGER;
+			  END;
+
+PROCEDURE GetToken (): INTEGER;
+   VAR
+      yyState		: yyStateRange;
+      yyTablePtr	: yyCombTypePtr;
+      yyRestartFlag	: BOOLEAN;
+      yyi, yySource, yyTarget, yyChBufferFree	: INTEGER;
+(* line 121 "puma.rex" *)
+ VAR Word, String, TargetCode: tString; 
+BEGIN
+   LOOP
+      yyState		:= yyStartState;
+      TokenLength 	:= 0;
+ 
+      (* ASSERT yyChBuffer [yyChBufferIndex] = first character *)
+ 
+      LOOP		(* eventually restart after sentinel *)
+	 LOOP		(* execute as many state transitions as possible *)
+	    					(* determine next state *)
+	    yyTablePtr := yyCombTypePtr (yyBasePtr [yyState] +
+	       ORD (yyChBufferPtr^ [yyChBufferIndex]) * SYSTEM.TSIZE (yyCombType));
+	    IF yyTablePtr^.Check # yyState THEN
+	       yyState := yyDefault [yyState];
+	       IF yyState = yyDNoState THEN EXIT; END;
+	    ELSE
+	       yyState := yyTablePtr^.Next;
+	       INC (TokenLength);
+	       yyStateStack^ [TokenLength] := yyState;	(* push state *)
+	       INC (yyChBufferIndex);		(* get next character *)
+	    END;
+	 END;
+ 
+	 LOOP					(* search for last final state *)
+CASE yyStateStack^ [TokenLength] OF
+|209
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 155 "puma.rex" *)
+
+			   IF NestingLevel = 0 THEN
+			      MakeText (Attribute.TargetBlock.Text);
+			      AssignEmpty (TargetCode);
+			      Position := Attribute.Position;
+			   ELSE
+			      GetWord (Word);
+			      Concatenate (TargetCode, Word);
+			   END;
+			   INC (NestingLevel);
+			
+yyRestartFlag := FALSE; EXIT;
+|208
+:
+(* line 167 "puma.rex" *)
+
+			   DEC (NestingLevel);
+			   IF NestingLevel = 0 THEN
+			      yyStart (STD);
+			      Append (Attribute.TargetBlock.Text, TargetCode);
+			      Attribute.Position := Position;
+			      RETURN 4;
+			   ELSE
+			      GetWord (Word);
+			      Concatenate (TargetCode, Word);
+			   END;
+			
+yyRestartFlag := FALSE; EXIT;
+|22
+,75
+:
+(* line 180 "puma.rex" *)
+
+			   IF NestingLevel > 0 THEN
+			      GetWord (Word);
+			      Concatenate (TargetCode, Word);
+			   END;
+			
+yyRestartFlag := FALSE; EXIT;
+|207
+:
+(* line 187 "puma.rex" *)
+
+			   IF NestingLevel > 0 THEN
+			      Strings.Append (TargetCode, 11C);
+			   END;
+			   yyTab;
+			
+yyRestartFlag := FALSE; EXIT;
+|206
+:
+(* line 194 "puma.rex" *)
+
+			   IF NestingLevel > 0 THEN
+			      Append (Attribute.TargetBlock.Text, TargetCode);
+			      AssignEmpty (TargetCode);
+			   END;
+			   yyEol (0);
+			
+yyRestartFlag := FALSE; EXIT;
+|23
+:
+(* line 202 "puma.rex" *)
+
+			   IF NestingLevel > 0 THEN
+			      GetWord (Word);
+			      Strings.Append (TargetCode, Char (Word, 2));
+			   END;
+			
+yyRestartFlag := FALSE; EXIT;
+|37
+:
+(* line 209 "puma.rex" *)
+
+			   IF NestingLevel > 0 THEN
+			      Strings.Append (TargetCode, '\');
+			   END;
+			
+yyRestartFlag := FALSE; EXIT;
+|203
+,205
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 215 "puma.rex" *)
+yyStart (comment); Position := Attribute.Position;
+yyRestartFlag := FALSE; EXIT;
+|201
+:
+(* line 216 "puma.rex" *)
+yyPrevious;
+yyRestartFlag := FALSE; EXIT;
+|28
+,42
+,70
+:
+(* line 217 "puma.rex" *)
+
+yyRestartFlag := FALSE; EXIT;
+|30
+:
+(* line 219 "puma.rex" *)
+
+yyRestartFlag := FALSE; EXIT;
+|29
+,43
+,59
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 222 "puma.rex" *)
+GetWord (Word);
+	                    Attribute.Number.StringRef := PutString (Word);
+			    RETURN 6;
+yyRestartFlag := FALSE; EXIT;
+|200
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 226 "puma.rex" *)
+GetWord (String);
+			    StringPos := Attribute.Position;
+			    IF IsElement (ORD ('c'), Options)
+			    THEN yyStart (CStr1);
+			    ELSE yyStart (Str1);
+			    END;
+yyRestartFlag := FALSE; EXIT;
+|199
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 233 "puma.rex" *)
+GetWord (String);
+			    StringPos := Attribute.Position;
+			    IF IsElement (ORD ('c'), Options)
+			    THEN yyStart (CStr2);
+			    ELSE yyStart (Str2);
+			    END;
+yyRestartFlag := FALSE; EXIT;
+|27
+,71
+:
+(* line 243 "puma.rex" *)
+GetWord (Word); Concatenate (String, Word);
+yyRestartFlag := FALSE; EXIT;
+|26
+,72
+:
+(* line 243 "puma.rex" *)
+GetWord (Word); Concatenate (String, Word);
+yyRestartFlag := FALSE; EXIT;
+|25
+,41
+,58
+,73
+:
+(* line 243 "puma.rex" *)
+GetWord (Word); Concatenate (String, Word);
+yyRestartFlag := FALSE; EXIT;
+|24
+,40
+,57
+,74
+:
+(* line 243 "puma.rex" *)
+GetWord (Word); Concatenate (String, Word);
+yyRestartFlag := FALSE; EXIT;
+|198
+:
+(* line 246 "puma.rex" *)
+GetWord (Word); Concatenate (String, Word); yyEol (0);
+yyRestartFlag := FALSE; EXIT;
+|197
+:
+(* line 246 "puma.rex" *)
+GetWord (Word); Concatenate (String, Word); yyEol (0);
+yyRestartFlag := FALSE; EXIT;
+|196
+:
+(* line 249 "puma.rex" *)
+Strings.Append (String, Char (String, 1));
+			    yyPrevious;
+			    IF yyStartState = targetcode THEN
+			       Concatenate (TargetCode, String);
+			    ELSE
+			       Attribute.String.StringRef := PutString (String);
+			       RETURN 5;
+			    END;
+yyRestartFlag := FALSE; EXIT;
+|195
+:
+(* line 249 "puma.rex" *)
+Strings.Append (String, Char (String, 1));
+			    yyPrevious;
+			    IF yyStartState = targetcode THEN
+			       Concatenate (TargetCode, String);
+			    ELSE
+			       Attribute.String.StringRef := PutString (String);
+			       RETURN 5;
+			    END;
+yyRestartFlag := FALSE; EXIT;
+|194
+:
+(* line 258 "puma.rex" *)
+Strings.Append (String, 11C); yyTab;
+yyRestartFlag := FALSE; EXIT;
+|193
+:
+(* line 260 "puma.rex" *)
+Error ("unclosed string", Attribute.Position);
+			    Strings.Append (String, Char (String, 1));
+			    yyEol (0); yyPrevious;
+			    IF yyStartState = targetcode THEN
+			       Concatenate (TargetCode, String);
+			    ELSE
+			       Attribute.String.StringRef := PutString (String);
+			       RETURN 5;
+			    END;
+yyRestartFlag := FALSE; EXIT;
+|192
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 270 "puma.rex" *)
+RETURN 9			;
+yyRestartFlag := FALSE; EXIT;
+|118
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 272 "puma.rex" *)
+IF NestingLevel = 0 THEN Position := Attribute.Position; END;
+			   yyStart (expr); INC (NestingLevel); RETURN 34;
+yyRestartFlag := FALSE; EXIT;
+|18
+,35
+,204
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 275 "puma.rex" *)
+GetWord (Word);
+			   Attribute.TargetCode.StringRef := PutString (Word);
+			   RETURN 7		;
+yyRestartFlag := FALSE; EXIT;
+|191
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 279 "puma.rex" *)
+INC (NestingLevel);
+			   GetWord (Word);
+			   Attribute.TargetCode.StringRef := PutString (Word);
+			   RETURN 7		;
+yyRestartFlag := FALSE; EXIT;
+|190
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 284 "puma.rex" *)
+DEC (NestingLevel);
+			   IF NestingLevel = 0 THEN
+			      yyStart (STD);
+			      RETURN 35;
+			   ELSE
+			      GetWord (Word);
+			      Attribute.TargetCode.StringRef := PutString (Word);
+			      RETURN 7;
+			   END				;
+yyRestartFlag := FALSE; EXIT;
+|188
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 294 "puma.rex" *)
+GetWord (Word);
+			   Attribute.TargetCode.StringRef := PutString (Word);
+			   RETURN 7		;
+yyRestartFlag := FALSE; EXIT;
+|189
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 298 "puma.rex" *)
+GetWord (Word);
+			   Attribute.yy9.StringRef := PutString (Word);
+			   RETURN 9			;
+yyRestartFlag := FALSE; EXIT;
+|19
+,76
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 302 "puma.rex" *)
+GetWord (Word);
+			   Attribute.WhiteSpace.StringRef := PutString (Word);
+			   RETURN 8		;
+yyRestartFlag := FALSE; EXIT;
+|187
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 306 "puma.rex" *)
+GetWord (Word);
+			   Attribute.WhiteSpace.StringRef := PutString (Word);
+			   yyEol (0);
+			   RETURN 8		;
+yyRestartFlag := FALSE; EXIT;
+|186
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 311 "puma.rex" *)
+GetWord (Word);
+			   Attribute.WhiteSpace.StringRef := PutString (Word);
+			   yyTab;
+			   RETURN 8		;
+yyRestartFlag := FALSE; EXIT;
+|21
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 316 "puma.rex" *)
+GetWord (Word);
+			   SubString (Word, 2, 2, String);
+			   Attribute.TargetCode.StringRef := PutString (String);
+			   RETURN 7		;
+yyRestartFlag := FALSE; EXIT;
+|38
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 321 "puma.rex" *)
+GetWord (Word);
+			   Attribute.TargetCode.StringRef := PutString (Word);
+			   RETURN 7		;
+yyRestartFlag := FALSE; EXIT;
+|150
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 325 "puma.rex" *)
+yyStart (targetcode); RETURN 19	;
+yyRestartFlag := FALSE; EXIT;
+|145
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 326 "puma.rex" *)
+yyStart (targetcode); RETURN 20	;
+yyRestartFlag := FALSE; EXIT;
+|167
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 327 "puma.rex" *)
+yyStart (targetcode); RETURN 16;
+yyRestartFlag := FALSE; EXIT;
+|156
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 328 "puma.rex" *)
+yyStart (targetcode); RETURN 18;
+yyRestartFlag := FALSE; EXIT;
+|161
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 329 "puma.rex" *)
+yyStart (targetcode); RETURN 17;
+yyRestartFlag := FALSE; EXIT;
+|126
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 330 "puma.rex" *)
+yyStart (targetcode); RETURN 30	;
+yyRestartFlag := FALSE; EXIT;
+|31
+,44
+,45
+,46
+,47
+,48
+,49
+,50
+,60
+,128
+,202
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 361 "puma.rex" *)
+GetWord (Word);
+	                   Attribute.Operator.Ident := MakeIdent (Word);
+			   RETURN 2		;
+yyRestartFlag := FALSE; EXIT;
+|33
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 365 "puma.rex" *)
+GetWord (Word);
+	                   Attribute.IncOperator.Ident := MakeIdent (Word);
+			   RETURN 3		;
+yyRestartFlag := FALSE; EXIT;
+|32
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 369 "puma.rex" *)
+GetWord (Word);
+			   SubString (Word, 2, Length (Word), String);
+	                   Attribute.Operator.Ident := MakeIdent (String);
+			   RETURN 2		;
+yyRestartFlag := FALSE; EXIT;
+|185
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 374 "puma.rex" *)
+ RETURN 10; 
+yyRestartFlag := FALSE; EXIT;
+|182
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 375 "puma.rex" *)
+ RETURN 11; 
+yyRestartFlag := FALSE; EXIT;
+|178
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 376 "puma.rex" *)
+ RETURN 12; 
+yyRestartFlag := FALSE; EXIT;
+|177
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 377 "puma.rex" *)
+ RETURN 13; 
+yyRestartFlag := FALSE; EXIT;
+|172
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 378 "puma.rex" *)
+ RETURN 14; 
+yyRestartFlag := FALSE; EXIT;
+|168
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 379 "puma.rex" *)
+ RETURN 15; 
+yyRestartFlag := FALSE; EXIT;
+|140
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 385 "puma.rex" *)
+ RETURN 21; 
+yyRestartFlag := FALSE; EXIT;
+|133
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 386 "puma.rex" *)
+ RETURN 22; 
+yyRestartFlag := FALSE; EXIT;
+|132
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 387 "puma.rex" *)
+ RETURN 23; 
+yyRestartFlag := FALSE; EXIT;
+|77
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 388 "puma.rex" *)
+ RETURN 24; 
+yyRestartFlag := FALSE; EXIT;
+|61
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 389 "puma.rex" *)
+ RETURN 25; 
+yyRestartFlag := FALSE; EXIT;
+|131
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 390 "puma.rex" *)
+ RETURN 26; 
+yyRestartFlag := FALSE; EXIT;
+|130
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 391 "puma.rex" *)
+ RETURN 27; 
+yyRestartFlag := FALSE; EXIT;
+|129
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 392 "puma.rex" *)
+ RETURN 28; 
+yyRestartFlag := FALSE; EXIT;
+|127
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 393 "puma.rex" *)
+ RETURN 29; 
+yyRestartFlag := FALSE; EXIT;
+|79
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 395 "puma.rex" *)
+ RETURN 31; 
+yyRestartFlag := FALSE; EXIT;
+|121
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 396 "puma.rex" *)
+ RETURN 32; 
+yyRestartFlag := FALSE; EXIT;
+|119
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 397 "puma.rex" *)
+ RETURN 33; 
+yyRestartFlag := FALSE; EXIT;
+|117
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 399 "puma.rex" *)
+ RETURN 35; 
+yyRestartFlag := FALSE; EXIT;
+|116
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 400 "puma.rex" *)
+ RETURN 36; 
+yyRestartFlag := FALSE; EXIT;
+|115
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 401 "puma.rex" *)
+ RETURN 37; 
+yyRestartFlag := FALSE; EXIT;
+|114
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 402 "puma.rex" *)
+ RETURN 38; 
+yyRestartFlag := FALSE; EXIT;
+|113
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 403 "puma.rex" *)
+ RETURN 39; 
+yyRestartFlag := FALSE; EXIT;
+|112
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 404 "puma.rex" *)
+ RETURN 40; 
+yyRestartFlag := FALSE; EXIT;
+|111
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 405 "puma.rex" *)
+ RETURN 41; 
+yyRestartFlag := FALSE; EXIT;
+|107
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 406 "puma.rex" *)
+ RETURN 42; 
+yyRestartFlag := FALSE; EXIT;
+|104
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 407 "puma.rex" *)
+ RETURN 43; 
+yyRestartFlag := FALSE; EXIT;
+|103
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 408 "puma.rex" *)
+ RETURN 44; 
+yyRestartFlag := FALSE; EXIT;
+|97
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 409 "puma.rex" *)
+ RETURN 45; 
+yyRestartFlag := FALSE; EXIT;
+|89
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 410 "puma.rex" *)
+ RETURN 46; 
+yyRestartFlag := FALSE; EXIT;
+|80
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 413 "puma.rex" *)
+RETURN 31			;
+yyRestartFlag := FALSE; EXIT;
+|78
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 414 "puma.rex" *)
+RETURN 40			;
+yyRestartFlag := FALSE; EXIT;
+|17
+,34
+,51
+,52
+,53
+,54
+,55
+,56
+,62
+,63
+,81
+,82
+,83
+,84
+,85
+,86
+,87
+,88
+,90
+,91
+,92
+,93
+,94
+,95
+,96
+,98
+,99
+,100
+,101
+,102
+,105
+,106
+,108
+,109
+,110
+,120
+,122
+,123
+,124
+,125
+,134
+,135
+,136
+,137
+,138
+,139
+,141
+,142
+,143
+,144
+,146
+,147
+,148
+,149
+,151
+,152
+,153
+,154
+,155
+,157
+,158
+,159
+,160
+,162
+,163
+,164
+,165
+,166
+,169
+,170
+,171
+,173
+,174
+,175
+,176
+,179
+,180
+,181
+,183
+,184
+:
+Attribute.Position.Line   := yyLineCount;
+Attribute.Position.Column := yyChBufferIndex - yyLineStart - TokenLength;
+(* line 417 "puma.rex" *)
+GetWord (Word);
+	                   Attribute.Ident.Ident := MakeIdent (Word);
+			   RETURN 1			;
+yyRestartFlag := FALSE; EXIT;
+|69
+:
+(* BlankAction *)
+WHILE yyChBufferPtr^ [yyChBufferIndex] = ' ' DO INC (yyChBufferIndex); END;
+yyRestartFlag := FALSE; EXIT;
+|68
+:
+(* TabAction *)
+DEC (yyLineStart, 7 - (yyChBufferIndex - yyLineStart - 2) MOD 8);
+yyRestartFlag := FALSE; EXIT;
+|67
+:
+(* EolAction *)
+INC (yyLineCount);
+yyLineStart := yyChBufferIndex - 1;
+yyRestartFlag := FALSE; EXIT;
+|1
+,2
+,3
+,4
+,5
+,6
+,7
+,8
+,9
+,10
+,11
+,12
+,13
+,14
+,15
+,16
+,20
+,36
+,39
+,64
+:
+	    (* non final states *)
+		  DEC (yyChBufferIndex);	(* return character *)
+		  DEC (TokenLength)		(* pop state *)
+ 
+| 66:
+		  Attribute.Position.Line   := yyLineCount;
+		  Attribute.Position.Column := yyChBufferIndex - yyLineStart;
+		  INC (yyChBufferIndex);
+		  TokenLength := 1;
+(* line 125 "puma.rex" *)
+
+   GetWord (Word);
+   Errors.MessageI ("illegal character", Errors.Error, Attribute.Position, Errors.String, ADR (Word));
+
+	          yyRestartFlag := FALSE; EXIT;
+
+	    |  yyDNoState	:		(* automatic initialization *)
+		  yyGetTables;
+		  yyStateStack^ [0] := yyDefaultState; (* stack underflow sentinel *)
+		  IF yyFileStackPtr = 0 THEN
+		     yyInitialize;
+		     yySourceFile := System.StdInput;
+		  END;
+	          yyRestartFlag := FALSE; EXIT;
+
+| 65:
+		  DEC (yyChBufferIndex);	(* undo last state transition *)
+		  DEC (TokenLength);		(* get previous state *)
+		  IF TokenLength = 0 THEN
+		     yyState := yyStartState;
+		  ELSE
+		     yyState := yyStateStack^ [TokenLength];
+		  END;
+
+		  IF yyChBufferIndex # yyChBufferStart + yyBytesRead THEN
+		     yyState := yyEobTrans [yyState];	(* end of buffer sentinel in buffer *)
+		     IF yyState # yyDNoState THEN
+			INC (yyChBufferIndex);
+			INC (TokenLength);
+			yyStateStack^ [TokenLength] := yyState;
+			yyRestartFlag := TRUE; EXIT;
+		     END;
+		  ELSE				(* end of buffer reached *)
+
+		     (* copy initial part of token in front of input buffer *)
+
+		     yySource := yyChBufferIndex - TokenLength - 1;
+		     yyTarget := General.MaxAlign - TokenLength MOD General.MaxAlign - 1;
+		     IF yySource # yyTarget THEN
+			FOR yyi := 1 TO TokenLength DO
+			   yyChBufferPtr^ [yyTarget + yyi] := yyChBufferPtr^ [yySource + yyi];
+			END;
+			DEC (yyLineStart, yySource - yyTarget);
+			yyChBufferStart := yyTarget + TokenLength + 1;
+		     ELSE
+			yyChBufferStart := yyChBufferIndex;
+		     END;
+
+		     IF NOT yyEof THEN		(* read buffer and restart *)
+			yyChBufferFree := General.Exp2 (General.Log2 (yyChBufferSize - 4 - General.MaxAlign - TokenLength));
+			IF yyChBufferFree < yyChBufferSize DIV 8 THEN
+			   DynArray.ExtendArray (yyChBufferPtr, yyChBufferSize, SYSTEM.TSIZE (CHAR));
+			   IF yyChBufferPtr = NIL THEN yyErrorMessage (1); END;
+			   yyChBufferFree := General.Exp2 (General.Log2 (yyChBufferSize - 4 - General.MaxAlign - TokenLength));
+			   IF yyStateStackSize < yyChBufferSize THEN
+			      DynArray.ExtendArray (yyStateStack, yyStateStackSize, SYSTEM.TSIZE (yyStateRange));
+			      IF yyStateStack = NIL THEN yyErrorMessage (1); END;
+			   END;
+			END;
+			yyChBufferIndex := yyChBufferStart;
+			yyBytesRead := Source.GetLine (yySourceFile, SYSTEM.ADR
+			   (yyChBufferPtr^ [yyChBufferIndex]), yyChBufferFree);
+			IF yyBytesRead <= 0 THEN yyBytesRead := 0; yyEof := TRUE; END;
+			yyChBufferPtr^ [yyChBufferStart + yyBytesRead    ] := yyEobCh;
+			yyChBufferPtr^ [yyChBufferStart + yyBytesRead + 1] := 0C;
+			yyRestartFlag := TRUE; EXIT;
+		     END;
+
+		     IF TokenLength = 0 THEN	(* end of file reached *)
+			Attribute.Position.Line   := yyLineCount;
+			Attribute.Position.Column := yyChBufferIndex - yyLineStart;
+			CloseFile;
+			IF yyFileStackPtr = 0 THEN
+(* line 130 "puma.rex" *)
+
+   CASE yyStartState OF
+   | comment	: Error ("unclosed comment", Position);
+   | expr	,
+     targetcode	: Error ("unclosed target code", Position);
+   | CStr1, CStr2,
+     Str1, Str2	: Error ("unclosed string", StringPos);
+   ELSE
+   END;
+
+			END;
+			IF yyFileStackPtr = 0 THEN RETURN EofToken; END;
+			yyRestartFlag := FALSE; EXIT;
+		     END;
+		  END;
+	    ELSE
+	       yyErrorMessage (0);
+	    END;
+	 END;
+	 IF yyRestartFlag THEN ELSE EXIT; END;
+      END;
+   END;
+   END GetToken;
+ 
+PROCEDURE BeginFile (FileName: ARRAY OF CHAR);
+   BEGIN
+      IF yyStateStack^ [0] = yyDNoState THEN	(* have tables been read in ? *)
+	 yyGetTables;
+	 yyStateStack^ [0] := yyDefaultState;	(* stack underflow sentinel *)
+      END;
+      yyInitialize;
+      yySourceFile := Source.BeginSource (FileName);
+      IF yySourceFile < 0 THEN yyErrorMessage (5); END;
+   END BeginFile;
+
+PROCEDURE yyInitialize;
+   BEGIN
+      IF yyFileStackPtr >= yyFileStackSize THEN yyErrorMessage (3); END;
+      INC (yyFileStackPtr);			(* push file *)
+      WITH yyFileStack [yyFileStackPtr] DO
+	 SourceFile	:= yySourceFile		;
+	 Eof		:= yyEof		;
+	 ChBufferPtr	:= yyChBufferPtr	;
+	 ChBufferStart	:= yyChBufferStart	;
+	 ChBufferSize	:= yyChBufferSize	;
+	 ChBufferIndex	:= yyChBufferIndex	;
+	 BytesRead	:= yyBytesRead		;
+	 LineCount	:= yyLineCount		;
+	 LineStart	:= yyLineStart		;
+      END;
+						(* initialize file state *)
+      yyChBufferSize	:= yyInitBufferSize;
+      DynArray.MakeArray (yyChBufferPtr, yyChBufferSize, SYSTEM.TSIZE (CHAR));
+      IF yyChBufferPtr = NIL THEN yyErrorMessage (1); END;
+      yyChBufferStart	:= General.MaxAlign;
+      yyChBufferPtr^ [yyChBufferStart - 1] := yyEolCh; (* begin of line indicator *)
+      yyChBufferPtr^ [yyChBufferStart    ] := yyEobCh; (* end of buffer sentinel *)
+      yyChBufferPtr^ [yyChBufferStart + 1] := 0C;
+      yyChBufferIndex	:= yyChBufferStart;
+      yyEof		:= FALSE;
+      yyBytesRead	:= 0;
+      yyLineCount	:= 1;
+      yyLineStart	:= yyChBufferStart - 1;
+   END yyInitialize;
+
+PROCEDURE CloseFile;
+   BEGIN
+      IF yyFileStackPtr = 0 THEN yyErrorMessage (4); END;
+      Source.CloseSource (yySourceFile);
+      DynArray.ReleaseArray (yyChBufferPtr, yyChBufferSize, SYSTEM.TSIZE (CHAR));
+      WITH yyFileStack [yyFileStackPtr] DO	(* pop file *)
+	 yySourceFile	:= SourceFile		;
+	 yyEof		:= Eof			;
+	 yyChBufferPtr	:= ChBufferPtr		;
+	 yyChBufferStart:= ChBufferStart	;
+	 yyChBufferSize	:= ChBufferSize		;
+	 yyChBufferIndex:= ChBufferIndex	;
+	 yyBytesRead	:= BytesRead		;
+	 yyLineCount	:= LineCount		;
+	 yyLineStart	:= LineStart		;
+      END;
+      DEC (yyFileStackPtr);		
+   END CloseFile;
+
+PROCEDURE GetWord (VAR Word: Strings.tString);
+   VAR i, WordStart	: INTEGER;
+   BEGIN
+      WordStart := yyChBufferIndex - TokenLength - 1;
+      FOR i := 1 TO TokenLength DO
+	 Word.Chars [i] := yyChBufferPtr^ [WordStart + i];
+      END;
+      Word.Length := TokenLength;
+   END GetWord;
+ 
+PROCEDURE GetLower (VAR Word: Strings.tString);
+   VAR i, WordStart	: INTEGER;
+   BEGIN
+      WordStart := yyChBufferIndex - TokenLength - 1;
+      FOR i := 1 TO TokenLength DO
+	 Word.Chars [i] := yyToLower [yyChBufferPtr^ [WordStart + i]];
+      END;
+      Word.Length := TokenLength;
+   END GetLower;
+ 
+PROCEDURE GetUpper (VAR Word: Strings.tString);
+   VAR i, WordStart	: INTEGER;
+   BEGIN
+      WordStart := yyChBufferIndex - TokenLength - 1;
+      FOR i := 1 TO TokenLength DO
+	 Word.Chars [i] := yyToUpper [yyChBufferPtr^ [WordStart + i]];
+      END;
+      Word.Length := TokenLength;
+   END GetUpper;
+ 
+PROCEDURE yyStart (State: yyStateRange);
+   BEGIN
+      yyPreviousStart	:= yyStartState;
+      yyStartState	:= State;
+   END yyStart;
+ 
+PROCEDURE yyPrevious;
+   VAR s	: yyStateRange;
+   BEGIN
+      s		      := yyStartState;
+      yyStartState    := yyPreviousStart;
+      yyPreviousStart := s;
+   END yyPrevious;
+ 
+PROCEDURE yyEcho;
+   VAR i	: INTEGER;
+   BEGIN
+      FOR i := yyChBufferIndex - TokenLength TO yyChBufferIndex - 1 DO
+	 IO.WriteC (IO.StdOutput, yyChBufferPtr^ [i]);
+      END;
+   END yyEcho;
+ 
+PROCEDURE yyLess (n: INTEGER);
+   BEGIN
+      DEC (yyChBufferIndex, TokenLength - n);
+      TokenLength := n;
+   END yyLess;
+ 
+PROCEDURE yyTab;
+   BEGIN
+      DEC (yyLineStart, yyTabSpace - 1 - (yyChBufferIndex - yyLineStart - 2) MOD yyTabSpace);
+   END yyTab;
+
+PROCEDURE yyTab1 (a: INTEGER);
+   BEGIN
+      DEC (yyLineStart, yyTabSpace - 1 - (yyChBufferIndex - yyLineStart - TokenLength + a - 1) MOD yyTabSpace);
+   END yyTab1;
+
+PROCEDURE yyTab2 (a, b: INTEGER);
+   BEGIN
+      DEC (yyLineStart, yyTabSpace - 1 - (yyChBufferIndex - yyLineStart - TokenLength + a - 1) MOD yyTabSpace);
+   END yyTab2;
+
+PROCEDURE yyEol (Column: INTEGER);
+   BEGIN
+      INC (yyLineCount);
+      yyLineStart := yyChBufferIndex - 1 - Column;
+   END yyEol;
+
+PROCEDURE output (c: CHAR);
+   BEGIN
+      IO.WriteC (IO.StdOutput, c);
+   END output;
+
+PROCEDURE unput (c: CHAR);
+   BEGIN
+      DEC (yyChBufferIndex);
+      yyChBufferPtr^ [yyChBufferIndex] := c;
+   END unput;
+
+PROCEDURE input (): CHAR;
+   BEGIN
+      IF yyChBufferIndex = yyChBufferStart + yyBytesRead THEN
+	 IF NOT yyEof THEN
+	    DEC (yyLineStart, yyBytesRead);
+	    yyChBufferIndex := 0;
+	    yyChBufferStart := 0;
+	    yyBytesRead := Source.GetLine (yySourceFile, yyChBufferPtr, General.Exp2 (General.Log2 (yyChBufferSize)));
+	    IF yyBytesRead <= 0 THEN yyBytesRead := 0; yyEof := TRUE; END;
+	    yyChBufferPtr^ [yyBytesRead    ] := yyEobCh;
+	    yyChBufferPtr^ [yyBytesRead + 1] := 0C;
+	 END;
+      END;
+      IF yyChBufferIndex = yyChBufferStart + yyBytesRead THEN
+	 RETURN 0C;
+      ELSE
+	 INC (yyChBufferIndex);
+	 RETURN yyChBufferPtr^ [yyChBufferIndex - 1];
+      END
+   END input;
+
+PROCEDURE BeginScanner;
+   BEGIN
+(* line 123 "puma.rex" *)
+ NestingLevel := 0; 
+   END BeginScanner;
+ 
+PROCEDURE CloseScanner;
+   BEGIN
+   END CloseScanner;
+ 
+PROCEDURE yyGetTables;
+   VAR
+      BlockSize, j, n	: CARDINAL;
+      TableFile	: System.tFile;
+      i		: yyStateRange;
+      Base	: ARRAY yyStateRange OF yyTableRange;
+   BEGIN
+      BlockSize	:= 64000 DIV SYSTEM.TSIZE (yyCombType);
+      TableFile := System.OpenInput (ScanTabName);
+      Checks.ErrorCheck ("yyGetTables.OpenInput", TableFile);
+      IF (yyGetTable (TableFile, SYSTEM.ADR (Base      )) DIV SYSTEM.TSIZE (yyTableElmt) - 1 # yyDStateCount) OR
+         (yyGetTable (TableFile, SYSTEM.ADR (yyDefault )) DIV SYSTEM.TSIZE (yyTableElmt) - 1 # yyDStateCount) OR
+         (yyGetTable (TableFile, SYSTEM.ADR (yyEobTrans)) DIV SYSTEM.TSIZE (yyTableElmt) - 1 # yyDStateCount)
+	 THEN
+	 yyErrorMessage (2);
+      END;
+      n := 0;
+      j := 0;
+      WHILE j <= yyTableSize DO
+         INC (n, yyGetTable (TableFile, SYSTEM.ADR (yyComb [j])) DIV SYSTEM.TSIZE (yyCombType));
+         INC (j, BlockSize);
+      END;
+      IF n # yyTableSize + 1 THEN yyErrorMessage (2); END;
+      System.Close (TableFile);
+
+      FOR i := 0 TO yyDStateCount DO
+	 yyBasePtr [i] := LONGCARD (SYSTEM.ADR (yyComb [Base [i]]));
+      END;
+   END yyGetTables;
+ 
+PROCEDURE yyGetTable (TableFile: System.tFile; Address: SYSTEM.ADDRESS): CARDINAL;
+   VAR
+      N		: INTEGER;
+      Length	: yyTableElmt;
+   BEGIN
+      N := System.Read (TableFile, SYSTEM.ADR (Length), SYSTEM.TSIZE (yyTableElmt));
+      Checks.ErrorCheck ("yyGetTable.Read1", N);
+      N := System.Read (TableFile, Address, Length);
+      Checks.ErrorCheck ("yyGetTable.Read2", N);
+      RETURN Length;
+   END yyGetTable;
+ 
+PROCEDURE yyErrorMessage (ErrorCode: SHORTCARD);
+   BEGIN
+      Positions.WritePosition (IO.StdError, Attribute.Position);
+      CASE ErrorCode OF
+   | 0: IO.WriteS (IO.StdError, ": Scanner: internal error");
+   | 1: IO.WriteS (IO.StdError, ": Scanner: out of memory");
+   | 2: IO.WriteS (IO.StdError, ": Scanner: table mismatch");
+   | 3: IO.WriteS (IO.StdError, ": Scanner: too many nested include files");
+   | 4: IO.WriteS (IO.StdError, ": Scanner: file stack underflow (too many calls of CloseFile)");
+   | 5: IO.WriteS (IO.StdError, ": Scanner: cannot open input file");
+      END;
+      IO.WriteNl (IO.StdError); Exit;
+   END yyErrorMessage;
+ 
+PROCEDURE yyExit;
+   BEGIN
+      IO.CloseIO; System.Exit (1);
+   END yyExit;
+
+BEGIN
+   ScanTabName		:= "Scanner.Tab";
+   Exit			:= yyExit;
+   yyFileStackPtr	:= 0;
+   yyStartState		:= 1;			(* set up for auto init *)
+   yyPreviousStart	:= 1;
+   yyBasePtr [yyStartState] := LONGCARD (SYSTEM.ADR (yyComb [0]));
+   yyDefault [yyStartState] := yyDNoState;
+   yyComb [0].Check	:= yyDNoState;
+   yyChBufferPtr	:= SYSTEM.ADR (yyComb [0]);	(* dirty trick *)
+   yyChBufferIndex	:= 1;				(* dirty trick *)
+   yyStateStackSize	:= yyInitBufferSize;
+   DynArray.MakeArray (yyStateStack, yyStateStackSize, SYSTEM.TSIZE (yyStateRange));
+   yyStateStack^ [0]	:= yyDNoState;
+   
+   FOR yyCh := yyFirstCh TO yyLastCh DO yyToLower [yyCh] := yyCh; END;
+   yyToUpper := yyToLower;
+   FOR yyCh := 'A' TO 'Z' DO
+      yyToLower [yyCh] := CHR (ORD (yyCh) - ORD ('A') + ORD ('a'));
+   END;
+   FOR yyCh := 'a' TO 'z' DO
+      yyToUpper [yyCh] := CHR (ORD (yyCh) - ORD ('a') + ORD ('A'));
+   END;
+END Scanner.

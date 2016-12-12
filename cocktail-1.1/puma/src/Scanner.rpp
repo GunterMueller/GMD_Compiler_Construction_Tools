@@ -1,0 +1,109 @@
+m
+TYPE
+yyIdent = RECORD Ident: tIdent; END;
+yyOperator = RECORD Ident: tIdent; END;
+yyIncOperator = RECORD Ident: tIdent; END;
+yyTargetBlock = RECORD Text: tText; END;
+yyString = RECORD StringRef: tStringRef; END;
+yyNumber = RECORD StringRef: tStringRef; END;
+yyTargetCode = RECORD StringRef: tStringRef; END;
+yyWhiteSpace = RECORD StringRef: tStringRef; END;
+(* '::' *) yy9 = RECORD StringRef: tStringRef; END;
+
+tScanAttribute = RECORD
+Position: tPosition;
+CASE : SHORTCARD OF
+| 1: Ident: yyIdent;
+| 2: Operator: yyOperator;
+| 3: IncOperator: yyIncOperator;
+| 4: TargetBlock: yyTargetBlock;
+| 5: String: yyString;
+| 6: Number: yyNumber;
+| 7: TargetCode: yyTargetCode;
+| 8: WhiteSpace: yyWhiteSpace;
+| 9: (* '::' *) yy9: yy9;
+END; END;
+
+PROCEDURE ErrorAttribute (Token: INTEGER; VAR pAttribute: tScanAttribute);
+%%
+PROCEDURE ErrorAttribute (Token: INTEGER; VAR pAttribute: tScanAttribute);
+BEGIN
+ pAttribute.Position := Attribute.Position;
+ CASE Token OF
+ | (* Ident *) 1: 
+ pAttribute.Ident.Ident	:= NoIdent	;
+ ;
+ | (* Operator *) 2: 
+ pAttribute.Operator.Ident	:= NoIdent	;
+ ;
+ | (* IncOperator *) 3: 
+ pAttribute.IncOperator.Ident	:= NoIdent	;
+ ;
+ | (* TargetBlock *) 4: 
+ MakeText (pAttribute.TargetBlock.Text); ;
+ ;
+ | (* String *) 5: 
+ pAttribute.String.StringRef	:= GetStringRef (NoIdent);
+ ;
+ | (* Number *) 6: 
+ pAttribute.Number.StringRef	:= GetStringRef (NoIdent);
+ ;
+ | (* TargetCode *) 7: 
+ pAttribute.TargetCode.StringRef	:= GetStringRef (NoIdent);
+ ;
+ | (* WhiteSpace *) 8: 
+ pAttribute.WhiteSpace.StringRef	:= GetStringRef (NoIdent);
+ ;
+ | (* '::' *) 9: 
+ pAttribute.yy9.StringRef	:= GetStringRef (NoIdent);
+ ;
+ ELSE
+ END;
+END ErrorAttribute;
+%%
+1 S Ident Ident
+2 S Operator Operator
+3 S IncOperator IncOperator
+4 S TargetBlock TargetBlock
+5 S String String
+6 S Number Number
+7 S TargetCode TargetCode
+8 S WhiteSpace WhiteSpace
+9 S yy9 '::'
+10 N TRAFO TRAFO
+11 N 'TREE' 'TREE'
+12 N ',' ','
+13 N PUBLIC PUBLIC
+14 N EXTERN EXTERN
+15 N ';' ';'
+16 N 'EXPORT' 'EXPORT'
+17 N 'IMPORT' 'IMPORT'
+18 N 'GLOBAL' 'GLOBAL'
+19 N 'BEGIN' 'BEGIN'
+20 N 'CLOSE' 'CLOSE'
+21 N PROCEDURE PROCEDURE
+22 N '(' '('
+23 N REF REF
+24 N ':' ':'
+25 N '.' '.'
+26 N '[' '['
+27 N ']' ']'
+28 N '=>' '=>'
+29 N ')' ')'
+30 N 'LOCAL' 'LOCAL'
+31 N '..' '..'
+32 N NIL NIL
+33 N '_' '_'
+34 N '{' '{'
+35 N '}' '}'
+36 N '->' '->'
+37 N '^' '^'
+38 N ':>' ':>'
+39 N ':=' ':='
+40 N '?' '?'
+41 N REJECT REJECT
+42 N FAIL FAIL
+43 N NL NL
+44 N RETURN RETURN
+45 N 'FUNCTION' 'FUNCTION'
+46 N PREDICATE PREDICATE

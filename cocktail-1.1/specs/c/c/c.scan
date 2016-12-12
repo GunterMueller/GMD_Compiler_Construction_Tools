@@ -1,0 +1,101 @@
+EXPORT	{
+# include "ratc.h"
+# include "Positions.h"
+
+INSERT tScanAttribute
+}
+
+GLOBAL	{
+# include "Errors.h"
+
+INSERT ErrorAttribute
+
+extern char idents_only	[];
+extern int decl_level	  ;
+
+extern char * strpbrk	();
+extern char * strchr	();
+extern char * strrchr	();
+
+char * filename = 0;
+}
+
+DEFAULT	{ MessageI ("illegal character", xxError, Attribute.Position, xxCharacter, TokenPtr); }
+
+EOF	{ if (yyStartState == comment) Message ("unclosed comment", xxError, Attribute.Position); }
+
+DEFINE
+   O	= {0-7} .
+   D	= {0-9} .
+   L	= {a-zA-Z_} .
+   H	= {a-fA-F0-9} .
+   E	= {Ee}{+\-}? D + .
+   FS	= (f|F|l|L) .
+   IS	= (u|U|l|L) .
+   W	= {\ \t\f}* .
+   LIT	= \"(\\ ANY |-{\\"})*\" .
+
+START	comment
+
+RULE
+
+#STD# "/*"			:- { yyStart (comment); }
+#comment# "*/"			:- { yyPrevious; }
+#comment# "*" | - {*\t\n} +	:- {}
+
+< W \# W pragma ANY * \n	:- { /* ignore pragma */ yyEol (0); }
+< W \# W line ? W D + W LIT ANY * \n	,
+< W \# W line ? W D + -{"} * \n		:- {
+
+  /* Handle directive left by the preprocessor, i.e.
+   *
+   *    # line 123 "foo.h"
+   *    # line 125
+   *    # 126 "foo.h" 2
+   *
+   * et cetera.
+   */
+
+   char Word [256]; (void) GetWord (Word);
+   {
+      char * line_ptr = strpbrk (Word, "0123456789");
+      char * file_ptr = strchr (line_ptr, '"') + 1;	/* Start of file-name */
+      yyLineCount = atoi (line_ptr);
+
+      if (file_ptr != 0) {
+	 char * file_end = strrchr (file_ptr, '"');	/* end */
+	 int len = file_end - file_ptr;
+	 if (filename != 0) free (filename);
+	 filename = (char *) malloc (len + 1);
+	 (void) strncpy (filename, file_ptr, len);
+	 filename [len] = 0;
+      }
+   }
+}
+
+\f | \r				:- {}
+
+INSERT RULES #STD#
+
+L (L | D)*			: {
+
+   /* Make a copy and set Attribute */
+   Attribute.IDENTIFIER.Name = (char *) malloc (TokenLength + 1);
+   (void) GetWord (Attribute.IDENTIFIER.Name);
+
+   /* Return the type of the token: IDENTIFIER, TYPEDEF_NAME, or ENUM_CONSTANT */
+   if (idents_only [decl_level]) return IDENTIFIER;
+   else return type_of_name (Attribute.IDENTIFIER.Name);
+}
+
+"0"{xX} H + IS ?		: { return INTEGER_CONSTANT	; }
+"0" O + IS ?			: { return INTEGER_CONSTANT	; }
+D + IS ?			: { return INTEGER_CONSTANT	; }
+
+' (\\ ANY | - {\\'}) + '	: { return CHARACTER_CONSTANT	; }
+
+D + E FS ?			: { return FLOATING_CONSTANT	; }
+D * "." D + E ? FS ?		: { return FLOATING_CONSTANT	; }
+D + "." D * E ? FS ?		: { return FLOATING_CONSTANT	; }
+
+LIT 				: { return STRING		; }

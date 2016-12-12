@@ -1,0 +1,7 @@
+MODULE main;
+
+IMPORT Compiler;
+
+BEGIN
+   Compiler.goal;
+END main.

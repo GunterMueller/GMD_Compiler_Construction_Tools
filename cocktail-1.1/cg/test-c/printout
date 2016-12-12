@@ -1,0 +1,23 @@
+cg -ca g.cg;
+cc -I/zone2/grosch/reuse/c -c Main.c;
+cc -I/zone2/grosch/reuse/c -c Tree.c;
+Tree.c: 34: closeint redefined
+"Tree.c", line 1056: warning: statement not reached
+cc -o Main Main.o Tree.o /zone2/grosch/lib.sparc/libreuse.a
+Main
++ cmp a aa 
++ cmp b bb 
++ cmp a aaa 
+fopen (a, w)
+fopen (a, r)
+fopen (b, w)
+fopen (b, r)
+fopen (aa, w)
+fopen (bb, w)
+fopen (aaa, w)
+should print:
+1 2 3 4 5 4 3 5 2 1 
+1 2 3 4 5 4 3 5 2 1 
+should print:
+4 3 5 2 1 
+4 3 5 2 1 

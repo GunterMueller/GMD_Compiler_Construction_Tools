@@ -1,0 +1,68 @@
+EXPORT  {
+# ifdef __cplusplus
+extern "C" {
+# include "Idents.h"
+# include "Positions.h"
+}
+# else
+# include "Idents.h"
+# include "Positions.h"
+# endif
+
+INSERT tScanAttribute
+}
+
+GLOBAL	{
+# ifdef __cplusplus
+extern "C" {
+# include <math.h>
+# include "Memory.h"
+# include "StringMem.h"
+# include "Idents.h"
+# include "Errors.h"
+}
+# else
+# include <math.h>
+# include "Memory.h"
+# include "StringMem.h"
+# include "Idents.h"
+# include "Errors.h"
+# endif
+
+INSERT ErrorAttribute
+}
+
+LOCAL	{ char Word [256]; }
+
+DEFAULT	{
+   MessageI ("illegal character", xxError, Attribute.Position, xxCharacter, TokenPtr);
+}
+
+EOF	{
+   if (yyStartState == Comment) Message ("unclosed comment", xxError, Attribute.Position);
+}
+
+DEFINE	digit	= {0-9} .
+	letter	= {a-z A-Z} .
+
+START	Comment
+
+RULE
+	  "(*"	:- {yyStart (Comment);}
+#Comment# "*)"	:- {yyStart (STD);}
+#Comment# "*" | - {*\t\n} + :- {}
+
+#STD# digit +	: {(void) GetWord (Word);
+		   Attribute.IntegerConst.Integer = atoi (Word);
+		   return IntegerConst;}
+
+#STD# digit * "." digit + (E {+\-} ? digit +) ?
+		: {(void) GetWord (Word);
+		   Attribute.RealConst.Real = atof (Word);
+		   return RealConst;}
+
+INSERT RULES #STD#
+
+#STD# letter (letter | digit) *
+		: {Attribute.Ident.Ident = MakeIdent (TokenPtr, TokenLength);
+		   return Ident;}

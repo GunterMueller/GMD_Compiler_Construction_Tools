@@ -1,0 +1,778 @@
+.\" use: pic | tbl | eqn | ditroff -me
+.\"
+.\"	"@(#)bibmac.me	2.2	9/9/83";
+.de IP
+.ip \\$1 \\$2
+..
+.de LP
+.lp
+..
+.\"	@(#)bmac.std	2.2	9/9/83;
+.\" standard format troff commands
+.\" citation formatting strings
+.ds [[ [
+.ds ]] ]
+.ds ], ,\|
+.ds ]- -
+.ds [. " \&
+.ds .] .
+.ds [, " \&
+.ds ,] ,
+.ds [? " \&
+.ds ?] ?
+.ds [: " \&
+.ds :] :
+.ds [; " \&
+.ds ;] ;
+.ds [! " \&
+.ds !] !
+.ds [" " \&
+.ds "] \&"
+.ds [' " \&
+.ds '] '
+.ds [< " \&
+.ds >]
+.\" reference formmating strings
+.ds a] " \&
+.ds b] , \&
+.ds c] , \&
+.ds n] "\& and \&
+.ds m] "\& and \&
+.ds p] .
+.\" reference formmating macros
+.de s[   \" start reference
+.nh
+.IP [\\*([F] 5m
+..
+.de e[   \" end reference
+.[-
+..
+.de []   \" start to display collected references
+.LP
+..
+.de ][   \" choose format
+.ie !"\\*([J"" \{\
+.    ie !"\\*([V"" .nr t[ 1    \" journal
+.    el            .nr t[ 5    \" conference paper
+.\}
+.el .ie !"\\*([B"" .nr t[ 3    \" article in book
+.el .ie !"\\*([R"" .nr t[ 4    \" technical report
+.el .ie !"\\*([I"" .nr t[ 2    \" book
+.el                .nr t[ 0    \" other
+.\\n(t[[
+..
+.de 0[   \" other
+.s[
+.if !"\\*([A"" \\*([A\\c
+.if !"\\*([T"" , \\*([T\\c
+.if !"\\*([V"" , Vol. \\*([V\\c
+.if !"\\*([O"" , \\*([O\\c
+.if !"\\*([D"" , \\*([D\\c
+\&.
+.e[
+..
+.de 1[ \" journal article
+.s[
+.if !"\\*([A"" \\*([A,
+.if !"\\*([T""  \\*([T,
+\\fI\\*([J \\*([V\\fP\c
+.if !"\\*([N"" ,\\*([N
+.if !"\\*([D"" (\\*([D)\c
+.if !"\\*([P"" , \\*([P\c
+.if !"\\*([I"" , \\*([I\c
+\\&.
+.if !"\\*([O"" \\*([O.
+.e[
+..
+.de 2[ \" book
+.s[
+.ie !"\\*([A"" \\*([A,
+.el .if !"\\*([E"" \{\
+.       ie \\n([E-1 \\*([E, eds.,
+.       el \\*([E, ed.,\}
+.if !"\\*([T"" \\fI\\*([T\\fP,
+.rm a[
+.if !"\\*([I"" .ds a[ \\*([I
+.if !"\\*([C"" \{\
+.       if !"\\*(a["" .as a[ , \\&
+.       as a[ \\*([C\}
+.if !"\\*([D"" \{\
+.       if !"\\*(a["" .as a[ , \\&
+.       as a[ \\*([D\}
+\\*(a[.
+.if !"\\*([G"" Gov. ordering no. \\*([G.
+.if !"\\*([O"" \\*([O.
+.e[
+..
+.de 3[ \" article in book
+.s[
+.if !"\\*([A"" \\*([A,
+.if !"\\*([T"" \\*([T,
+in \\fI\\*([B\\fP\c
+.if !"\\*([V"" , vol. \\*([V
+.if !~\\*([E~~ \{\
+.       ie , \\n([E-1  \\*([E (editors)\c
+.       el , \\*([E (editor)\c\}
+.if !"\\*([I"" , \\*([I\c
+.if !"\\*([C"" , \\*([C\c
+.if !"\\*([D"" , \\*([D\c
+.if !"\\*([P"" , \\*([P\c
+\\&.
+.if !"\\*([O"" \\*([O.
+.e[
+..
+.de 4[ \" report
+.s[
+.if !"\\*([A"" \\*([A,
+.if !~\\*([E~~ \{\
+.       ie \\n([E-1 \\*([E, editors.
+.       el \\*([E, editor.\}
+\\*([T,
+\\*([R\c
+.if !"\\*([G"" \& (\\*([G)\c
+.if !"\\*([I"" , \\*([I\c
+.if !"\\*([C"" , \\*([C\c
+.if !"\\*([D"" , \\*([D\c
+\\&.
+.if !"\\*([O"" \\*([O.
+.e[
+..
+.de 5[ \" conference paper
+.s[
+.if !"\\*([A"" \\*([A,
+.if !"\\*([T"" \\*([T,
+\\fI\\*([J\\fP,
+.if !"\\*([C"" \\*([C,
+.if !"\\*([D"" \\*([D\c
+.if !"\\*([P"" , \\*([P\c
+\\&.
+.if !"\\*([O"" \\*([O.
+.e[
+..
+.de [-   \" clean up after yourself
+.rm [A [B [C [D
+.rm [E [F [G
+.rm [I [J [K
+.rm [N [O [P
+.rm [R [T
+.rm [V [W
+..
+.\"	@(#)bmac.std	2.2	8/24/83;
+.\" standard format troff commands
+.\" citation formatting strings
+.ds [[ [
+.ds ]] ]
+.ds ], ,\|
+.ds ]- -
+.ds [. " \&
+.ds .] .
+.ds [, " \&
+.ds ,] ,
+.ds [< " \&
+.ds >]
+.\" reference formmating strings
+.ds c] , \&
+.ds n] "" and \&
+.ds m] "" and \&
+.ds a] " \&
+.\" reference formmating macros
+.de s[   \" start reference
+.nh
+.IP [\\*([F] 5m
+..
+.de e[   \" end reference
+.[-
+..
+.de []   \" start to display collected references
+.SH
+References
+.LP
+..
+.de ][   \" choose format
+.ie !"\\*([J"" \{\
+.    ie !"\\*([V"" .nr t[ 1    \" journal
+.    el            .nr t[ 5    \" conference paper
+.\}
+.el .ie !"\\*([B"" .nr t[ 3    \" article in book
+.el .ie !"\\*([R"" .nr t[ 4    \" technical report
+.el .ie !"\\*([I"" .nr t[ 2    \" book
+.el                .nr t[ 0    \" other
+.\\n(t[[
+..
+.de 0[   \" other
+.s[
+.if !"\\*([A"" \\*([A,
+.if !"\\*([T"" \\*([T,
+.if !"\\*([O"" \\*([O\c
+.if !"\\*([D"" , \\*([D\c
+\&.
+.e[
+..
+.de 1[ \" journal article
+.s[
+.if !"\\*([A"" \\*([A,
+.if !"\\*([T"" \\*([T,
+\\fI\\*([J \\*([V\\fP,
+.if !"\\*([N"" \\*([N
+.if !"\\*([D"" (\\*([D),
+.if !"\\*([P"" \\*([P\c
+.if !"\\*([I"" , \\*([I\c
+\\&.
+.if !"\\*([O"" \\*([O.
+.e[
+..
+.de 2[ \" book
+.s[
+.ie !"\\*([A"" \\*([A,
+.el .if !"\\*([E"" \{\
+.       ie \\n([E-1 \\*([E, eds.,
+.       el \\*([E, ed.,\}
+.if !"\\*([T"" \\fI\\*([T\\fP,
+.rm a[
+.if !"\\*([I"" .ds a[ \\*([I
+.if !"\\*([C"" \{\
+.       if !"\\*(a["" .as a[ , \\&
+.       as a[ \\*([C\}
+.if !"\\*([D"" \{\
+.       if !"\\*(a["" .as a[ , \\&
+.       as a[ \\*([D\}
+\\*(a[.
+.if !"\\*([G"" Gov. ordering no. \\*([G.
+.if !"\\*([O"" \\*([O.
+.e[
+..
+.de 3[ \" article in book
+.s[
+.if !"\\*([A"" \\*([A,
+.if !"\\*([T"" \\*([T,
+in \\fI\\*([B\\fP,
+.if !"\\*([V"" vol. \\*([V,
+.if !"\\*([E"" \\*([E (ed.),
+.if !"\\*([I"" \\*([I,
+.if !"\\*([C"" \\*([C,
+.if !"\\*([D"" \\*([D\c
+.if !"\\*([P"" , \\*([P\c
+\\&.
+.if !"\\*([O"" \\*([O.
+.e[
+..
+.de 4[ \" report
+.s[
+.if !"\\*([A"" \\*([A,
+\\*([T,
+\\*([R\c
+.if !"\\*([G"" \& (\\*([G)\c
+.if !"\\*([I"" , \\*([I\c
+.if !"\\*([C"" , \\*([C\c
+.if !"\\*([D"" , \\*([D\c
+\\&.
+.if !"\\*([O"" , \\*([O.
+.e[
+..
+.de 5[ \" conference paper
+.s[
+.if !"\\*([A"" \\*([A,
+.if !"\\*([T"" \\*([T,
+\\fI\\*([J\\fP,
+.if !"\\*([C"" \\*([C\c
+.if !"\\*([D"" , \\*([D\c
+.if !"\\*([P"" , \\*([P\c
+\\&.
+.if !"\\*([O"" , \\*([O.
+.e[
+..
+.de [-   \" clean up after yourself
+.rm [A [B [C [D
+.rm [E [F [G
+.rm [I [J [K
+.rm [N [O [P
+.rm [R [T
+.rm [V [W
+..
+.if t \{ \
+.pl 29.7c	\" page length
+.po 2.5c	\" page offset (left margin)
+.ll 16.5c	\" line length
+.lt 16.5c	\" title length
+.nr LL 16.5c
+.nr )l 29.7c
+.nr hm 2c
+.nr $r 9	\" factor for vertical spacing
+.nr $R \n($r
+.sz 12		\" font size
+.nr pp 12
+.nr sp 12
+.nr tp 12
+.nr fp 10
+.hc ~		\" hyphenation character
+.		\" Umlauts and sharp s
+.ds A \(A:
+.ds O \(O:
+.ds U \(U:
+.ds a \(a:
+.ds o \(o:
+.ds u \(u:
+.ds s \(ss
+.		\"  UMLAUT  \*:u, etc.
+.ds : \v'-0.6m'\h'(1u-(\\n(.fu%2u))*0.13m+0.06m'\z.\h'0.2m'\z.\h'-((1u-(\\n(.fu%2u))*0.13m+0.26m)'\v'0.6m'
+.\}
+.if n \{ \
+.po 0		\" page offset (left margin)
+.ll 78		\" line length
+.lt 78		\" title length
+.nr $r 4	\" factor for vertical spacing
+.nr $R \n($r
+.hc ~		\" hyphenation character
+.		\" Umlaute und scharfes s
+.ds A Ae
+.ds O Oe
+.ds U Ue
+.ds a ae
+.ds o oe
+.ds u ue
+.ds s sz
+.\}
+.de _
+\&\\$1\l'|0\(ul'\\$2
+..
+.de FT		\" font for programs
+.ft C
+.sz -2
+..
+.de FR
+.ft R
+.sz +2
+..
+.de []		\" start to display collected references
+.uh References
+.lp
+..
+.de $0		\" collect table of contents
+.(x
+.ta 2c
+.ie '\\$2''	\\$1
+.el \\$2.	\\$1
+.)x
+..
+.de np
+.nr $p +1
+.ip \\n($p.
+..
+.de SH
+.sp 0.5
+.in -3
+.r \\$1
+.sp 0.5
+.in +3
+..
+.de PP
+.sp 0.5
+..
+.de IP
+.ip \\$1 \\$2
+..
+.de I
+.i \\$1
+..
+.de TH
+..
+.hc @
+.EQ
+gsize 12
+gfont B
+delim off
+.EN
+.sz 28
+.b
+.ce 2
+Automatic Generation
+of Efficient Compilers
+.sp 2
+.nf
+.ta 3c
+.sz 18
+using a complete tool box containing:
+.sz 14
+
+   Rex	scanner generator
+
+   Lalr	LALR(1) parser generator
+
+   Ell	LL(1) parser generator
+
+   Ast	generator for abstract syntax trees
+
+   Ag	attribute evaluator generator (OAG)
+
+   Estra	transformation of attributed syntax trees
+
+   Beg	back end generator
+
+   Reuse	library of reusable modules
+
+
+.sz 18
+advantages:
+.sz 14
+.sp 0.5
+- specification replaces implementation
+.sp 0.5
+- tools reduce construction effort
+.sp 0.5
+- consistency checks avoid errors
+.sp 0.5
+- program generation increases reliability
+.sp 0.5
+- efficiency comparable to hand-written implementations
+.sp
+.sz 18
+common properties:
+.sz 14
+.sp 0.5
+- implementation languages are Modula-2 or C
+.sp 0.5
+- target languages are Modula-2 or C
+.b
+.bp
+.ce
+.sz 28
+Compiler Generation
+.sz 14
+.PS
+linewid	= linewid * 1.2
+boxwid	= boxwid * 1.7
+boxht	= boxht * 1.2
+circlerad = circlerad * 1.2
+bh	= boxht * 1.8
+
+	right
+
+S1:	box "concrete" "syntax" height bh
+	arrow dashed
+SP:	box "Scanner" "Spec"
+	arrow
+T:	circle "rex"
+	arrow
+I1:	box "Scanner"
+
+S2:	box "mapping" "concrete \(->" "abstract" at S1 - (0, bh) height bh
+	arrow dashed
+P:	box "Parser" "Spec"
+	arrow
+	circle "lalr" "ell"
+	arrow
+I2:	box "Parser"
+
+S3:	box "abstract" "syntax" at S2 - (0, bh) height bh
+	arrow dashed
+	box "Tree" "Spec"
+	arrow
+	circle "ast"
+	arrow
+I3:	box "Tree"
+
+S4:	box "semantic" "analysis" at S3 - (0, bh) height bh
+	arrow dashed
+	box "Semantics" "Spec"
+	arrow
+	circle "ag"
+	arrow
+I4:	box "Semantics"
+
+S5:	box "mapping" "abstract \(->" "intermediate" at S4 - (0, bh) height bh
+	arrow dashed
+	box "Trafo" "Spec"
+	arrow
+	circle "estra"
+	arrow
+I5:	box "Trafo"
+
+S6:	box "intermediate" "language" at S5 - (0, bh) height bh
+	arrow dashed
+	box "Intermediate" "Spec"
+	arrow
+	circle "ast"
+	arrow
+I6:	box "Intermediate"
+
+S7:	box "code" "generation" at S6 - (0, bh) height bh
+	arrow dashed
+	box "Codegen" "Spec"
+	arrow
+	circle "beg"
+	arrow
+I7:	box "Codegen"
+
+	arrow dashed from S1.e to P.w
+	box invis "Compiler" "Specification" at S1 + (0, bh)
+	box invis "Tool" "Specification" at SP + (0, bh)
+	box invis "Tool" at T + (0, bh)
+	box invis "Compiler" "Module" at I1 + (0, bh)
+
+	line from I1.n up boxht * 0.9 <-
+	arrow from I1.s to I2.n
+	arrow from I2.s to I3.n
+	arrow from I3.s to I4.n <->
+	arc from I3.se to I5.ne at I4 -> cw
+	arrow from I5.s to I6.n
+	arrow from I6.s to I7.n
+	arrow from I7.s down boxht * 0.9
+.PE
+.b
+.bp
+.ce 2
+.sz 28
+Rex
+.sz 18
+
+a scanner generator
+
+
+.sz 14
+- specifications are based on regular expressions
+
+- actions are composed of target language statements
+
+- right context is handled by an additional regular expression
+
+- left context is handled by start states
+
+- conflicts are resolved in favour of longest match and first rule given
+
+- provides line and column of every token
+
+- can normalize tokens to lower or upper case letters
+
+- knows predefined rules to skip white space
+
+- can handle include files
+
+- generates table-driven scanners
+
+- generates efficient scanners
+
+- generates scanners in Modula-2 or C
+
+- scanners process up to 180,000 lines/minute (on MC 68020)
+
+- scanners are 4 times faster than those of LEX
+.b
+.bp
+.ce 2
+.sz 28
+Lalr
+.sz 18
+
+a parser generator
+
+
+.sz 14
+- processes LALR(1) grammars
+
+- actions are composed of target language statements
+
+- allows to evaluate an S-Attribution during parsing
+
+- reports grammar conflicts by easy to understand derivation trees
+
+- resolves grammar conflicts with precedence and associativity
+
+- generates automatic error reporting, recovery, and repair
+
+- generates table-driven parsers
+
+- generates efficient parsers
+
+- generates parsers in Modula-2 or C
+
+- parsers process up to 35,000 tokens/sec. or 580,000 lines/min. (on MC 68020)
+
+- parsers are 3 times faster than those of YACC
+.b
+.bp
+.ce 2
+.sz 28
+Ell
+.sz 18
+
+a parser generator
+
+
+.sz 14
+- processes LL(1) grammars in extended BNF
+
+- actions are composed of target language statements
+
+- allows to evaluate an L-Attribution during parsing
+
+- generates automatic error reporting, recovery, and repair
+
+- generates recursive descent parsers
+
+- generates efficient parsers
+
+- generates parsers in Modula-2 or C
+
+- parsers process up to 55,000 tokens/sec. or 900,000 lines/min. (on MC 68020)
+.b
+.bp
+.ce 2
+.sz 28
+Ast
+.sz 18
+
+a generator for abstract syntax trees
+
+
+.sz 14
+- generates abstract data types (program modules) to handle trees
+
+- the trees may be attributed
+
+- besides trees graphs are handled as well
+
+- nodes may be associated with arbitrary many attributes of arbitrary type
+
+- specifications are based on extended context-free grammars
+
+- common notation for concrete and abstract syntax
+
+- as well as for attributed trees and graphs
+
+- an extension mechanism provides single inheritance
+
+- trees are stored as linked records
+
+- generates efficient program modules
+
+- generates modules in Modula-2 or C
+
+- provides many tree operations (procedures):
+
+- node constructors combine aggregate notation and storage management
+
+- ascii graph reader and writer
+
+- binary graph reader and writer
+
+- reversal of lists
+
+- top down and bottom up traversal
+
+- interactive graph browser
+.b
+.bp
+.ce 2
+.sz 28
+Ag
+.sz 18
+
+an attribute evaluator generator
+
+
+.sz 14
+- processes ordered attribute grammars (OAGs)
+
+- processes higher order attribute grammars (HAGs)
+
+- operates on abstract syntax
+
+- is based on tree modules generated by Ast
+
+- the tree structure is fully known
+
+- terminals and nonterminals may have arbitrary many attributes
+
+- attributes can have any target language type
+
+- allows tree-valued attributes
+
+- differentiates input and output attributes
+
+- allows attributes local to rules
+
+- allows to eliminate chain rules
+
+- offers an extension mechanism (single inheritance)
+
+- attributes are denoted by unique selector names
+
+   instead of nonterminal names with subscripts
+.b
+.bp
+.ce 2
+.sz 28
+Ag
+.sz 18
+
+an attribute evaluator generator (continued)
+
+
+.sz 14
+- attribute computations are expressed in the target language
+
+- attribute computations are written in a functional style
+
+- attribute computations can call external functions
+
+- non-functional statements and side-effects are possible
+
+- allows to write compact, modular, and readable specifications
+
+- AGs can consist of several modules
+
+- the context-free grammar is specified only once
+
+- checks an AG for completeness of the attribute computations
+
+- checks for unused attributes
+
+- checks an AG for the classes SNC, DNC, OAG, LAG, and SAG
+
+- the evaluators are directly coded using recursive procedures
+
+- generates efficient evaluators
+
+- generates evaluators in Modula-2 (or C)
+.b
+.bp
+.ce 2
+.sz 28
+Estra
+.sz 18
+
+a generator for transformations of attributed syntax trees
+
+
+.sz 14
+- is based on tree modules generated by Ast
+
+- specifications are rule based
+
+- a rule consists of a pattern and an action
+
+- actions are composed of target language statements
+
+- patterns describe tree fragments
+
+- several transformations can be specified
+
+- subtrees can be transformed in any order
+
+- subtrees can be transformed several times
+
+- subtrees can be transformed by several transformations
+
+- inherited and synthesized attributes can be evaluated
+
+- ambiguities are resolved using costs
+
+- application of rules can be restricted by conditions
+
+- pattern-matching by directly coded dynamic programming algorithm
+
+- or by table-driven tree pattern-matcher
+
+- generates efficient transformation modules
+
+- generates transformation modules in Modula-2

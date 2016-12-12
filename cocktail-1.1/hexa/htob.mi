@@ -1,0 +1,35 @@
+MODULE htob;
+
+(* convert ascii hexadecimal files into binary *)
+
+FROM StdIO IMPORT ReadC, EndOfFile, WriteC, CloseIO;
+
+VAR ch		: CHAR;
+    value	: ARRAY ['0'..'F'] OF CARDINAL;
+
+BEGIN
+   value ['0'] := 0;
+   value ['1'] := 1;
+   value ['2'] := 2;
+   value ['3'] := 3;
+   value ['4'] := 4;
+   value ['5'] := 5;
+   value ['6'] := 6;
+   value ['7'] := 7;
+   value ['8'] := 8;
+   value ['9'] := 9;
+   value ['A'] := 10;
+   value ['B'] := 11;
+   value ['C'] := 12;
+   value ['D'] := 13;
+   value ['E'] := 14;
+   value ['F'] := 15;
+
+   WHILE NOT EndOfFile () DO
+      ch := ReadC ();
+      IF ch # 12C THEN
+	 WriteC (CHR (value [ch] * 16 + value [ReadC ()]));
+      END;
+   END;
+   CloseIO;
+END htob.

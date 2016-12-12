@@ -1,0 +1,1603 @@
+.\" use: pic | tbl | eqn | ditroff -me
+.\"
+.\"	"@(#)bibmac.me	2.2	9/9/83";
+.de IP
+.ip \\$1 \\$2
+..
+.de LP
+.lp
+..
+.\"	@(#)bmac.std	2.2	9/9/83;
+.\" standard format troff commands
+.\" citation formatting strings
+.ds [[ [
+.ds ]] ]
+.ds ], ,\|
+.ds ]- -
+.ds [. " \&
+.ds .] .
+.ds [, " \&
+.ds ,] ,
+.ds [? " \&
+.ds ?] ?
+.ds [: " \&
+.ds :] :
+.ds [; " \&
+.ds ;] ;
+.ds [! " \&
+.ds !] !
+.ds [" " \&
+.ds "] \&"
+.ds [' " \&
+.ds '] '
+.ds [< " \&
+.ds >]
+.\" reference formmating strings
+.ds a] " \&
+.ds b] , \&
+.ds c] , \&
+.ds n] "\& and \&
+.ds m] "\& and \&
+.ds p] .
+.\" reference formmating macros
+.de s[   \" start reference
+.nh
+.IP [\\*([F] 5m
+..
+.de e[   \" end reference
+.[-
+..
+.de []   \" start to display collected references
+.LP
+..
+.de ][   \" choose format
+.ie !"\\*([J"" \{\
+.    ie !"\\*([V"" .nr t[ 1    \" journal
+.    el            .nr t[ 5    \" conference paper
+.\}
+.el .ie !"\\*([B"" .nr t[ 3    \" article in book
+.el .ie !"\\*([R"" .nr t[ 4    \" technical report
+.el .ie !"\\*([I"" .nr t[ 2    \" book
+.el                .nr t[ 0    \" other
+.\\n(t[[
+..
+.de 0[   \" other
+.s[
+.if !"\\*([A"" \\*([A\\c
+.if !"\\*([T"" , \\*([T\\c
+.if !"\\*([V"" , Vol. \\*([V\\c
+.if !"\\*([O"" , \\*([O\\c
+.if !"\\*([D"" , \\*([D\\c
+\&.
+.e[
+..
+.de 1[ \" journal article
+.s[
+.if !"\\*([A"" \\*([A,
+.if !"\\*([T""  \\*([T,
+\\fI\\*([J \\*([V\\fP\c
+.if !"\\*([N"" ,\\*([N
+.if !"\\*([D"" (\\*([D)\c
+.if !"\\*([P"" , \\*([P\c
+.if !"\\*([I"" , \\*([I\c
+\\&.
+.if !"\\*([O"" \\*([O.
+.e[
+..
+.de 2[ \" book
+.s[
+.ie !"\\*([A"" \\*([A,
+.el .if !"\\*([E"" \{\
+.       ie \\n([E-1 \\*([E, eds.,
+.       el \\*([E, ed.,\}
+.if !"\\*([T"" \\fI\\*([T\\fP,
+.rm a[
+.if !"\\*([I"" .ds a[ \\*([I
+.if !"\\*([C"" \{\
+.       if !"\\*(a["" .as a[ , \\&
+.       as a[ \\*([C\}
+.if !"\\*([D"" \{\
+.       if !"\\*(a["" .as a[ , \\&
+.       as a[ \\*([D\}
+\\*(a[.
+.if !"\\*([G"" Gov. ordering no. \\*([G.
+.if !"\\*([O"" \\*([O.
+.e[
+..
+.de 3[ \" article in book
+.s[
+.if !"\\*([A"" \\*([A,
+.if !"\\*([T"" \\*([T,
+in \\fI\\*([B\\fP\c
+.if !"\\*([V"" , vol. \\*([V
+.if !~\\*([E~~ \{\
+.       ie , \\n([E-1  \\*([E (editors)\c
+.       el , \\*([E (editor)\c\}
+.if !"\\*([I"" , \\*([I\c
+.if !"\\*([C"" , \\*([C\c
+.if !"\\*([D"" , \\*([D\c
+.if !"\\*([P"" , \\*([P\c
+\\&.
+.if !"\\*([O"" \\*([O.
+.e[
+..
+.de 4[ \" report
+.s[
+.if !"\\*([A"" \\*([A,
+.if !~\\*([E~~ \{\
+.       ie \\n([E-1 \\*([E, editors.
+.       el \\*([E, editor.\}
+\\*([T,
+\\*([R\c
+.if !"\\*([G"" \& (\\*([G)\c
+.if !"\\*([I"" , \\*([I\c
+.if !"\\*([C"" , \\*([C\c
+.if !"\\*([D"" , \\*([D\c
+\\&.
+.if !"\\*([O"" \\*([O.
+.e[
+..
+.de 5[ \" conference paper
+.s[
+.if !"\\*([A"" \\*([A,
+.if !"\\*([T"" \\*([T,
+\\fI\\*([J\\fP,
+.if !"\\*([C"" \\*([C,
+.if !"\\*([D"" \\*([D\c
+.if !"\\*([P"" , \\*([P\c
+\\&.
+.if !"\\*([O"" \\*([O.
+.e[
+..
+.de [-   \" clean up after yourself
+.rm [A [B [C [D
+.rm [E [F [G
+.rm [I [J [K
+.rm [N [O [P
+.rm [R [T
+.rm [V [W
+..
+.\"	@(#)bmac.std	2.2	8/24/83;
+.\" standard format troff commands
+.\" citation formatting strings
+.ds [[ [
+.ds ]] ]
+.ds ], ,\|
+.ds ]- -
+.ds [. " \&
+.ds .] .
+.ds [, " \&
+.ds ,] ,
+.ds [< " \&
+.ds >]
+.\" reference formmating strings
+.ds c] , \&
+.ds n] "" and \&
+.ds m] "" and \&
+.ds a] " \&
+.\" reference formmating macros
+.de s[   \" start reference
+.nh
+.IP [\\*([F] 5m
+..
+.de e[   \" end reference
+.[-
+..
+.de []   \" start to display collected references
+.SH
+References
+.LP
+..
+.de ][   \" choose format
+.ie !"\\*([J"" \{\
+.    ie !"\\*([V"" .nr t[ 1    \" journal
+.    el            .nr t[ 5    \" conference paper
+.\}
+.el .ie !"\\*([B"" .nr t[ 3    \" article in book
+.el .ie !"\\*([R"" .nr t[ 4    \" technical report
+.el .ie !"\\*([I"" .nr t[ 2    \" book
+.el                .nr t[ 0    \" other
+.\\n(t[[
+..
+.de 0[   \" other
+.s[
+.if !"\\*([A"" \\*([A,
+.if !"\\*([T"" \\*([T,
+.if !"\\*([O"" \\*([O\c
+.if !"\\*([D"" , \\*([D\c
+\&.
+.e[
+..
+.de 1[ \" journal article
+.s[
+.if !"\\*([A"" \\*([A,
+.if !"\\*([T"" \\*([T,
+\\fI\\*([J \\*([V\\fP,
+.if !"\\*([N"" \\*([N
+.if !"\\*([D"" (\\*([D),
+.if !"\\*([P"" \\*([P\c
+.if !"\\*([I"" , \\*([I\c
+\\&.
+.if !"\\*([O"" \\*([O.
+.e[
+..
+.de 2[ \" book
+.s[
+.ie !"\\*([A"" \\*([A,
+.el .if !"\\*([E"" \{\
+.       ie \\n([E-1 \\*([E, eds.,
+.       el \\*([E, ed.,\}
+.if !"\\*([T"" \\fI\\*([T\\fP,
+.rm a[
+.if !"\\*([I"" .ds a[ \\*([I
+.if !"\\*([C"" \{\
+.       if !"\\*(a["" .as a[ , \\&
+.       as a[ \\*([C\}
+.if !"\\*([D"" \{\
+.       if !"\\*(a["" .as a[ , \\&
+.       as a[ \\*([D\}
+\\*(a[.
+.if !"\\*([G"" Gov. ordering no. \\*([G.
+.if !"\\*([O"" \\*([O.
+.e[
+..
+.de 3[ \" article in book
+.s[
+.if !"\\*([A"" \\*([A,
+.if !"\\*([T"" \\*([T,
+in \\fI\\*([B\\fP,
+.if !"\\*([V"" vol. \\*([V,
+.if !"\\*([E"" \\*([E (ed.),
+.if !"\\*([I"" \\*([I,
+.if !"\\*([C"" \\*([C,
+.if !"\\*([D"" \\*([D\c
+.if !"\\*([P"" , \\*([P\c
+\\&.
+.if !"\\*([O"" \\*([O.
+.e[
+..
+.de 4[ \" report
+.s[
+.if !"\\*([A"" \\*([A,
+\\*([T,
+\\*([R\c
+.if !"\\*([G"" \& (\\*([G)\c
+.if !"\\*([I"" , \\*([I\c
+.if !"\\*([C"" , \\*([C\c
+.if !"\\*([D"" , \\*([D\c
+\\&.
+.if !"\\*([O"" , \\*([O.
+.e[
+..
+.de 5[ \" conference paper
+.s[
+.if !"\\*([A"" \\*([A,
+.if !"\\*([T"" \\*([T,
+\\fI\\*([J\\fP,
+.if !"\\*([C"" \\*([C\c
+.if !"\\*([D"" , \\*([D\c
+.if !"\\*([P"" , \\*([P\c
+\\&.
+.if !"\\*([O"" , \\*([O.
+.e[
+..
+.de [-   \" clean up after yourself
+.rm [A [B [C [D
+.rm [E [F [G
+.rm [I [J [K
+.rm [N [O [P
+.rm [R [T
+.rm [V [W
+..
+.if t \{ \
+.pl 29.7c	\" page length
+.po 2.5c	\" page offset (left margin)
+.ll 16.5c	\" line length
+.lt 16.5c	\" title length
+.nr LL 16.5c
+.nr )l 29.7c
+.nr hm 2c
+.nr $r 9	\" factor for vertical spacing
+.nr $R \n($r
+.sz 12		\" font size
+.nr pp 12
+.nr sp 12
+.nr tp 12
+.nr fp 10
+.hc ~		\" hyphenation character
+.		\" Umlauts and sharp s
+.ds A \(A:
+.ds O \(O:
+.ds U \(U:
+.ds a \(a:
+.ds o \(o:
+.ds u \(u:
+.ds s \(ss
+.		\"  UMLAUT  \*:u, etc.
+.ds : \v'-0.6m'\h'(1u-(\\n(.fu%2u))*0.13m+0.06m'\z.\h'0.2m'\z.\h'-((1u-(\\n(.fu%2u))*0.13m+0.26m)'\v'0.6m'
+.\}
+.if n \{ \
+.po 0		\" page offset (left margin)
+.ll 78		\" line length
+.lt 78		\" title length
+.nr $r 4	\" factor for vertical spacing
+.nr $R \n($r
+.hc ~		\" hyphenation character
+.		\" Umlaute und scharfes s
+.ds A Ae
+.ds O Oe
+.ds U Ue
+.ds a ae
+.ds o oe
+.ds u ue
+.ds s sz
+.\}
+.de _
+\&\\$1\l'|0\(ul'\\$2
+..
+.de FT		\" font for programs
+.ft C
+.sz -2
+..
+.de FR
+.ft R
+.sz +2
+..
+.de []		\" start to display collected references
+.uh References
+.lp
+..
+.de $0		\" collect table of contents
+.(x
+.ta 2c
+.ie '\\$2''	\\$1
+.el \\$2.	\\$1
+.)x
+..
+.de np
+.nr $p +1
+.ip \\n($p.
+..
+.de SH
+.sp 0.5
+.in -3
+.r \\$1
+.sp 0.5
+.in +3
+..
+.de PP
+.sp 0.5
+..
+.de IP
+.ip \\$1 \\$2
+..
+.de I
+.i \\$1
+..
+.de TH
+..
+.EQ
+delim off
+.EN
+.hc ~
+.ds ], , 
+.b " "
+.sp 1c
+.ta 9c
+.ft R
+.sz 12
+\l'17.1c'
+.nf
+
+
+	Preprocessors
+
+
+	J. Grosch
+
+
+\l'17.1c'
+.sp 12.5c
+\l'17.1c'
+.ft H
+.nf
+	GESELLSCHAFT F\*UR MATHEMATIK
+	UND DATENVERARBEITUNG MBH
+
+	FORSCHUNGSSTELLE F\*UR
+	PROGRAMMSTRUKTUREN
+	AN DER UNIVERSIT\*AT KARLSRUHE
+.r
+\l'17.1c'
+.bp
+.oh '''%'
+.eh '''%'
+.ce 99
+.sz 20
+.b " "
+.sp 2
+Project
+.sp
+.b "Compiler Generation"
+.sp
+.sz 12
+\l'15c'
+.sp
+.sz 16
+.b "Preprocessors"
+.sp 2
+Josef Grosch
+.sp 2
+.sz 14
+Aug. 4, 1992
+.sp
+.sz 12
+\l'15c'
+.sp 2
+Report No. 24
+.sp 2
+Copyright \(co 1992 GMD
+.sp 2
+Gesellschaft f\*ur Mathematik und Datenverarbeitung mbH
+Forschungsstelle an der Universit\*at Karlsruhe
+Vincenz-Prie\*snitz-Str. 1
+D-7500 Karlsruhe
+.ce 0
+.fi
+.bp 1
+.ce 99
+.b "Preprocessors"
+.\" .sp 2
+.\" Josef Grosch
+.\" GMD Forschungsstelle an der Universit\*at Karlsruhe
+.\" Vincenz-Prie\*snitz-Str. 1, D-7500 Karlsruhe, Germany
+.\" grosch@karlsruhe.gmd.de
+.ce 0
+.sp
+.sh 1 Introduction
+.lp
+This manual describes the features and the usage of two kinds of preprocessors contained in
+the Karlsruhe Toolbox for Compiler Construction. The preprocessors
+.i "cg -xz"
+and
+.i rpp
+derive a parser specification and most of a scanner specification from an attribute grammar.
+The preprocessors
+.i l2r ,
+.i y2l ,
+and
+.i r2l
+convert input for
+.i lex
+and
+.i yacc
+into specifications for
+.i rex
+and
+.i lalr
+and vice versa. All preprocessors work as filter programs reading input from
+.i "standard input"
+and writing output to
+.i "standard output" .
+Some preprocessors can read from a file specified as argument, too.
+.sh 1 "Specification of Scanner and Parser with an Attribute Grammar"
+.pp
+Writing specifications for the scanner generator
+.i rex
+\*([[Gro87\*(]] and the parser generator
+.i lalr
+\*([[GrV88\*(]] directly in the tool specific language is a practicable method.
+However, it has some disadvantages. Most of the tokens are specified twice and their
+internal representation or code, respectively, has to be selected and kept consistent,
+manually. Access to
+attributes using the yacc-style $i construct (see e.g.\*([<\*([[GrV88\*(]]\*(>]) is less readable
+and error-prone in case of changes. The following solution avoids these disadvantages.
+.pp
+Instead of using the tool specific language for
+.i rex
+and
+.i lalr
+directly, a language of higher level is used. It replaces the $i construct by named
+attributes and describes a complete parser and most of a scanner in one document.
+Two preprocessors transform such a specification into the languages directly understood by
+.i rex
+and
+.i lalr .
+Fig. 1 shows the data flow using arrows between boxes and circles.
+Boxes represent files or file types and circles represent tools or preprocessors.
+The intermediate file named
+.i Scanner.rpp
+by default
+contains the part of the scanner specification that can be extracted from the parser
+specification. Table 1 gives the meaning of the file types used in Fig. 1 and this manual.
+.(z L
+.sp 0.5
+.PS
+scale	= 2.54
+boxwid	= 2.0
+boxht	= 1.2
+circlerad = 0.6
+linewid	= 1.2
+lineht	= 1.2
+movewid	= 1.2
+moveht	= 1.2
+
+	down
+O:	box ".scan"
+	arrow
+Rp:	circle "rpp"
+	arrow
+	box ".rex"
+	arrow 
+R:	circle "rex"
+	move down
+D0:	box invis width 3.0
+So:	box "Source" at D0.w
+Sc:	box "Scanner" at D0.e
+	arrow from R.sw to So.n
+	arrow from R.se to Sc.n
+	move to So.w - (2.75, 0)
+
+	down
+	box ".pars" at O.c + (6, 0)
+	arrow
+Cg:	circle "cg -xz"
+	arrow
+	box ".lalr"
+	arrow 
+L:	circle "lalr"
+	move down
+D1:	box invis width 3.0
+Pa:	box "Parser" at D1.w
+Er:	box "Errors" at D1.e
+	arrow from L.sw to Pa.n
+	arrow from L.se to Er.n
+
+	arrow from Cg.w left 1.4
+	box "Scanner" ".rpp"
+	arrow to Rp.e
+.PE
+.sp
+.ce
+Fig. 1: Data flow during scanner and parser generation
+.)z
+.(b L
+.sp 0.5
+.ce
+Table 1: Meaning of file types
+.sp 0.5
+.TS
+center box;
+l | l.
+file type	meaning
+_
+\&.pars	scanner and parser specification (including S-attribution)
+\&.scan	rest of scanner specification
+\&.rpp	intermediate data for completion of scanner in .scan
+\&.rex	scanner specification understood by \fIrex\fP
+\&.lalr	parser specification understood by \fIlalr\fP
+\&.ell	input for \fIell\fP (= input for \fPlalr\fP with EBNF constructs\*([<\*([[GrV88\*(]]\*(>])
+\&.lex	input for \fIlex\fP
+\&.yacc	input for \fIyacc\fP
+Source	generated module (or linked from library \fIreuse\fP)
+Scanner	generated module
+Parser	generated module
+Errors	generated module (or linked from library \fIreuse\fP)
+.TE
+.)b
+.pp
+The formalism used to describe parsers (.pars) is an extension of the input language
+for the tools
+.i ast
+\*([[Gro91\*(]] and
+.i ag
+\*([[Gro89\*(]] (see section 2.1.). This leads to a rather uniform set of input languages
+for most of the tools and simplifies their use. The preprocessor
+.i "cg -xz"
+transforms a parser specification in
+.i ag
+notation into one in
+.i lalr
+notation and extracts most of a scanner specification. The parser specification in
+.i lalr
+notation is written on a file named <Parser>.lalr. <Parser> is substituted by the name of
+the parser module which defaults to
+.i Parser .
+The extracted scanner specification is written to a file named <Scanner>.rpp.
+<Scanner> is substituted by the name of the scanner module which defaults to
+.i Scanner .
+The rest of the scanner specification must be written in
+the language directly understood by
+.i rex .
+It has to contain the part of a scanner specification that can not be derived automatically.
+This part is usually rather small and comprises the description of user-defined tokens like
+identifiers and numbers, comments, and the computation of attributes for the tokens. A few
+insertion points are marked to tell the preprocessor
+.i rpp
+where to include the generated parts (see section 2.2.).
+.sh 2 "Parser Specification"
+.pp
+The input language of
+.i ast
+and
+.i ag
+can be used to generate a parser. The details of this language can
+be found in the manuals for these tools\*([<\*([[Gro89\*(],Gro91\*(]]\*(>].
+The reader should be familiar with these documents because the current manual
+describes primarily the extensions necessary for parser generation.
+.pp
+The language can describe concrete as well as abstract syntaxes. Nonterminal, terminal,
+and abstract
+symbols or node types are distinguished by the definition characters '=', ':', and ':=',
+respectively, and have to be declared by default. However, the option j of
+.i "cg -xz"
+allows undeclared terminal symbols and declares them implicitly.
+In any case, terminal symbols with attributes have to be declared explicitly.
+.pp
+Note, the following names are reserved for keywords and can not be used for grammar symbols.
+Unfortunately, some of them occur frequently as keywords in languages that are being defined.
+They should be turned into strings by surrounding apostrophes:
+.(b
+.FT
+BEGIN           CLOSE           DECLARE         DEMAND          END
+EVAL            EXPORT          FOR             FUNCTION        GLOBAL
+IGNORE          IMPORT          IN              INH             INHERITED
+INPUT           LEFT            LOCAL           MODULE          NONE
+OUT             OUTPUT          PARSER          PREC            PROPERTY
+REMOTE          REV             REVERSE         RIGHT           RULE
+SCANNER         SELECT          STACK           SUBUNIT         SYN
+SYNTHESIZED     THREAD          TREE            VIEW            VIRTUAL
+VOID
+.)b
+.pp
+The right-hand sides of node types without extensions are interpreted as right-hand sides of
+grammar rules (see e. g. Assign, Call0, Call, and If in the example below).
+The children of the right-hand side form a sequence of terminal and nonterminal symbols
+as usual.
+The names of those node types serve as rule names.
+If a symbol occurs several times on one right-hand side, it has to be preceded by different
+selector names (see e. g. the rule named
+.i If ).
+Attributes in brackets are not interpreted as grammar symbols
+but as attribute declarations representing values to be evaluated during parsing.
+.pp
+Not every name of a node type is interpreted as nonterminal or terminal symbol.
+Only those node types that are used (referenced) on some right-hand side and the first node
+type which is regarded as start symbol are treated as grammar symbols.
+If a node type is defined as nonterminal then
+all associated extensions become alternative right-hand sides for this nonterminal symbol.
+If a node type is defined as terminal it remains a terminal symbol.
+If a node type is not defined and option j is not set an error message is issued.
+If option j is set then undefined node types are implicitly defined as terminals.
+.pp
+The grammar needs not to be reduced. This means it may contain superfluous terminal and
+nonterminal symbols. Symbols are superfluous if they are not referenced from any rule.
+Those symbols are simply ignored and reported as a warning.
+.(b
+Example: input of cg -xz
+.sp 0.5
+.FT
+Stat            = <
+   Assign       = Adr ':=' Expr .
+   Calls        = Ident <
+      Call0     = .
+      Call      = '(' Actuals ')' .
+   > .
+   If           = IF Expr THEN Then: Stats ELSE Else: Stats 'END' .
+> .
+Expr            = <
+   Plus         = Lop: Expr '+' Rop: Expr .
+   Times        = Lop: Expr '*' Rop: Expr .
+   '()'         = '(' Expr ')' .
+   Adr          = <
+      Name      = Ident .
+      Index     = Adr '[' Expr ']' .
+   > .
+> .
+.)b
+.(b
+Example: output of cg -xz
+.sp 0.5
+.FT
+Stat : Adr ':=' Expr .
+Stat : Ident .
+Stat : Ident '(' Actuals ')' .
+Stat : IF Expr THEN Stats ELSE Stats 'END' .
+
+Expr : Expr '+' Expr .
+Expr : Expr '*' Expr .
+Expr : '(' Expr ')' .
+Expr : Ident .
+Expr : Adr '[' Expr ']' .
+
+Adr  : Ident .
+Adr  : Adr '[' Expr ']' .
+.)b
+The rule names and the selector names on the right-hand sides disappear (e. g. If). The
+extension formalism is expanded (e. g. Calls and Adr) \- it is not mapped to chain rules.
+The expansion includes the inheritance of children and attributes (e. g. Calls).
+All node types that are used somewhere become nonterminal symbols (e. g. Expr and Adr).
+.pp
+The rule names of non-referenced node types may be omitted. They are necessary for example
+if modules are used in order to refer from an attribute computation to a grammar rule.
+.(b
+Example without rule names:
+.sp 0.5
+.FT
+Stat  = -> [Tree: tTree] <
+      = Adr ':=' Expr         { Tree := mAssign (Adr:Tree, Expr:Tree);     } .
+      = Ident '(' Actuals ')' { Tree := mCall (Ident:Ident, Actuals:Tree); } .
+> .
+.sp 0.5
+Ident : [Ident: tIdent] .
+.)b
+.(b
+Example with rule names:
+.sp 0.5
+.FT
+Stat      = <
+   Assign = Adr ':=' Expr .
+   Call   = Ident '(' Actuals ')' .
+> .
+.sp 0.5
+Ident     : [Ident: tIdent] .
+.sp 0.5
+MODULE Tree
+.sp 0.5
+DECLARE Stat = -> [Tree: tTree] .
+.sp 0.5
+Assign    = { Tree := mAssign (Adr:Tree, Expr:Tree);         } .
+Call      = { Tree := mCall (Ident:Ident, Actuals:Tree);     } .
+.sp 0.5
+END Tree
+.)b
+.pp
+Attribute declarations and attribute computations are written exactly as for
+.i ast
+and
+.i ag .
+Attribute computations may be placed everywhere within right-hand sides, not only at the
+end. These computations are executed from left to right as parsing proceeds. They may only
+make use of those attributes that have already been computed before or to the left,
+respectively. The extension or inheritance mechanism for right-hand sides,
+attribute declarations, and attribute computations is available.
+The default computations (copy rules) for synthesized attributes are available, too. A
+specification may be separated into several modules. There could for example be modules for
+the concrete syntax, for the attribute declarations, and for the attribute computations. It
+is even possible to distribute the mentioned kinds of information into several modules.
+.pp
+Attribute declarations and attribute computations with named attributes replace the explicit
+declaration of the type
+.i tParsAttribute
+and the $i construct. The attribute declarations are transformed automatically into a
+declaration of the type
+.i tParsAttribute .
+The attribute computations in the new style are more readable and robust against changes. The
+given attribute computations are checked for completeness and whether the resulting attribute
+grammar obeys the SAG property. Only attribute grammars with synthesized attributes can be
+evaluated during parsing.
+.pp
+Every terminal has a predefined attribute named
+.i Position
+of type
+.i tPosition .
+This type is a user defined struct (record) type and has to contain at least the members
+.i Line
+and
+.i Column .
+This attribute describes the source coordinates of every token and it is computed
+automatically by
+.i rex
+generated scanners.
+The values of all other attributes of terminals have to be supplied by the scanner by
+user specified computations. Still, attribute computations for those attributes (except
+.i Position )
+have to be specified in the parser specification, too. They are used to generate the procedure
+.i ErrorAttribute .
+This procedure is called by the parser whenever tokens are inserted in order to repair syntax
+errors. The procedure and therefore the mentioned attribute computations have
+to supply default values for the attributes of tokens.
+.pp
+The right-hand side of a node type or a grammar rule, respectively, may contain actions
+to be executed during parsing. These actions may be placed at the end of the right-hand side
+or anywhere between the right-hand side elements. In any case these actions are executed from
+left to right according to the progress of parsing. The syntax of the actions is the one
+defined for the attribute computations of 
+.i ag .
+It is assumed that most of the actions will compute attributes.
+Actions which are not attribute computations are possible but
+have to be written as some kind of CHECK statement:
+.(b
+.FT
+=> statement ;   or    => { statement_sequence } ;
+.)b
+.pp
+The following extensions of the language of
+.i ast
+and
+.i ag
+are used for parser generation, only.
+A grammar may be optionally headed by names for the modules to be generated:
+.(b
+.FT
+SCANNER Name PARSER Name
+.)b
+The first identifier specifies the module name of the scanner to be used by the parser.
+The second identifier specifies a name which is used to derive the names of the
+parsing module, the parsing routine, the parse tables, etc.
+If the names are missing they default to
+.i Scanner
+and
+.i Parser .
+In this document we refer to these names by <Scanner> and <Parser>.
+The parser name may be followed by a set of target code sections which
+is copied unchecked and unchanged to the input of the parser generator or the parser
+module, respectively:
+.(b
+.FT
+SCANNER Name
+PARSER  Name
+IMPORT { target_code }
+EXPORT { target_code }
+GLOBAL { target_code }
+LOCAL  { target_code }
+BEGIN  { target_code }
+CLOSE  { target_code }
+.)b
+.pp
+The precedence and associativity for operator tokens can be specified after the keyword PREC
+using LEFT, RIGHT, and NONE for left-, right-, and no associativity. Each group headed by one
+of the latter three keywords introduces a new group of tokens with increasing precedence.
+The precedence and associativity information is copied unchanged to the parser generator.
+.(b
+Example:
+.sp 0.5
+.FT
+PREC LEFT MONOP
+     NONE SEQ
+     LEFT '+' '-'
+     LEFT '*' '/' MOD
+.)b
+The precedence and associativity information is usually propagated implicitly to the grammar
+rules by taking it from the right-most token in a rule. Rules without an operator token
+can get the precedence and associativity from an operator token by adding a PREC clause
+at the end of a right-hand side.
+.(b
+Example:
+.sp 0.5
+.FT
+Expr = <
+     = Expr Expr PREC SEQ .   /* explicit  prec. + assoc. of SEQ          */
+     = '-'  Expr PREC MONOP . /* overwrite prec. + assoc. of '-' by MONOP */
+     = Expr '+' Expr .        /* implicit  prec. + assoc. of '+'          */
+     = Expr '-' Expr .        /* implicit  prec. + assoc. of '-'          */
+> .
+.)b
+.pp
+Tokens or terminal symbols are mapped automatically to integer numbers to be used as internal
+representation. This mapping can be overwritten by explicitly giving codes for terminals.
+.(b
+Example:
+.sp 0.5
+.FT
+Ident    :   [Ident: tIdent] .   /* implicitly coded      */
+IntConst : 5 [Value: int   ] .   /* explicitly coded as 5 */
+.)b
+.pp
+The attribute declarations for terminals are turned into a declaration of the type
+.i tScanAttribute .
+The scanner communicates attribute values of terminals to the parser using a global variable
+called
+.i Attribute
+which is of this type. This type is a union type (variant record) with one member (variant)
+for each terminal with attributes. The names of the terminals are taken for the names of
+these members (variants). However, this leads to problems if the terminals are named by
+strings or by keywords of the implementation language. Therefore terminals may have two
+names. The second one is used as member name in the type
+.i tScanAttribute .
+The predefined attribute
+.i Position
+mentioned above is always included in this type. Assignments of attribute values in the
+scanner therefore have to use two selections to describe an attribute:
+.(b
+.FT
+Attribute.<selector name>.<attribute name> = ...
+.)b
+.(b
+Example:
+.sp 0.5
+definition of terminals including attributes and member selectors in the parser specification
+.sp 0.5
+.FT
+Ident        : [Ident: tIdent] .   /* selector name: Ident   */
+\&':=' sAssign : [Ident: tIdent] .   /* selector name: sAssign */
+TRUE sTRUE   : [Ident: tIdent] .   /* selector name: sTRUE   */
+\&'..'         : [Ident: tIdent] .   /* selector name: yy17    */
+.)b
+.(b
+access of attributes in the scanner specification
+.sp 0.5
+.FT
+Attribute.Ident.Ident
+Attribute.sAssign.Ident
+Attribute.sTRUE.Ident
+Attribute.yy17.Ident
+.)b
+.(b
+access of attributes in the parser specification (at node directly)
+.sp 0.5
+.FT
+Ident                     Position
+.)b
+.(b
+access of attributes in the parser specification (from a child node)
+.sp 0.5
+.FT
+Ident:Ident               Ident:Position
+\&':=':Ident                ':=':Position
+TRUE:Ident                TRUE:Position
+\&'..':Ident                '..':Position
+.)b
+.pp
+The preprocessor for the parser specification is part of the program
+.i cg .
+It is called by the following command:
+.(b
+cg -xzvjc [ \fIParser\fP.pars ]
+.)b
+The input is read either from the file given as argument or from standard input if the
+argument is missing. The output is written to a file named <Parser>.lalr.
+The program is controlled by the following options:
+.(b
+.ta 1c
+x	generate scanner specification for rex
+z	generate parser  specification for lalr
+v	omit actions in the generated parser specification
+j	allow undefined node types; define implicitly as terminals
+c	generate C source code (default is Modula-2)
+.)b
+.pp
+Appendix 1 of the
+.i ag
+manual\*([<\*([[Gro89\*(]]\*(>] contains the complete formal syntax understood by the program
+.i cg .
+Appendix 2 of this manual shows a parser specification for the example language MiniLAX.
+It separates context-free grammar and attribute computations in two modules.
+The attribute computations in the module
+.i Tree
+use one attribute also called
+.i Tree
+and describe the construction of an abstract syntax tree by calling functions generated by
+.i ast .
+The implementation language is C.
+.sh 2 "Scanner Specification"
+.pp
+The scanner specification has to contain only those parts that can not be extracted
+automatically from the parser specification. This is as already mentioned above
+the description of user-defined tokens like identifiers and numbers, comments, and the
+computation of attributes for the tokens. The formalism to describe this fragmentary
+scanner specification (.scan) is the input language of rex\*([<\*([[Gro87\*(]]\*(>].
+It may contain three insertion points which instruct the preprocessor
+.i rpp
+(rex preprocessor) to include certain generated parts. Moreover, tokens in return statements
+can be denoted by the same strings or identifiers as in the parser specification.
+.lp
+.(b
+.FT
+INSERT tScanAttribute
+.)b
+in the EXPORT section is replaced by the generated declaration of the type
+.i tScanAttribute
+and the head or external declaration of the procedure
+.i ErrorAttribute .
+.(b
+.FT
+INSERT ErrorAttribute
+.)b
+in the GLOBAL section is replaced by the body of the generated procedure
+.i ErrorAttribute .
+.pp
+The third insertion point lies in the RULE section and has the following syntax
+(only the brackets
+.FT
+[ ]
+.FR
+are used as meta characters and denote optional parts):
+.(b
+.FT
+INSERT RULES [CASE-INSENSITIVE] [[NOT] #<start_states>#] [{ <target_code> }]
+.)b
+It is replaced by as many rules as there are tokens extracted automatically from the
+parser specification. Every rule has the following format:
+.(b
+.FT
+NOT # <start_states> # <token> : { <target_code> return <code>; }
+.)b
+The start states including the keyword NOT and the target code are optional and are copied to
+the generated rule as indicated. If CASE-INSENSITIVE is specified, the regular expressions
+for the tokens are constructed to match lower as well as upper case letters.
+Note, only rules for tokens without explicitly declared attributes are constructed
+automatically.
+.pp
+Within a rule, return (or RETURN) statements are used to report the internal code of a
+recognized token. The expression of those statements can be any expression of the
+implementation language or a string or an identifier used in the parser specification.
+The latter are replaced by their internal representation.
+.(b
+Example:
+.sp 0.5
+.FT
+return 5;
+return Ident;
+return ':=';
+.)b
+.pp
+The program
+.i rpp
+is called by the following command:
+.(b
+rpp [ \fIScanner\fP.rpp ] < \fIScanner\fP.scan > \fIScanner\fP.rex
+.)b
+The fragmentary scanner specification is read from standard input.
+The scanner specification extracted from the parser specification is read from a file
+given as argument. This argument is optional and defaults to
+.i Scanner.rpp .
+The scanner specification understood by \fIrex\fP is written on standard output.
+The basename \fIScanner\fP in the command line above is usually substituted by the name of
+the scanner module.
+.pp
+Appendix 1 contains a scanner specification for the example language MiniLAX.
+It uses C as implementation language.
+.(b L
+.sp 0.5
+.PS
+scale	= 2.54
+boxwid	= 2.0
+boxht	= 1.2
+circlerad = 0.6
+linewid	= 1.2
+lineht	= 1.2
+movewid	= 1.2
+moveht	= 1.2
+
+	down
+Y:	box ".yacc"
+	arrow
+Y2:	circle "y2l"
+	arrow
+La:	box ".lalr"
+	arrow
+	circle "lalr"
+	arrow
+
+	left
+P:	box ".pars" at Y.e + (4.6, 0)
+	arrow
+	circle "cg -u"
+	arrow to Y.e
+
+	left
+E:	box ".ell" at La.e + (4.6, 0)
+	arrow
+	circle "bnf"
+	arrow to La.e
+
+	arrow at E.s down
+	circle "ell"
+	arrow
+
+Z:	circle "cg -z" at Y2 + (2.8, 0)
+	arrow from P.sw to Z.ne
+	arrow from Z.sw to La.ne
+
+Le:	box ".lex" at Y.w - (6.6, 0)
+	move down
+D0:	box invis width 3.0
+	move down
+R:	box ".rex"
+	arrow
+	circle "rex"
+	arrow
+
+L2:	circle "l2r" at D0.w
+R2:	circle "r2l" at D0.e
+	arrow from Le.s to L2.n
+	arrow from L2.s to R.n
+	arrow from R.n to R2.s
+	arrow from R2.n to Le.s
+
+	arrow at R.e + (3.6, 0) left
+	circle "rpp"
+	arrow to R.e
+.PE
+.sp
+.ce
+Fig. 2: Conversion programs for scanner and parser specifications
+.)b
+.sh 1 "Conversion of Scanner and Parser Specifications"
+.sh 2 "Input Languages"
+.pp
+The input languages of
+.i rex
+and
+.i lalr
+have been designed to be as readable as possible. Although they contain the same information
+as inputs for
+.i lex
+\*([[Les75\*(]] and
+.i yacc
+\*([[Joh75\*(]] they are syntactically incompatible. Several conversion programs allow the
+transformation of input for
+.i rex
+and
+.i lalr
+to input for
+.i lex
+and
+.i yacc
+or vice versa.
+Fig.2 shows the possible conversions for scanner and parser specifications.
+Table 2 lists the existing filter programs and the types of their input and
+output files.
+.(z L
+.sp 0.5
+.ce
+Table 2: Filters for input conversion
+.sp 0.5
+.TS
+center box;
+l | l | l.
+filter	input	output
+_
+l2r	.lex	.rex
+r2l	.rex	.lex
+y2l	.yacc	.lalr
+cg -u	.pars	.yacc
+cg -z	.pars	.lalr
+bnf	.ell	.lalr
+.TE
+.)z
+.pp
+The option '-v' instructs
+.i y2l
+and
+.i cg
+to omit the semantic actions in the produced output.
+The following restrictions or problems are known to exist because they can not be mapped to
+the target tool:
+.br
+.ne 2c
+.lp
+.i l2r
+.ta 2.5c
+.ip -
+yymore
+.ip -
+REJECT
+.ip -
+yywrap	(redirection can be done with \fIrex\fP, but differently)
+.ip -
+%T	(specification of the character set is not possible)
+.br
+.ne 2c
+.lp
+.i r2l
+.ip -
+yyPrevious
+.ip -
+EOF	(specifies actions to be performed upon reaching end of file)
+.br
+.ne 2c
+.lp
+.i y2l
+.ip -
+The conversion of token definitions may not be completely automatic.
+.ip -
+If scanning depends on information collected by the parser then parsers generated by
+.i yacc
+and
+.i lalr
+may behave differently because they do not agree upon the order or timing, respectively,
+of the execution of read (shift) and reduce actions.
+.br
+.ne 2c
+.lp
+.i bnf
+.ip -
+The attribute computations for
+.i ell
+and
+.i lalr
+are different and are not converted.
+.sh 2 "Interfaces"
+.pp
+The interfaces of scanners and parsers generated by
+.i lex/yacc
+and
+.i rex/lalr
+are incompatible. The differences are primarily caused by different names for the
+external (exported) objects. Table 3 lists the interface objects.
+.(z L
+.sp 0.5
+.ce
+Table 3: Interfaces of generated scanners and parsers
+.sp 0.5
+.TS
+center box;
+l | l | l.
+object	yacc/lex	lalr/rex
+_
+parse routine	int yyparse ();	int Parser ();
+stack size	YYMAXDEPTH	yyInitStackSize
+attribute type	YYSTYPE	tParsAttribute
+_
+global attribute	YYSTYPE yylval;	tScanAttribute Attribute;
+_
+position type	 	typedef struct { short Line, Column; ... } tPosition;
+attribute type	 	typedef struct { tPosition Position; ... } tScanAttribute;
+scanner routine	int yylex ();	int GetToken ();
+error repair	 	void ErrorAttribute ();
+line number	int yylineno;	\fImember\fP Attribute.Position.Line
+token buffer	char yytext [];
+token length	int yyleng;
+.TE
+.)z
+The interfaces of the scanners and parsers generated by
+.i rex
+and
+.i lalr
+can be switched from the default as listed in Table 3 to an approximation of the
+.i lex
+and
+.i yacc
+interfaces. This is controlled by
+.i cpp
+commands:
+.(b
+.FT
+# define lex_interface
+.)b
+in the EXPORT section of a
+.i rex
+specification selects a lex-style interface for the scanner.
+.(b
+.FT
+# define lex_interface
+.)b
+in the EXPORT section of a
+.i lalr
+specification tells the parser to use a lex-style interface for the scanner.
+.(b
+.FT
+# define yacc_interface
+.)b
+in the EXPORT section of a
+.i lalr
+specification selects a yacc-style interface for the parser.
+.pp
+The output of the preprocessors
+.i l2r
+and
+.i y2l
+automatically selects lex- and yacc-style interfaces. The following problems
+are known, currently:
+.ip -
+The output of
+.i l2r
+provides the matched string in the array
+.i yytext
+to be used in action statements. This is done by calling the procedure
+.i Getword .
+However, many actions do not need
+.i yytext .
+Deleting superfluous calls of
+.i Getword
+will make the scanner significantly faster.
+.ip -
+Access to the line counter
+.i yylineno
+has to be replaced by access to
+.(b
+.FT
+Attribute.Position.Line
+.)b
+.ip -
+If both, scanner and parser specification have been converted by
+.i l2r
+and
+.i y2l
+in order to be fed into
+.i rex
+and
+.i lalr ,
+the two preprocessor statements which define
+.i lex_interface
+should be deleted in order to select the standard interface. This offers more comfort with
+respect to the information about the source position.
+.lp
+.sp
+.b Acknowledgements
+.pp
+The preprocessor
+.i bnf
+has been implemented by Bertram Vielsack. The preprocessors
+.i y2l ,
+.i l2r ,
+.i rpp ,
+and
+.i "cg -xz"
+have been implemented by Thomas M\*uller.
+.fi
+.sz 12
+.[]
+.[-
+.ds [F Gro87
+.ds [A J\*(p] Grosch
+.ds [T Rex - A Scanner Generator
+.ds [I GMD Forschungsstelle an der Universit\\*:at Karlsruhe
+.ds [R Compiler Generation Report No. 5
+.ds [N 5
+.ds [D Dec. 1987
+.][
+.[-
+.ds [F GrV88
+.ds [A J\*(p] Grosch
+.as [A \*(n]B\*(p] Vielsack
+.ds [T The Parser Generators Lalr and Ell
+.ds [I GMD Forschungsstelle an der Universit\\*:at Karlsruhe
+.ds [R Compiler Generation Report No. 8
+.ds [N 8
+.ds [D Apr. 1988
+.][
+.[-
+.ds [F Gro89
+.ds [A J\*(p] Grosch
+.ds [T Ag - An Attribute Evaluator Generator
+.ds [I GMD Forschungsstelle an der Universit\\*:at Karlsruhe
+.ds [R Compiler Generation Report No. 16
+.ds [N 16
+.ds [D Aug. 1989
+.][
+.[-
+.ds [F Gro91
+.ds [A J\*(p] Grosch
+.ds [T Ast - A Generator for Abstract Syntax Trees
+.ds [I GMD Forschungsstelle an der Universit\\*:at Karlsruhe
+.ds [R Compiler Generation Report No. 15
+.ds [N 15
+.ds [D Sep. 1991
+.][
+.[-
+.ds [F Joh75
+.ds [A S\*(p]\*(a]C\*(p] Johnson
+.ds [T Yacc \(em  Yet Another Compiler-Compiler
+.ds [R Computer Science Technical Report 32
+.ds [I Bell Telephone Laboratories
+.ds [C Murray Hill, NJ
+.ds [D July 1975
+.][
+.[-
+.ds [F Les75
+.ds [A M\*(p]\*(a]E\*(p] Lesk
+.ds [T LEX \(em A Lexical Analyzer Generator
+.ds [R Computing Science Technical Report 39
+.ds [I Bell Telephone Laboratories
+.ds [C Murray Hill, NJ
+.ds [D 1975
+.][
+.bp
+.uh "Appendix 1: Scanner Specification for MiniLAX"
+.sp
+.nf
+.FT
+EXPORT  {
+# include "Idents.h"
+# include "Positions.h"
+.sp 0.5
+INSERT tScanAttribute
+}
+.sp 0.5
+GLOBAL  {
+# include <math.h>
+# include "Memory.h"
+# include "StringMem.h"
+# include "Idents.h"
+# include "Errors.h"
+.sp 0.5
+INSERT ErrorAttribute
+}
+.sp 0.5
+LOCAL   { char Word [256]; }
+.sp 0.5
+DEFAULT {
+MessageI ("illegal character", xxError, Attribute.Position, xxCharacter, TokenPtr);
+}
+.sp 0.5
+EOF     {
+   if (yyStartState == Comment)
+      Message ("unclosed comment", xxError, Attribute.Position);
+}
+.sp 0.5
+DEFINE  digit   = {0-9} .
+        letter  = {a-z A-Z} .
+.sp 0.5
+START   Comment
+.sp 0.5
+RULE
+          "(*"  :- {yyStart (Comment);}
+#Comment# "*)"  :- {yyStart (STD);}
+#Comment# "*" | - {*\\t\\n} + :- {}
+.sp 0.5
+#STD# digit +   : {(void) GetWord (Word);
+                   Attribute.IntegerConst.Integer = atoi (Word);
+                   return IntegerConst;}
+.sp 0.5
+#STD# digit * "." digit + (E {+\\-} ? digit +) ?
+                : {(void) GetWord (Word);
+                   Attribute.RealConst.Real = atof ((char *) Word);
+                   return RealConst;}
+.sp 0.5
+INSERT RULES #STD#
+.sp 0.5
+#STD# letter (letter | digit) *
+                : {Attribute.Ident.Ident = MakeIdent (TokenPtr, TokenLength);
+                   return Ident;}
+.bp
+.uh "Appendix 2: Parser Specification for MiniLAX"
+.sp
+.nf
+.FT
+PARSER
+
+GLOBAL {# include "Idents.h" }
+
+BEGIN  { BeginScanner (); }
+
+PREC    LEFT    '<'                             /* operator precedence  */
+        LEFT    '+'
+        LEFT    '*'
+        LEFT    NOT
+
+PROPERTY INPUT
+
+RULE                                            /* concrete syntax      */
+
+Prog            = PROGRAM Ident ';' 'DECLARE' Decls 'BEGIN' Stats 'END' '.' .
+Decls           = <
+   Decls1       = Decl .
+   Decls2       = Decls ';' Decl .
+> .
+Decl            = <
+   Var          = Ident ':' Type .
+   Proc0        = PROCEDURE Ident ';' 'DECLARE' Decls 'BEGIN' Stats 'END' .
+   Proc         = PROCEDURE Ident '(' Formals ')' ';'
+                                      'DECLARE' Decls 'BEGIN' Stats 'END' .
+> .
+Formals         = <
+   Formals1     = Formal .
+   Formals2     = Formals ';' Formal .
+> .
+Formal          = <
+   Value        = Ident ':' Type .
+   Ref          = VAR Ident ':' Type .
+> .
+Type            = <
+   Int          = INTEGER .
+   Real         = REAL .
+   Bool         = BOOLEAN .
+   Array        = ARRAY '[' Lwb: IntegerConst '..' Upb: IntegerConst ']' OF Type .
+> .
+Stats           = <
+   Stats1       = Stat .
+   Stats2       = Stats ';' Stat .
+> .
+Stat            = <
+   Assign       = Adr ':=' Expr .
+   Call0        = Ident .
+   Call         = Ident '(' Actuals ')' .
+   If           = IF Expr THEN Then: Stats ELSE Else: Stats 'END' .
+   While        = WHILE Expr DO Stats 'END' .
+   Read         = READ '(' Adr ')' .
+   Write        = WRITE '(' Expr ')' .
+> .
+Actuals         = <
+   Expr1        = Expr .
+   Expr2        = Actuals ',' Expr .
+> .
+.bp
+Expr            = <
+   Less         = Lop: Expr '<' Rop: Expr .
+   Plus         = Lop: Expr '+' Rop: Expr .
+   Times        = Lop: Expr '*' Rop: Expr .
+   Not          = NOT Expr .
+   '()'         = '(' Expr ')' .
+   IConst       = IntegerConst .
+   RConst       = RealConst .
+   False        = FALSE .
+   True         = TRUE .
+   Adr          = <
+      Name      = Ident .
+      Index     = Adr '[' Expr ']' .
+   > .
+> .
+
+                                        /* terminals (with attributes)  */
+
+Ident           : [Ident: tIdent] { Ident       := NoIdent      ; } .
+IntegerConst    : [Integer      ] { Integer     := 0            ; } .
+RealConst       : [Real : float ] { Real        := 0.0          ; } .
+
+MODULE Tree
+                        /* import functions for tree construction       */
+PARSER GLOBAL   {
+# include "Tree.h"
+
+tTree  nInteger, nReal, nBoolean;
+}
+
+BEGIN   {
+   nInteger     = mInteger      ();
+   nReal        = mReal         ();
+   nBoolean     = mBoolean      ();
+}
+.bp
+                        /* attributes for tree construction             */
+DECLARE
+  Decls Decl Formals Formal Type Stats Stat Actuals Expr = [Tree: tTree] .
+
+RULE                    /* tree construction =                          */
+                        /* mapping: concrete syntax -> abstract syntax  */
+
+Prog    = { => { TreeRoot = mMiniLax (mProc (mNoDecl (), Ident:Ident,
+                 Ident:Position, mNoFormal (), ReverseTree (Decls:Tree),
+                 ReverseTree (Stats:Tree)));};                                  } .
+Decls1  = { Tree := {Decl:Tree->\\Decl.Next = mNoDecl (); Tree = Decl:Tree;};    } .
+Decls2  = { Tree := {Decl:Tree->\\Decl.Next = Decls:Tree; Tree = Decl:Tree;};    } .
+Var     = { Tree := mVar (NoTree, Ident:Ident, Ident:Position, mRef (Type:Tree));}.
+Proc0   = { Tree := mProc (NoTree, Ident:Ident, Ident:Position, mNoFormal (),
+                    ReverseTree (Decls:Tree), ReverseTree (Stats:Tree));        } .
+Proc    = { Tree := mProc (NoTree, Ident:Ident, Ident:Position, ReverseTree
+           (Formals:Tree), ReverseTree (Decls:Tree), ReverseTree (Stats:Tree)); } .
+Formals1= { Tree := {Formal:Tree->\\Formal.Next = mNoFormal ();
+                    Tree = Formal:Tree;};                                       } .
+Formals2= { Tree := {Formal:Tree->\\Formal.Next = Formals:Tree;
+                    Tree = Formal:Tree;};                                       } .
+Value   = { Tree := mFormal (NoTree, Ident:Ident, Ident:Position,
+                    mRef (Type:Tree));                                          } .
+Ref     = { Tree := mFormal (NoTree, Ident:Ident, Ident:Position,
+                    mRef (mRef (Type:Tree)));                                   } .
+Int     = { Tree := nInteger;                                                   } .
+Real    = { Tree := nReal;                                                      } .
+Bool    = { Tree := nBoolean;                                                   } .
+Array   = { Tree := mArray (Type:Tree, Lwb:Integer, Upb:Integer, Lwb:Position); } .
+Stats1  = { Tree := {Stat:Tree->\\Stat.Next = mNoStat (); Tree = Stat:Tree;};    } .
+Stats2  = { Tree := {Stat:Tree->\\Stat.Next = Stats:Tree; Tree = Stat:Tree;};    } .
+Assign  = { Tree := mAssign (NoTree, Adr:Tree, Expr:Tree, ':=':Position);       } .
+Call0   = { Tree := mCall (NoTree, mNoActual (Ident:Position), Ident:Ident,
+                    Ident:Position);                                            } .
+Call    = { Tree := mCall (NoTree, ReverseTree (Actuals:Tree), Ident:Ident,
+                    Ident:Position);                                            } .
+If      = { Tree := mIf (NoTree, Expr:Tree, ReverseTree (Then:Tree),
+                    ReverseTree (Else:Tree));                                   } .
+While   = { Tree := mWhile (NoTree, Expr:Tree, ReverseTree (Stats:Tree));       } .
+Read    = { Tree := mRead (NoTree, Adr:Tree);                                   } .
+Write   = { Tree := mWrite (NoTree, Expr:Tree);                                 } .
+Expr1   = { Tree := mActual (mNoActual (Expr:Tree->\\Expr.Pos), Expr:Tree);      } .
+Expr2   = { Tree := mActual (Actuals:Tree, Expr:Tree);                          } .
+Less    = { Tree := mBinary ('<':Position, Lop:Tree, Rop:Tree, Less);           } .
+Plus    = { Tree := mBinary ('+':Position, Lop:Tree, Rop:Tree, Plus);           } .
+Times   = { Tree := mBinary ('*':Position, Lop:Tree, Rop:Tree, Times);          } .
+Not     = { Tree := mUnary (NOT:Position, Expr:Tree, Not);                      } .
+IConst  = { Tree := mIntConst (IntegerConst:Position, IntegerConst:Integer);    } .
+RConst  = { Tree := mRealConst (RealConst:Position, RealConst:Real);            } .
+False   = { Tree := mBoolConst (FALSE:Position, false);                         } .
+True    = { Tree := mBoolConst (TRUE:Position, true);                           } .
+Name    = { Tree := mIdent (Ident:Position, Ident:Ident);                       } .
+Index   = { Tree := mIndex ('[':Position, Adr:Tree, Expr:Tree);                 } .
+
+END Tree
+.bp 1
+.lp
+.b Contents
+.sp
+.xp

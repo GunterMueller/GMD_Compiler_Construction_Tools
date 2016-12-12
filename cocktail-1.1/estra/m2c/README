@@ -1,0 +1,24 @@
+Estra - Generator for Syntax Tree Transformations
+=================================================
+
+The libraries MLIB=reuse and COMMON must have been compiled before the
+installation of estra.
+Estra has been compiled successfully on several configurations:
+
+configuration | computer | processor | operating-system | compiler
+--------------------------------------------------------------------
+CC            | SUN 3    | MC 68020  | SunOS 4.1        | cc
+CC	      | SUN 4    | SPARC     | SunOS 4.1  	| cc
+CC	      | VAX 2000 |	     | ULTRIX V2.0	| cc
+CC	      | VAX 8500 |	     | ULTRIX V2.0-1	| cc
+CC	      | DEC 3100 | MIPS      | ULTRIX V2.0-7	| cc
+
+When moving from little-endian to big-endian machines or vice versa
+(like e. g. VAX and MC 68000) the binary files Scan.Tab and Pars.Tab
+have to be converted:
+
+   make bin.conv
+
+To generate estra use:
+
+   make install LIB=... BIN=... OPT=...

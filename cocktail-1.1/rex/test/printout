@@ -1,0 +1,45 @@
+make clean ScannerDrv test LIB=/zone2/grosch/lib.sparc CFLAGS="-I../../reuse/c" CC="cc"
+rm -f Scan* Source* core
+rex -sdc1 modula.c;
+
+Start States	     4
+Definitions	     6
+Rules		    82
+Patterns	    83
+Classes		     3
+LastCh		    54
+Transitions	   811
+Leafs		    33
+NFA States	    33
+Minimize Savings     9
+Ambiguous States    23
+Nodes		   491
+DFA States	   215
+Sentinel Savings    32
+Default Savings	   219
+Table Entries	   705
+Table Size	   821
+Memory used	145416
+Warning: in start state STD the default action may be triggered by:
+ \0 \1 \2 \3 \4 \5 \6 \7 \8 \11 \12 \13 \14 \15 \16 \17
+ \18 \19 \20 \21 \22 \23 \24 \25 \26 \27 \28 \29 \30 \31 '!' '"'
+ '$' '%' ''' '?' '@' '\' '_' '`'
+cc -I../../reuse/c -c ScannerDrv.c;
+cc -I../../reuse/c -c Scanner.c;
+cc -I../../reuse/c -c Source.c;
+cc ScannerDrv.o Scanner.o Source.o -o ScannerDrv /zone2/grosch/lib.sparc/libreuse.a
+time ScannerDrv < in
+3017
+        0.2 real         0.0 user         0.0 sys  
+time ScannerDrv < in
+3017
+        0.2 real         0.0 user         0.0 sys  
+time ScannerDrv < in
+3017
+        0.1 real         0.0 user         0.0 sys  
+time ScannerDrv < in
+3017
+        0.1 real         0.0 user         0.0 sys  
+time ScannerDrv < in
+3017
+        0.1 real         0.0 user         0.0 sys  

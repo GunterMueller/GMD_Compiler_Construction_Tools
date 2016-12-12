@@ -1,0 +1,96 @@
+.TH REX 1 "" "GMD-Forschungsstelle-Karlsruhe"
+.SH NAME
+rex \- generator of lexical analysers
+.SH SYNOPSIS
+rex [ -options ] [ -l\fIdir\fP ] [ file ]
+.SH DESCRIPTION
+.I Rex
+generates programs to be used in lexical analysis of text. A typical
+application is the generation of scanners for compilers. The input
+.I file
+contains regular expressions to be searched for, and actions written in C or
+Modula-2 to be executed when strings according to the expressions are found.
+Unrecognized portions of the input are copied to standard output.
+To be able to recognize tokens depending on their context,
+\fIRex\fP provides start states to handle left context
+and the right context can be specified by an additional regular expression.
+If several regular expressions match the input characters, the
+longest match is preferred. If there are still several possibilities, the
+regular expression given first in the specification is chosen.
+.PP
+\fIRex\fP generated scanners automatically provide the line and column position of
+each token. For languages like Pascal and Ada where the case of letters is
+insignificant tokens can be normalized to lower or upper case. There are
+predefined rules to skip white space like blanks, tabs, or newlines
+and there is a mechanism to handle include files.
+The generated scanners are table-driven deterministic finite automatons.
+.SH OPTIONS
+.IP a
+generate all (= sdm)
+.IP m
+generate a lexical analyser in Modula-2 (default)
+.IP c
+generate a lexical analyser in C
+.IP d
+generate a definition module for the lexical analyser
+.IP s
+generate support modules:
+.br
+- a source module for input
+.br
+- a main program to be used as test driver
+.IP r
+reduce the number of generated case/switch labels. Might be necessary due to compiler
+restrictions. Effects: slower scanner (2-4%), larger tables, same scanner size.
+.IP i
+use ISO 8 bit code (default: ASCII 7 bit code)
+.IP o
+optimize table size
+.br
+Effects: slower scanner (0-15%), small tables, long generation time (factor 1-10)
+.IP n
+do not optimize table size
+.br
+Effects: fast scanner, large tables (factor 1-10), short generation time
+.IP " "
+default: improve table size
+.br
+Effects: slower scanner (0-5%), medium size tables (factor 1-2), medium generation time (factor 1-2)
+.IP w
+suppress warnings
+.IP g
+generate # line directives
+.IP b
+do not partition charcater set into blocks
+.IP 1
+print statistics about the generated lexical analyser
+.IP l\fRdir
+.I dir
+is the directory where Rex finds its table and data files
+.SH FILES
+.nf
+.ta 2i
+if output is in C:
+.sp 0.5
+<Scanner>.h	specification of the generated scanner
+<Scanner>.c	body of the generated scanner
+<Scanner>Source.h	specification of support module source
+<Scanner>Source.c	body of support module source
+<Scanner>Drv.c	main program to serve as test driver
+.sp 0.5
+if output is in Modula-2:
+.sp 0.5
+<Scanner>.md	definition module of the generated scanner
+<Scanner>.mi	implementation module of the generated scanner
+<Scanner>Source.md	definition module of support module source
+<Scanner>Source.mi	implementation module of support module source
+<Scanner>Drv.mi	main program to serve as test driver
+<Scanner>.Tab	tables to control the generated scanner
+.fi
+.SH SEE\ ALSO
+J. Grosch: "Rex - A Scanner Generator",
+GMD Forschungsstelle an der Universitaet Karlsruhe,
+Compiler Generation Report No. 5, 1987
+.sp 0.5
+J. Grosch: "Efficient Generation of Lexical Analysers",
+Software - Practice & Experience, 19 (11), 1089-1103, Nov. 1989

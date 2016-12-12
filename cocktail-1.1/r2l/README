@@ -1,0 +1,42 @@
+*************************************************************************
+*									*
+*  r2l									*
+*									*
+*  transforms REX specifications to LEX specifications			*
+*									*
+*  Copyright (c) 1990 by						*
+*									*
+*  Gesellschaft fuer Mathematik und Datenverarbeitung			*
+*  (German National Research Center for Computer Science)		*
+*  Forschungsstelle fuer Programmstrukturen				*
+*  an der Universitaet Karlsruhe					*
+*									*
+*  All rights reserved.	GMD assumes no responsibility for the use	*
+*  or reliability of its software.					*
+* 									*
+*************************************************************************
+
+
+Direct requests, comments, questions, and error reports to:
+
+	Josef Grosch
+	GMD Forschungsstelle
+	Vincenz-Priessnitz-Str. 1
+	D-7500 Karlsruhe 1
+
+	Phone: +721-662226
+	Email: grosch@karslruhe.gmd.de
+
+
+Before compiling r2l the libraries reuse/c or reuse/mod have to be compiled.
+
+To compile and install r2l use:
+
+   cd m2c
+   make CLIB=... OPT=...
+   make install LIB=... BIN=...
+
+or
+
+   cd src
+   make install LIB=... BIN=...

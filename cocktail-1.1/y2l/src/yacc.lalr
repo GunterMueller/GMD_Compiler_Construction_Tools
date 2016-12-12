@@ -1,0 +1,130 @@
+GLOBAL {
+typedef union { tScanAttribute Scan; } tParsAttribute;
+
+int rword;		/* 0 = %token, 1 = %oper, 2 = %type */
+tStringRef lhs, tag, prec;
+tStringRef left_str, right_str, none_str, colon_str, bar_str, action_str, prec_str, dot_str;
+int has_rhs, has_action;
+struct tCell default_action = { 0, 0 };
+}
+
+BEGIN {
+left_str	= PutString ("\n\tLEFT", 6);
+right_str	= PutString ("\n\tRIGHT", 7);
+none_str	= PutString ("\n\tNONE", 6);
+colon_str	= PutString ("\t:", 2);
+bar_str		= PutString ("\t|", 2);
+action_str	= PutString (" }}", 3);
+prec_str	= PutString ("PREC", 4);
+dot_str		= PutString ("\n\t.", 3);
+default_action.car = action_str;
+}
+
+TOKEN
+	identifier	= 1
+	C_IDENT		= 2
+	number		= 3
+	'%left'		= 4
+	'%right'	= 5
+	'%nonassoc'	= 6
+	'%token'	= 7
+	'%prec'		= 8
+	'%type'		= 9
+	'%start'	= 10
+	'%union'	= 11
+	'%%'		= 12
+	'<'		= 13
+	'>'		= 14
+	','		= 15
+	'|'		= 16
+	'{'		= 17
+	'}'		= 18
+	';'		= 19
+	':'		= 20
+
+RULE	/* the grammar is taken from the yacc documentation */
+
+spec	: def * '%%' { put_text (text_list); } rules { yacc_globals (); } [ '%%' ]
+	.
+
+def	: '%start' identifier { start_symbol = $2.Scan.string; }
+	| '%union'
+	| rword tag nlist
+	.
+
+rword	: '%token'	{ rword = 0; }
+	| '%left'	{ rword = 1; put_oper (left_str); }
+	| '%right'	{ rword = 1; put_oper (right_str); }
+	| '%nonassoc'	{ rword = 1; put_oper (none_str); }
+	| '%type'	{ rword = 2; type = 1; }
+	.
+
+tag	: '<' identifier '>' { tag = $2.Scan.string; }
+	| { tag = 0; }
+	.
+
+nlist	: nmno
+	| nlist nmno
+	| nlist ',' nmno
+	.
+
+nmno	: identifier { switch (rword) {
+			 case 1 : put_oper ($1.Scan.string);
+			 case 0 : put_token ($1.Scan.string, 0); break;
+			 default: break;
+		       }
+		       if (tag) put_type ($1.Scan.string, tag); }
+	| identifier number { switch (rword) {
+			        case 1 : put_oper ($1.Scan.string);
+			        case 0 : put_token ($1.Scan.string, $2.Scan.number); break;
+			        default: break;
+			      }
+			      if (tag) put_type ($1.Scan.string, tag); }
+	.
+
+rules	: C_IDENT
+	  { rule_elmts_list = prec = has_rhs = has_action = 0; lhs = $0.Scan.string;
+	    put_lhs (lhs); put_delim (lhs); put_delim (colon_str); }
+	  ':' rbody prec
+	  { if (has_rhs && ! has_action) put_whole_action (& default_action, true);
+	    if (prec) { put_delim (prec_str); put_delim (prec); }
+	    if (yyTerminal != 16) put_delim (dot_str);
+	    put_rule (rule_elmts_list); put_text (text_list); }
+	| rules rule
+	.
+
+rule	: C_IDENT
+	  { rule_elmts_list = prec = has_rhs = has_action = 0; lhs = $0.Scan.string;
+	    put_lhs (lhs); put_delim (lhs); put_delim (colon_str); }
+	  ':' rbody prec
+	  { if (has_rhs && ! has_action) put_whole_action (& default_action, true);
+	    if (prec) { put_delim (prec_str); put_delim (prec); }
+	    if (yyTerminal != 16) put_delim (dot_str);
+	    put_rule (rule_elmts_list); put_text (text_list); }
+	| '|'
+	  { rule_elmts_list = prec = has_rhs = has_action = 0;
+	    put_lhs (lhs); put_delim (bar_str); }
+	  rbody prec
+	  { if (has_rhs && ! has_action) put_whole_action (& default_action, true);
+	    if (prec) { put_delim (prec_str); put_delim (prec); }
+	    if (yyTerminal != 16) put_delim (dot_str);
+	    put_rule (rule_elmts_list); put_text (text_list); }
+	.
+
+rbody	: rbody identifier { put_symbol ($2.Scan.string); has_rhs = 1; }
+	| rbody act
+	|
+	.
+
+(* actions are delivered in 2 tokens for the purpose of synchronisation *)
+
+act	: '{' '}' { has_action = 1; put_whole_action ($2.Scan.action, has_rhs &
+		    /* is it last action ? */
+		    (yyTerminal == 16 || yyTerminal == 19 || yyTerminal == 0)); }
+	.
+
+prec	: '%prec' identifier     { prec = $2.Scan.string; }
+	| '%prec' identifier act { prec = $2.Scan.string; }
+	| prec ';'
+	|
+	.

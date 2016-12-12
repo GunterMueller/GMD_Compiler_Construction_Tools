@@ -1,0 +1,1252 @@
+
+
+
+
+
+
+
+
+
+
+___________________________________________________________________
+
+
+                                   Werkzeuge fuer den
+                                   Uebersetzerbau
+
+                                   J. Grosch
+                                   H. Emmelmann
+
+___________________________________________________________________
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+___________________________________________________________________
+                                   GESELLSCHAFT FUeR MATHEMATIK
+                                   UND DATENVERARBEITUNG MBH
+
+                                   FORSCHUNGSSTELLE FUeR
+                                   PROGRAMMSTRUKTUREN
+                                   AN DER UNIVERSITAeT KARLSRUHE
+___________________________________________________________________
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   Project
+
+                             Compiler Generation
+
+         ___________________________________________________________
+
+                      Werkzeuge fuer den Uebersetzerbau
+
+
+                                 Josef Grosch
+                               Helmut Emmelmann
+
+
+                                 Feb. 7, 1990
+
+         ___________________________________________________________
+
+
+                                Report No. 21
+
+
+                             Copyright c 1990 GMD
+
+
+            Gesellschaft fuer Mathematik und Datenverarbeitung mbH
+                Forschungsstelle an der Universitaet Karlsruhe
+                          Vincenz-Priesznitz-Str. 1
+                               D-7500 Karlsruhe
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                             1
+
+
+                      Werkzeuge fuer den Uebersetzerbau
+
+                           J. Grosch, H. Emmelmann
+              GMD Forschungsstelle an der Universitaet Karlsruhe
+             Vincenz-Priesznitz-Str. 1, D-7500 Karlsruhe, Germany
+
+
+Uebersicht
+
+     Mit Uebersetzerbau-Werkzeugen lassen sich Uebersetzer  fuer  Programmier-
+sprachen  weitgehend  automatisch generieren. Wir stellen einen Werkzeugkasten
+vor, welcher die Konstruktion nahezu aller Phasen  eines  Uebersetzers  unter-
+stuetzt.  Die  Entwurfsziele fuer diesen Werkzeugkasten waren praktische Brau-
+chbarkeit, deutlich reduzierter Erstellungsaufwand fuer Uebersetzer  und  hohe
+Qualitaet   der  generierten  Uebersetzer.  Besonders  hinsichtlich  Effizienz
+sollten die Werkzeuge konkurrenzfaehig zur Programmierung von Hand sein.   Zur
+Zeit  koennen  mit  den Werkzeugen Uebersetzermodule in den Zielsprachen C und
+Modula-2 erzeugt werden. Erste realistische Anwendungen demonstrieren die aus-
+gezeichnete  Leistungsfaehigkeit  der Werkzeuge und zeigen, dasz die Werkzeuge
+die Konstruktion von Uebersetzern mit Produktionsqualitaet erlauben.
+
+1.  Aufbau eines Uebersetzers
+
+     Ein wichtiges Hilfsmittel zur  Programmierung  eines  Computers  ist  ein
+Uebersetzer  (compiler).   Ein  Uebersetzer  ist  ein Programm, welches ein in
+einer  Programmiersprache  geschriebenes  Programm  in  eine  Maschinensprache
+uebersetzt.  Die  Hardware  versteht  genaugenommen  nur aus Nullen und Einsen
+zusammengesetzte Maschinensprach-Programme. Um einem Computer auch  eine  fuer
+den  menschlichen  Programmierer  besser  geeignete hoehere Programmiersprache
+verstaendlich zu machen, ist eine Uebersetzung noetig.
+
+     Die Konstruktion eines Uebersetzers ist eine anspruchsvolle  und  aufwen-
+dige  Aufgabe. Der Bedarf an Uebersetzern ist relativ grosz, da fuer jede Pro-
+grammiersprache und jeden Computer ein eigener Uebersetzer notwendig ist.   Es
+lohnt  sich  daher,  nach  Methoden  zu suchen die Erstellung von Compilern zu
+vereinfachen.  Doch bevor wir zu unserem eigentlichen Thema  kommen,  naemlich
+der  automatischen Generierung von Uebersetzern mit Uebersetzerbau-Werkzeugen,
+moechten wir kurz den Aufbau und die prinzipielle Funktionsweise eines  Ueber-
+setzers  erlaeutern.  Die rechte Spalte in Abb. 1 zeigt die Phasen bzw. Module
+eines Uebersetzers.
+
+     Die lexikalische Analyse liest das Quellprogramm zeichenweise. Sie  faszt
+die  Zeichenfolgen  fuer Bezeichner, Zahlen und Schluesselwoerter zu Grundsym-
+bolen zusammen und ueberliest Zwischenraeume und Kommentare.
+
+     Die syntaktische Analyse hat als Eingabe eine  Folge  von  Grundsymbolen.
+Sie  ueberprueft  das  Quellprogramm auf syntaktische Fehler und rekonstruiert
+die Struktur des Programms, d. h. sie erkennt den Aufbau  der  Ausdruecke  und
+Anweisungen  sowie  deren  Zusammenhang. Diese Struktur wird oft in Form eines
+Syntaxbaums gespeichert.
+
+     Die semantische  Analyse  ueberprueft  die  Kontextbedingungen  bzw.  die
+Regeln  der statischen Semantik und berechnet fuer die Codegenerierung noetige
+
+
+
+
+
+
+
+
+
+
+                                                                             2
+
+
+Eigenschaften. Ein Beispiel fuer eine  Kontextbedingung  ist  die  Vorschrift,
+dasz  alle Variablen deklariert sein muessen.  Zur statischen Semantik zaehlen
+die Analyse der Gueltigkeitsbereiche, die Namensanalyse, d.  h. die  Feststel-
+lung  der  zu  einem  Bezeichner  gehoerenden  Deklaration,  und die Typueber-
+pruefung.
+
+     Zur Vereinfachung der gesamten Uebersetzungsaufgabe wird diese haeufig in
+zwei  Schritte unterteilt. Der Syntaxbaum wird zunaechst von einer Transforma-
+tionsphase in eine  Zwischensprache  umgewandelt.  Diese  Zwischensprache  ist
+meist  maschinenorientiert  jedoch  noch  maschinenunabhaengig.  Das  niedrige
+Niveau der Zwischensprache erleichtert dem  Codegenerator  die  Erzeugung  der
+Maschinensprache.
+
+     Zu den Aufgaben des Codegenerators zaehlen die Befehlsauswahl, d. h.  die
+Abbildung   der  Zwischensprachanweisungen  auf  Maschinenbefehle,  sowie  die
+Speicher- und Registerzuteilung.  Die Ausgabe  ist  schlieszlich  ein  binaer-
+codiertes Maschinenprogramm.
+
+     Der folgende Abschnitt beschreibt die Vorteile, die Entwurfsziele und den
+Inhalt  des Werkzeugkastens.  Abschnitt 3 stellt die gemeinsamen Eigenschaften
+der Werkzeuge dar.  Im Abschnitt 4 wird das von uns bevorzugte  Uebersetzermo-
+dell beschrieben.  Der Abschnitt 5 enthaelt eine kurze Darstellung der einzel-
+nen Werkzeuge.  Abschnitt 6 berichtet von den Erfahrungen  des  Einsatzes  der
+Werkzeuge in zwei realistischen Anwendungen.  Abschnitt 7 enthaelt eine Zusam-
+menfassung und beschreibt weiterfuehrende Arbeiten.
+
+2.  Werkzeugkasten
+
+     Die Erstellung eines Uebersetzers von Hand ist eine  sehr  anspruchsvolle
+und  aufwendige  Aufgabe.   Durch  den  Einsatz  von Uebersetzerbau-Werkzeugen
+laeszt sich  dieser  Aufwand  reduzieren.   Im  folgenden  stellen  wir  einen
+Werkzeugkasten  zur  Uebersetzer-Generierung  vor,  welcher  fuer  nahezu jede
+Uebersetzerphase Werkzeuge enthaelt.  Diese sind fuer den Einsatz  in  realis-
+tischen Uebersetzerprojekten konzipiert.
+
+     Im allgemeinen akzeptieren die Werkzeuge als Eingabe eine  Spezifikation,
+die  in  einer  werkzeug-spezifischen Sprache geschrieben ist. Sie produzieren
+als Ausgabe ein Programm-Modul in einer Zielsprache (C oder Modula-2). Deshalb
+kann  ein  Werkzeug  als generische Loesung eines Teilproblems in einem Ueber-
+setzer gesehen werden, wobei  mit  Hilfe  einer  Spezifikation  eine  konkrete
+Loesung gewonnen wird.
+
+     Die Benutzung von Werkzeugen hat gegenueber der Programmierung  von  Hand
+mehrere  Vorteile:  Der zur Konstruktion eines Uebersetzers notwendige Aufwand
+wird wesentlich verringert. An Stelle eines Programms wird eine viel  kuerzere
+Spezifikation  entwickelt.  Die  Werkzeuge koennen eine Spezifikation in viel-
+facher Weise auf Konsistenz ueberpruefen. Das Schreiben automatisch pruefbarer
+Spezifikationen  verringert  die  Anzahl  moeglicher Fehler und erhoeht so die
+Zuverlaessigkeit des resultierenden Uebersetzers.
+
+     Die wichtigsten Entwurfsziele fuer den Werkzeugkasten waren:
+
+
+
+
+
+
+
+
+
+
+
+                                                                             3
+
+
+-    praktische Brauchbarkeit fuer realistische Programmiersprachen
+
+-    automatische Generierung von Uebersetzern mit Produktionsqualitaet
+
+-    wesentliche Steigerung der Uebersetzerbau-Produktivitaet
+
+-    mit Handprogrammierung vergleichbare Qualitaet der erzeugten Uebersetzer
+
+     Mit dieser  Zielsetzung   sollte  die  praktische  Einsatzfaehigkeit  des
+Werkzeugkastens  in  realistischen  Uebersetzerbauprojekten  erreicht  werden.
+Daher wurde auch die Konkurrenzfaehigkeit zur Handprogrammierung  betont.  Wir
+meinen,  dasz  die  hohe  Produktivitaet und Zuverlaessigkeit nicht durch eine
+geringere Codequalitaet oder Effizienz des  resultierenden  Compilers  erkauft
+werden musz.
+
+     Der Werkzeugkasten enthaelt folgende Werkzeuge:
+
+    Rex     Generator fuer lexikalische Analysatoren
+    Lalr    LALR(1) Zerteilergenerator
+    Ell     LL(1) Zerteilergenerator
+    Ast     Generator fuer abstrakte Syntaxbaeume
+    Ag      Generator fuer Attributauswerter
+    Estra   Transformation abstrakter Syntaxbaeume
+    Beg     Generator fuer Codegeneratoren
+    Reuse   Bibliothek wiederverwendbarer Module
+
+
+     Alle Werkzeuge wurden urspruenglich in Modula-2 programmiert  und  laufen
+unter  dem  Betriebssystem  UNIX.  Unter Verwendung des Modula-2 nach C Ueber-
+setzers Mtc [Mar90] (siehe Abschnitt 6.1), konnte von den  Programmen  automa-
+tisch  eine C-Version erstellt werden. Zur Zeit erzeugen die meisten Werkzeuge
+Module in den Zielsprachen C und Modula-2.
+
+3.  Gemeinsame Eigenschaften
+
+     Unsere Entwurfsziele fuehrten zu einigen fuer alle Werkzeuge  gemeinsamen
+Entwurfsentscheidungen.  Nahezu  jedes  Werkzeug  benoetigt  eine Programmier-
+sprache, mit der der Benutzer gewisze Aktionen, Bedingungen oder  Berechnungen
+spezifizieren  kann.  Das  trifft  offensichtlich fuer Attributgrammatiken zu,
+aber auch der Codegenerator-Generator musz Attribute und  Bedingungen  auswer-
+ten.  Sogar die Zerteilergeneratoren brauchen eine solche Sprache zur Spezifi-
+kation semantischer Aktionen.
+
+     Wir entschieden uns  dafuer  direkt  die  Zielsprache  (naemlich  C  oder
+Modula-2)  zu verwenden.  Deshalb koennen Spezifikationen Abschnitte mit Ziel-
+sprachanweisungen enthalten. Abgesehen  von  geringfuegigen  Ersetzungen  wird
+dieser Text unveraendert in die erzeugten Module kopiert.  Der Nachteil dieser
+Methode ist, dasz die in der Zielsprache geschriebenen Teile nicht  vollstaen-
+dig  von  den  Werkzeugen  ueberprueft  werden  koennen. Zum Beispiel kann das
+Attributgrammatik-Werkzeug nicht ueberpruefen, ob  Attributberechnungen  keine
+Seiteneffekte  haben.  Andererseits  wird damit eine sehr grosze Flexibilitaet
+erreicht, da die volle Ausdruckskraft der Zielsprache  zur  Verfuegung  steht.
+Ebenso   wird   die   praktische   Brauchbarkeit  drastisch  erhoeht,  da  die
+
+
+
+
+
+
+
+
+
+
+                                                                             4
+
+
+Einbeziehung anderer, eventuell handgeschriebener Komponenten leicht  moeglich
+ist.  Schlieszlich  fuehrt es zu einfachen Werkzeugen und einfachen Spezifika-
+tionssprachen.
+
+     Unsere Erfahrung mit frueheren Werkzeugen zeigte, dasz waehrend der  Kon-
+struktion realistische Uebersetzer eine Reihe kleiner Sonderprobleme auftritt,
+die nicht mit den Werkzeugen geloest werden  koennen.  Deswegen  sind  Schlup-
+floecher  noetig,  also  Moeglichkeiten,  die es dem Werkzeugbenutzer erlauben
+leicht handgeschriebene Teile einzufuegen. Diese  Schlupfloecher  tragen  auch
+dazu  bei  die  Werkzeuge  einfach zu machen, da man nicht gezwungen ist, fuer
+jedes Problem  sofort  eine  Loesung  bereitzustellen.  Das  Schlupfloch  kann
+benutzt  werden  solange  bis eine wirklich gute Loesung gefunden wird, welche
+man in ein Werkzeug einbauen kann.
+
+     Die Werkzeuge sind groesztenteils von  einander  unabhaengig.  Dies  wird
+dadurch  erzielt,  dasz  keines  der erzeugten Module eine festgelegte Ausgabe
+besitzt. Stattdessen wird diese Ausgabe mittels  Anweisungen  der  Zielsprache
+spezifiziert  und kann somit beliebig gewaehlt werden. Die Unabhaengigkeit der
+Werkzeuge sorgt fuer grosze Freiheiten beim Uebersetzerentwurf. Eine  Ausnahme
+bilden  die  Werkzeuge  Ag und Estra, denn sie basieren auf den mit Ast spezi-
+fizierten Syntaxbaeumen. Deshalb haengen diese Werkzeuge von Ast ab, und  alle
+drei  Werkzeuge  sind fuer Uebersetzer zugeschnitten, die einen attributierten
+abstrakten Syntaxbaum benutzen.
+
+4.  Uebersetzer-Modell
+
+     Obwohl die Werkzeuge kein bestimmtes Uebersetzer-Modell  erzwingen,  moe-
+chten wir das von uns bevorzugte Modell vorstellen. Wir meinen, dasz dieses am
+besten von den Werkzeugen unterstuetzt wird. Wir  betrachten  die  semantische
+Analyse  nach  wie  vor als den schwierigsten Teil eines Uebersetzers. Deshalb
+gehen wir fuer die semantische Analyse und die Erzeugung einer Zwischensprache
+von  der  abstrakten  Syntax aus. Wir bauen den abstrakten Syntaxbaum explizit
+auf, welcher  waehrend  der  semantischen  Analyse  eventuell  mit  Attributen
+ergaenzt  wird.  Neben der abstrakten Syntax, welche als erste, hohe Zwischen-
+sprache betrachtet werden kann, bevorzugen wir die Verwendung  einer  zweiten,
+niederen Zwischensprache als Schnittstelle zum Codegenerator. Dies bringt Vor-
+teile in der Optimierung und der mustergesteuerten Codeauswahl mit sich.
+
+     Abbildung 1 zeigt das von uns bevorzugte  Uebersetzermodell.  Die  rechte
+Spalte  enthaelt  die  wichtigsten Module eines Uebersetzers. Die linke Spalte
+zeigt die dazu notwendigen Spezifikationen. Die dazwischen liegenden Werkzeuge
+werden  von  den  Spezifikationen gesteuert und erzeugen die einzelnen Module.
+Die Pfeile stellen den Datenflusz dar, teils zur  Generierungszeit  und  teils
+zur Uebersetzungszeit.
+
+5.  Die Werkzeuge
+
+     Die  folgenden  Abschnitte  stellen  kurz  die  einzelnen  Werkzeuge  des
+Werkzeugkastens vor. Wir beschreiben nur die Eigenschaften der Werkzeuge. Fuer
+
+                          Abb. 1: Uebersetzer-Modell
+
+
+
+
+
+
+
+
+
+
+
+                                                                             5
+
+
+weitere Einzelheiten, die Spezifikationstechniken oder fuer Beispiele sei  der
+Leser auf die existierenden, werkzeug-spezifischen Dokumente verwiesen.
+
+5.1.  Rex
+
+     Rex  (regular  expression  tool)  ist  ein  Generator  fuer  lexikalische
+Analysatoren  [Gro87a,  Gro88,  Gro89a].   Seine  Spezifikationen basieren auf
+regulaeren Ausdruecken und beliebigen semantischen Aktionen, die in einer  der
+Zielsprachen  C  oder  Modula-2 geschrieben werden.  Immer wenn in der Eingabe
+des  erzeugten  lexikalischen  Analysators  eine  einem  regulaeren   Ausdruck
+entsprechende  Zeichenkette  erkannt  wurde,  werden die zugehoerigem Aktionen
+ausgefuehrt. Falls zur eindeutigen Erkennung der Symbole  der  Kontext  betra-
+chtet  werden musz, so kann der rechte Kontext durch einen zusaetzlichen regu-
+laeren  Ausdruck  spezifiziert  werden,  und  der  linke  Kontext   wird   mit
+sogenannten  Start-Zustaenden  behandelt.   Falls mehrere regulaere Ausdruecke
+auf die aktuelle Eingabe zutreffen, so wird der  Ausdruck  mit  der  laengsten
+Zeichenkette  bevorzugt.  Falls  es immer noch mehrere Moeglichkeiten gibt, so
+wird der zuerst in der Spezifikation stehende Ausdruck gewaehlt.
+
+     Die erzeugten lexikalischen Analysatoren berechnen automatisch Zeile  und
+Spalte  in  der  Quelle fuer jedes erkannte Symbol und enthalten einen Mechan-
+ismus  fuer  Include-Dateien.   Bezeichner   und   Schluesselwoerter   koennen
+effizient  in  Grosz- oder Kleinbuchstaben normalisiert werden. Es gibt vorde-
+finierte Regeln um Leerstellen, Tabulatoren und Zeilenwechsel  zu  ueberlesen.
+Die  generierten lexikalischen Analysatoren sind tabellengesteuerte, determin-
+istische endliche Automaten. Die Tabellen werden mit der sogenannten  Kammvek-
+tortechnik komprimiert [ASU86].
+
+     Die herausragende Eigenschaft von Rex  ist  seine  Geschwindigkeit.   Die
+lexikalischen  Analysatoren  verarbeiten nahezu 200.000 Zeilen pro Minute ohne
+Hashing von Bezeichnern und 150.000 Zeilen pro Minute mit  Hashing.  Dies  ist
+die  vierfache Geschwindigkeit gegenueber mit Lex [Les75] generierten lexikal-
+ischen Analysatoren. In typischen Faellen besitzen mit Rex generierte Analysa-
+toren  ein  Viertel der Groesze derer von Lex. Normalerweise benoetigt Rex nur
+1/10 der Zeit von Lex zum Generieren eines lexikalischen Analysators.
+
+5.2.  Lalr
+
+     Lalr  ist  ein  LALR(1)  Zerteiler-Generator  der  Grammatiken,  die   in
+erweiterter  BNF  geschrieben  sind,  verarbeitet [GrV88, Gro88].  Die Gramma-
+tikregeln koennen mit semantischen Aktionen versehen  werden,  die  direkt  in
+einer  Zielsprache  formuliert  sind.   Immer wenn der erzeugte Zerteiler eine
+Grammatikregel erkennt, wird die zugehoerige semantische  Aktion  ausgefuehrt.
+Der Generator stellt einen Mechanismus zur S-Attributierung zur Verfuegung, d.
+h. synthetisierte Attribute koennen waehrend der Zerteilung berechnet werden.
+
+     Im Falle von LR-Konflikten liefert Lalr nicht wie andere Generatoren  nur
+Information  ueber  aus  Mengen  von Situationen bestehende Zustaende, sondern
+druckt einen Ableitungsbaum, der wesentlich nuetzlicher zur Analyse  des  Kon-
+flikts ist. Konflikte koennen durch die Angabe von Prioritaet und Assoziativi-
+taet fuer Operatoren und Produktionen geloest  werden.  Die  generierten  Zer-
+teiler  beinhalten  eine automatische Fehlerbehandlung mit Fehlermeldungen und
+-reparatur.  Zur Fehlerbehandlung wird die  vollstaendige,  ruecksetzungsfreie
+
+
+
+
+
+
+
+
+
+
+                                                                             6
+
+
+Methode  von  Roehrich  [Roeh76, Roeh80, Roeh82] verwendet. Die Zerteiler sind
+tabellengesteuert und wie im  Falle  von  Rex  werden  die  Tabellen  mit  der
+Kammvektortechnik   komprimiert.   Der  Generator  verwendet  den  in  [DeP82]
+beschriebenen Algorithmus zur Berechnung der Vorschaumengen.
+
+     Mit Lalr erzeugte Zerteiler sind zwei bis drei mal schneller als mit Yacc
+[Joh75]  erzeugte.  Sie  erreichen eine Geschwindigkeit von 580.000 Zeilen pro
+Minute ohne Beruecksichtigung der lexikalischen Analyse. Die Groesze der  Zer-
+teiler  ist gegenueber Yacc leicht erhoeht, denn fuer die Geschwindigkeit musz
+ein kleiner Preis bezahlt werden.
+
+     Die Eingabesprachen  von  Rex  und  Lalr  sind  hinsichtlich  der  Syntax
+gegenueber  Lex  und  Yacc  lesbarer  gestaltet.  Mit Hilfe zweier, hier nicht
+naeher beschriebener Praeprozessoren koennen Rex und Lalr auch  Eingaben  fuer
+Lex  und  Yacc  verarbeiten.  Dadurch  sind  unsere Werkzeuge in Bezug auf die
+Benutzerschnittstelle kompatibel mit den UNIX-Werkzeugen.
+
+5.3.  Ell
+
+     Ell  ist  ein  LL(1)  Zerteiler-Generator,  der  die  gleiche  Spezifika-
+tionssprache  wie  Lalr verarbeitet, mit dem Unterschied, dasz die Grammatiken
+die LL(1)-Eigenschaft besitzen muessen [GrV88, Gro88, Gro89b].   Waehrend  der
+Zerteilung  kann  eine L-Attributierung ausgewertet werden. Die erzeugten Zer-
+teiler beinhalten eine automatische Fehlerbehandlung mit  Fehlermeldungen  und
+-reparatur  wie  Lalr.  Die  Zerteiler  sind nach dem Verfahren des rekursiven
+Abstiegs implementiert und erzielen eine Geschwindigkeit  von  900.000  Zeilen
+pro Minute.
+
+5.4.  Ast
+
+     Ast ist ein Generator fuer abtrakte Syntaxbaeume  [Gro89d,  Gro89e].   Er
+generiert  Programm-Module  oder abstrakte Datentypen zur Bearbeitung attribu-
+tierter Baeume. Neben Baeumen koennen auch  attributierte  Graphen  bearbeitet
+werden. Den Knoten dieser Datenstrukturen koennen beliebig viele Attribute von
+beliebigem Typ zugeordnet werden. Die  Spezifikationen  fuer  dieses  Werkzeug
+basieren  auf  erweiterten Baum-Grammatiken.  Sie koennen als gemeinsame Nota-
+tion sowohl fuer konkrete und abstrakte Syntax  als  auch  fuer  attributierte
+Baeume  und Graphen betrachtet werden. Ein Erweiterungsmechanismus stellt ein-
+fache Vererbung zur Verfuegung. Intern werden  die  Baeume  durch  verzeigerte
+Verbunde  gespeichert.  Zahlreiche Operationen fuer Baeume und Graphen koennen
+auf Anforderung von Ast erzeugt werden:  Sogenannte  Knotenkonstruktoren  kom-
+binieren    Aggregatschreibweise    mit    Speicherverwaltung.    Lese-    und
+Schreibeprozeduren uebertragen Graphen aus/in Dateien in lesbarem ASCII-  oder
+internem  Binaerformat.  Die  Reihenfolge  von Teilbaeumen in einer Liste kann
+umgekehrt  werden.  Es  werden  Prozeduren  fuer  haeufig   benutzte   Traver-
+sierungsstrategien  wie  top  down oder bottom up zur Verfuegung gestellt. Ein
+interaktiver Graph-Browser erlaubt die  Inspektion  von  Graphen  in  lesbarer
+Weise und unterstuetzt so den Programmtest.
+
+5.5.  Ag
+
+     Ag ist ein Generator fuer Attributauswerter [Gro89c,  Gro90].  Er  verar-
+beitet  geordnete  Attributgrammatiken  (OAGs)  [Kas80]  und sogenannte higher
+
+
+
+
+
+
+
+
+
+
+                                                                             7
+
+
+order Attributgrammatiken (HAGs) [VSK89].  Er basiert auf der abstrakten  Syn-
+tax  oder besser gesagt auf den von Ast erzeugten Baummodulen. Deshalb ist die
+Baumstruktur voellig  bekannt.  Den  Terminalen  und  Nichtterminalen  koennen
+beliebig  viele  Attribute  zugeordnet  werden. Diese werden mit den Typen der
+Zielsprache getypt.  Dabei  sind  auch  baumwertige  Attribute  moeglich.   Ag
+erlaubt  regellokale  Attribute  und  bietet einen Erweiterungsmechanismus an,
+welcher einfache Vererbung fuer Attribute und  Attributberechnungen  zur  Ver-
+fuegung  stellt.  Dieser gestattet ebenfalls die Elimination von Kettenregeln.
+Die Attributberechnungen werden in der Zielsprache formuliert und  sollten  in
+einem  funktionalen Stil gehalten sein. Es ist moeglich externe Funktionen von
+getrennt uebersetzten Modulen aufzurufen.  Die  Verwendung  nicht-funktionaler
+Anweisungen und von Seiteneffekten ist moeglich, verlangt allerdings sorgfael-
+tige Ueberlegung. Die Syntax der Spezifikationssprache ist im Hinblick auf die
+Unterstuetzung  kompakter,  modularer und lesbarer Dokumente entworfen worden.
+Eine Attributgrammatik kann aus mehreren  Modulen  bestehen,  wobei  die  kon-
+textfreie  Grammatik  nur einmal spezifiziert wird.  Es gibt Kurzschreibweisen
+fuer Kopierregeln and gefaedelte  Attribute  womit  viele  triviale  Attribut-
+Berechnungen weggelassen werden koennen.  Die erzeugten Attributauswerter sind
+sehr effizient, da sie unter Verwendung von rekursiven Prozeduren direkt codi-
+ert  sind.   Die  Speicherung der Attribute wird optimiert indem Attribute als
+lokale  Variable  und  Prozedurparameter  implementiert  werden,   wenn   ihre
+Lebenszeit innerhalb eines Besuches liegt.
+
+5.6.  Estra
+
+     Estra ist ein Generator fuer Transformatoren von abstrakten Syntaxbaeumen
+[Vie89].   Die erzeugten Transformations-Module haben als Eingabe einen attri-
+butierten Baum und bilden diesen auf eine Ausgabe beliebiger Art ab. Die  Aus-
+gabe  kann ein neuer Baum sein, eine lineare Zwischensprache wie z. B. P-Code,
+ein Quellprogramm z. B. in Pascal oder eine  Folge  von  Prozeduraufrufen.  In
+jedem  Fall bleibt der Eingabebaum unveraendert, um das Problem der Reattribu-
+tierung aus Konsistenzgruenden  zu  umgehen.  Jedoch  koennen  Teilbaeume  des
+Eingabebaums  zur  Konstruktion eines Ausgabebaums wiederverwendet werden. Die
+beabsichtigten Anwendungsgebiete fuer die Transformationen sind die  Erzeugung
+von  Zwischensprachen aus abstrakten Syntaxbaeumen und Optimierer fuer interne
+Baumstrukturen jeden Niveaus.  Estra arbeitet mit dem Werkzeug Ast zusammen in
+der  Art,  dasz  die  Eingabebaeume mittels von Ast erzeugten Modulen erstellt
+werden.
+
+     Die Spezifikation  einer  Transformation  ist  regelbasiert.  Eine  Regel
+besteht  aus  einem  Muster,  welches  ein  Baumfragment beschreibt, und einer
+Aktion. Aktionen bestehen aus Anweisungen der Zielsprache. Es koennen  mehrere
+Transformationen  spezifiziert werden. Die Teilbaeume eines Musters koennen in
+beliebiger Reihenfolge transformiert werden. Sie koennen mehrmals mit der sel-
+ben  oder  mit  verschiedenen Transformationen bearbeitet werden. Die Aktionen
+haben Lesezugriff auf die Attribute des Eingabebaums. Zusaetzliche abgeleitete
+oder  vererbte Attribute koennen waehrend der Transformation berechnet werden.
+Die Anwendung von Regeln laeszt sich durch Bedingungen einschraenken. Mehrdeu-
+tigkeiten werden mittels Kostenangaben aufgeloest.
+
+     Zwei Implementierungen fuer den Algorithmus zum  Mustervergleich  koennen
+gewaehlt  werden: Ein direkt codierter dynamischer Programmierungs-Algorithmus
+oder  ein  tabellen-gesteuerter  Baummuster-Vergleicher.  In  beiden   Faellen
+
+
+
+
+
+
+
+
+
+
+                                                                             8
+
+
+besitzt  eine Transformation zwei Phasen. Waehrend die Erste die mit minimalen
+Kosten passenden Muster bestimmt, fuehrt die Zweite die zugehoerigen  Aktionen
+aus.
+
+5.7.  Beg
+
+     Beg (back end generator) erzeugt Module zur Codeauswahl und zur Register-
+zuteilung  [Emm89a,  Emm89b].   Codeauswahl  wird mittels Baummuster-Vergleich
+durchgefuehrt. Die Maschinenbefehle werden mit Regeln beschrieben welche Baum-
+muster enthalten. Der erzeugte Codegenerator hat als Eingabe eine baumfoermige
+Zwischensprache. Ein Eingabebaum wird abgebildet durch  die  Ueberdeckung  des
+Baums  mit Mustern und der anschlieszenden Ausgabe der zugehoerigen Maschinen-
+befehle. Die Regeln sind mit Kosten versehen, wodurch der  Codegenerator  eine
+Ueberdeckung mit Regeln mit minimalen Kosten auswaehlen kann.
+
+     Der Benutzer beschreibt auf  eventuell  mehrdeutige  Art  und  Weise  die
+Abbildung  bestimmter Konstrukte der Zwischensprache. Er braucht keinen Algor-
+ithmus zu programmieren, der die beste Abbildung eines Eingabebaums auswaehlt.
+Es  ist  guenstig  bei  der  Entwicklung einer Codegenerator-Beschreibung erst
+einen Teil der Maschinenbefehle zu spezifizieren, der grosz genug ist, um  die
+ganze  Sprache  zu  uebersetzen. Dies fuehrt zu einem funktionsfaehigen Ueber-
+setzer, welcher eventuell ineffizienten Code erzeugt. Spaeter koennen nach und
+nach weitere Regeln hinzugefuegt werden, was schlieszlich zu einem Uebersetzer
+fuehrt, der guten Code erzeugt.
+
+     Beg implementiert die Bestimmung einer Ueberdeckung mit minimalen  Kosten
+unter    Verwendung   einer   direkt   codierten   Version   des   dynamischen
+Programmierungs-Algorithmus [Emm88, ESL89].
+
+     Die Generierung eines Registerzuteilers ist von besonderer Bedeutung,  da
+hier Handprogrammierung ziemlich schwer und laestig ist und weil Fehler in der
+Registerzuteilung manchmal schwer zu finden sind. Innerhalb der Regeln koennen
+die  Eigenschaften  eines  Maschinenbefehls hinsichtlich der Registerzuteilung
+spezifiziert werden: die erlaubten Register fuer jeden  Operanden,  die  durch
+Seiteneffekte  veraenderten  Register und ob es sich um einen Zweiadreszbefehl
+handelt  oder  nicht.  Zusaetzlich  wird  der  Registersatz  der  Zielmaschine
+beschrieben.  Sogar  das  Doppelregister-Problem  (wie z. B. auf IBM 370) kann
+behandelt werden.
+
+     Zwei Arten von Registerzuteilung sind moeglich: Die on the fly  Register-
+zuteilung  kann  nur  einfache  Registersaetze  behandeln. Sie ist jedoch sehr
+effizient und liefert fuer viele Maschinen  zufriedenstellende  Ergebisse.  In
+manchen  Faellen  ist der allgemeine Registerzuteiler noetig, welcher eine Art
+von Vorschau durchfuehrt und deshalb einen zusaetzlichen Pasz benoetigt.
+
+5.8.  Reuse
+
+     Reuse ist eine Bibliothek wiederverwendbarer Module  hauptsaechlich  fuer
+den  Einsatz  im  Uebersetzerbau  [Gro87b]. Sie enthaelt Module oder abstrakte
+Datentypen, die fast in jedem Uebersetzer gebraucht werden:
+
+-    eine dynamische Speicherverwaltung
+
+
+
+
+
+
+
+
+
+
+                                                                             9
+
+
+-    ein Modul fuer dynamische und flexible Felder
+
+-    ein Modul zur Speicherung variabel langer Zeichenketten
+
+-    ein Modul zur Zeichenkettenbearbeitung
+
+-    eine Bezeichnertabelle, welche Zeichenketten unter Verwendung eines Hash-
+     verfahrens eindeutig auf ganze Zahlen abbildet
+
+-    Module fuer oft verwendete Datenstrukturen wie Mengen von  ganzen  Zahlen
+     oder  binaere  Relationen  zwischen  ganzen Zahlen ohne Beschraenkung des
+     Definitionsbereichs.
+
+6.  Erfahrungen
+
+     Dieser Abschnitt  berichtet  ueber  die  Erfahrungen  des  Einsatzes  des
+Werkzeugkastens fuer zwei realistische Anwendungen.
+
+6.1.  Modula nach C Uebersetzer
+
+     Die bisher groeszte Anwendung des  Werkzeugkastens  war  die  Generierung
+eines  Modula-2  nach C Uebersetzers [Mar90]. Das Mtc genannte Programm ueber-
+setzt Modula-2  Programme  in  lesbaren  C  Code  ohne  Einschraenkung  (sogar
+geschachtelte  Prozeduren und Module). Es ist weitgehend automatisch generiert
+und folgt dem in  Abschnitt  4  vorgeschlagenen  Uebersetzer-Modell.  Anstelle
+einer Zwischensprache erzeugt Mtc C Code und benoetigt deshalb keinen Codegen-
+erator zur Ausgabe von Maschinencode. Es enthaelt so viel von der semantischen
+Analyse wie fuer die Aufgabe gebraucht wird. Die semantische Analyse ist ziem-
+lich vollstaendig und enthaelt die Behandlung der Gueltigkeitsbereiche, Namen-
+sanalyse und Typbestimmung. Es fehlt die Ueberpruefung von Kontextbedingungen,
+da davon ausgegangen wird, dasz  nur  korrekte  Programme  uebersetzt  werden.
+Tabelle  1  enthaelt  die  Groeszen  der  Spezifikationen  und der generierten
+Quell-Module. Der Entwurf und die Implementierung von  Mtc  wurden  im  Rahmen
+einer  Diplomarbeit  mit  einem  Aufwand von 6 Mannmonaten durchgefuehrt.  Das
+Programm ist stabil und hat bereits mehr als 100.000 Zeilen  Modula-2  nach  C
+uebersetzt.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                            10
+
+
+
+_________________________________________________________________________________
+ Phase               Spezifikation        Quell-Modul            Werkzeug
+_________________________________________________________________________________
+                  formal  Code  Summe  Def.  Impl.  Summe  Name  Referenzen
+_________________________________________________________________________________
+ Lex. Analyse       392    133   525     56   1320   1376  Rex   [Gro87a, Gro88]
+ Zerteiler          951     88  1039     81   3007   3088  Ell   [GrV88, Gro88]
+ Syntaxbaum         189     51   240    579   2992   3571  Ast   [Gro89d]
+ Symboltabelle      115    938  1053    413   1475   1888  Ast   [Gro89d]
+ Sem. Analyse      1886    151  2037      9   3288   3297  Ag    [Gro89c]
+ Codegenerator     2793    969  3762     47   7309   7356  Estra [Vie89]
+ Wiederverw.        -      -      -     819   2722   3541  Reuse [Gro87b]
+ Sonstiges          -      -      -     698   3153   3851
+_________________________________________________________________________________
+ Summe             6326   2330  8656   2702  25266  27968
+_________________________________________________________________________________
+
+
+
+
+
+
+
+
+
+
+
+
+                
+
+
+
+
+
+
+
+
+
+
+
+                                     
+
+
+
+
+
+
+
+
+
+
+
+                                                         
+
+
+
+
+
+
+
+
+
+
+
+                                                                                
+
+
+
+
+
+
+
+
+
+
+
+
+
+      Tabelle 1: Umfang der Spezifikationen und der Quellmodule von Mtc
+
+
+     Die Groesze des Binaerprogramms betraegt 300  K  Bytes.   Es  laeuft  mit
+einer  Geschwindigkeit  von  810  Grundsymbolen  (tokens) pro Sekunde oder 167
+Zeilen pro Sekunde auf einem SUN/3 Arbeitsplatzrechner (MC  68020  Prozessor).
+Diese  Zahlen  beruecksichtigen  nur die Groesze der uebersetzten Module. Wenn
+man zusaetzlich  die  (transitiv)  importierten  Definitionsmodule  beruecksi-
+chtigt,  die ebenfalls lexikalisch, syntaktisch und semantisch analysiert wer-
+den, so erreicht man  1320  Grundsymbole  pro  Sekunde  oder  418  Zeilen  pro
+Sekunde.   Zum  Vergleich  die  Zahlen  fuer  zwei  Uebersetzer  des  Rechner-
+Herstellers: Der C-Uebersetzer laeuft mit einer Geschwindigkeit von 97  Zeilen
+pro  Sekunde  (ohne  Header-Dateien)  bzw. 163 Zeilen pro Sekunde (mit Header-
+Dateien) und der Modula-2-Uebersetzer mit 48 Zeilen pro Sekunde. Die  Laufzeit
+von Mtc ist folgendermaszen verteilt:
+
+
+                     lex. + syn. Analyse + Baumaufbau   42 %
+                     semantische Analyse                33 %
+                     C Codegenerierung                  25 %
+
+
+Die semantische Analyse verbringt 95% der Zeit mit der Berechnung von Attribu-
+ten  mittels vom Benutzer spezifizierten Anweisungen und nur 5% fuer die Baum-
+traversierung bzw.  fuer  Besuchsaktionen.  Fuer  11  Knotentypen  sind  fuenf
+Besuche notwendig.
+
+     Mtc  braucht  ungefaehr  360  K  Bytes  dynamischen  Speicher  pro   1000
+Quellzeilen  zur Speicherung des abstrakten Syntaxbaums, der Attribute und der
+Symboltabelle ohne Optimierung der Attributspeicherung. Weitere  600  K  Bytes
+benoetigt  der  von  Estra generierte Transformator. Dies ist bei den heutigen
+Speicherkapazitaeten ertraeglich.  Es zeigt, dasz im Gegensatz zu der  in  der
+Literatur  vertretenen  Meinung  moeglich  ist,  alle  Attribute  im  Baum  zu
+speichern. Wir tun dies sogar mit dem sogenannten Umgebungsattribut. Dies wird
+moeglich,  indem  wir  die  Symboltabelle als abstrakten Datentyp in der Ziel-
+sprache programmieren. Die Implementierung  ist  zeit-  und  speichereffizient
+
+
+
+
+
+
+
+
+
+
+                                                                            11
+
+
+durch die Ausnutzung von Zeigersemantik und structure sharing.
+
+6.2.  Codegenerator fuer Modula-2-Uebersetzer
+
+     In einer anderen Anwendung wurde der urspruenglich handgeschriebene Code-
+generator des GMD Modula-2-Uebersetzers Mocka durch zwei mit Beg erzeugte Ver-
+sionen ersetzt. Die Zielmaschine war ein MC 68020 Prozessor. Die Spezifikation
+des  Codegenerators  umfaszt  1625  Zeilen  und  enthaelt  187  Regeln  und 99
+Zwischensprach-Operatoren.  Zum  Vergleich   der   Qualitaet   des   erzeugten
+Maschinencodes  haben  wir  die  Laufzeiten  fuer eine Sammlung von Benchmark-
+Programmen gemessen (siehe Tabelle 2).  Dabei  ist  Mocka  der  GMD  Modula-2-
+Uebersetzer mit handgeschriebenem Codegenerator, Begra und Begfly sind die mit
+Beg erzeugten Versionen mit dem allgemeinen bzw. mit dem on the fly  Register-
+zuteiler,  und  Sun  der SUN Modula-2-Uebersetzer Version 1.0. Im Durchschnitt
+ist der Code von mit Beg erzeugten Codegeneratoren genau so gut, wie  der  des
+handgeschriebenen Codegenerators.
+
+     Tabelle 3 vergleicht die Uebersetzungszeiten fuer ein 1116 Zeilen  langes
+Programm.  Alle  Messungen  wurden  auf  einer  SUN  3/60  durchgefuehrt,  die
+gemessenen Zeiten waren user Zeiten. Die Groesze des Codegenerators  nahm  von
+5140  Zeilen  (17,117 Grundsymbole) fuer die handgeschriebene Version auf 9574
+Zeilen (27,044 Grundsymbole) zu.
+
+7.  Zusammenfassung und Ausblick
+
+     Wir haben einen Werkzeugkasten mit Uebersetzerbau-Werkzeugen vorgestellt,
+womit sich Uebersetzer fuer Programmiersprachen weitgehend automatisch generi-
+eren lassen.   Die  Uebersetzerbau-Werkzeuge  unterstuetzen  die  Konstruktion
+nahezu  aller  Uebersetzerphasen.   Die Werkzeuge sind sehr maechtig, flexibel
+und weitgehend unabhaengig von einander.   Besonders  hervorzuheben  sind  die
+
+
+______________________________________________________________________________________________
+          Perm   Towers   Queens   Intmm   Mm    Puzzle   Quick   Tree   Bubble   FFT   Summe
+______________________________________________________________________________________________
+ Mocka     40      58       37      53     103    285      32      72      56     152    888
+ Begra     42      57       35      54     104    297      32      58      56     153    888
+ Begfly    42      57       34      54     102    299      33      56      56     151    884
+ Sun       67      90       28      83     101    263      41      81      63     150    967
+______________________________________________________________________________________________
+
+
+
+
+
+       
+
+
+
+
+              
+
+
+
+
+                       
+
+
+
+
+                                
+
+
+
+
+                                        
+
+
+
+
+                                              
+
+
+
+
+                                                       
+
+
+
+
+                                                               
+
+
+
+
+                                                                      
+
+
+
+
+                                                                               
+
+
+
+
+                                                                                     
+
+
+
+
+                                                                                             
+
+
+
+
+
+
+
+   Tabelle 2: Vergleich der Codequalitaet (Laufzeiten in ticks = 1/60 Sek.)
+
+
+                               _______________
+                                Mocka     2.9
+                                Begfly    3.2
+                                Begra     3.9
+                                Sun      25.4
+                               _______________
+                              
+
+
+                                      
+
+
+                                             
+
+
+
+
+
+            Tabelle 3: Vergleich der Uebersetzungszeiten (in Sek.)
+
+
+
+
+
+
+
+
+
+
+
+                                                                            12
+
+
+praktische Brauchbarkeit der Werkzeuge, der  deutlich  reduzierte  Erstellung-
+saufwand  fuer Uebersetzer und die hohe Qualitaet der generierten Uebersetzer.
+Von der Effizienz her sind die Werkzeuge konkurrenzfaehig  zur  Programmierung
+von  Hand.   Sie unterstuetzen einen breiten Bereich von Uebersetzerstrukturen
+und erlauben  die  Konstruktion  von  Uebersetzern  mit  Produktionsqualitaet.
+Erste  realistische  Anwendungen zeigen die ausgezeichnete Leistungsfaehigkeit
+der Werkzeuge.
+
+     Die Uebersetzerbau-Werkzeuge eignen sich fuer  viele  Aufgabenstellungen,
+die  ueber die Konstruktion von reinen Uebersetzern hinausgehen. Sie gestatten
+beispielsweise   die   Implementierung   von   Praeprozessoren,   die    Spra-
+cherweiterungen  und  Sprachdialekte  auf Standardsprachen abbilden. Wie eines
+unserer  Anwendungsbeispiele  zeigte,   lassen   sich   Umsetzer   von   einer
+Quellsprache  in eine andere erstellen. Weiterhin ist etwa die Generierung von
+Pruefprogrammen fuer Programmierkonventionen moeglich.
+
+     Die Optimierung der Attributspeicherung des Werkzeugs Ag werden wir  ver-
+bessern,  damit Attribute gegebenenfalls auch als globale Variable und globale
+Keller implementiert werden koennen.  Auszerdem sollte die Transformation  von
+Grammatiken,  die  nicht  die  OAG-Eigenschaft  besitzen,  in  OAG-Grammatiken
+automatisiert werden.
+
+     Fuer  das  Werkzeug  Estra  ist  ein  Redesign  geplant.  Die  Spezifika-
+tionssprache  laeszt  sich  vereinfachen, und die Integration des Werkzeug mit
+Ast kann verbessert werden. Die  Effizienz  der  generierten  Transformations-
+Module   laeszt  sich  sowohl  hinsichtlich  Laufzeit  als  auch  hinsichtlich
+Speicherverbrauch verbessern.
+
+     Die Optimierungsphase eines Uebersetzers sollte selbstverstaendlich  auch
+unterstuetzt  werden.  Dies kann entweder durch einen wiederverwendbaren spra-
+chunabhaengigen Optimierer, durch einen  parameterisierbaren  Optimierer  oder
+durch einen Optimierergenerator geschehen.
+
+     Das Werkzeug Beg wird in folgende Richtungen  erweitert  werden:  Generi-
+erung  eines  globalen  Registerzuteilers, Unterstuetzung der Befehlsumordnung
+(instruction scheduling) und einer Einrichtung zur  direkten  Generierung  von
+binaerem Objektcode.
+
+Danksagung
+
+     Wir danken allen die zur Entstehung des Werkeugkastens  und  dieses  Auf-
+satzes durch aktive Mitarbeit oder durch ihre Ideen beigetragen haben: Michael
+Besser, Carsten Gerlhof, Bob Gray, Eduard  Klein,  Rudolf  Landwehr,  Matthias
+Martin,  Thomas  Mueller,  F. W. Schroeer, Dirk Schwartz-Hertzner, Doris Viel-
+sack, Bertram Vielsack und William M. Waite.
+
+Literatur
+
+[ASU86]
+     A. V. Aho, R. Sethi and J. D. Ullman, Compilers: Principles,  Techniques,
+     and Tools, Addison Wesley, Reading, MA, 1986.
+
+
+
+
+
+
+
+
+
+
+
+                                                                            13
+
+
+[DeP82]
+     F. DeRemer and T. Pennello, Efficient Computation of  LALR(1)  Look-Ahead
+     Sets, ACM Trans. Prog. Lang. and Systems 4, 4 (Oct. 1982), 615-649.
+
+[Emm88]
+     H.  Emmelmann,  Automatische   Erzeugung   effizienter   Codegeneratoren,
+     Diplomarbeit,  GMD  Forschungsstelle  an  der Universitat Karlsruhe, Sep.
+     1988.
+
+[ESL89]
+     H. Emmelmann, F. W. Schroer and  R.  Landwehr,  BEG  -  a  Generator  for
+     Efficient Back Ends, SIGPLAN Notices 24, 7 (July 1989), 227-237.
+
+[Emm89a]
+     H. Emmelmann, Automatische Erzeugung  effizienter  Codegeneratoren,  GMD-
+     Studie Nr. 158, GMD Forschungsstelle an der Universitat Karlsruhe, 1989.
+
+[Emm89b]
+     H. Emmelmann, BEG - A Back End Generator - User Manual, Arbeitspapier Nr.
+     420, GMD Forschungsstelle an der Universitat Karlsruhe, Dec. 1989.
+
+[Gro87a]
+     J. Grosch, Rex - A Scanner Generator, Compiler Generation Report  No.  5,
+     GMD Forschungsstelle an der Universitat Karlsruhe, Dec. 1987.
+
+[Gro87b]
+     J. Grosch, Reusable Software - A Collection of  Modula-Modules,  Compiler
+     Generation   Report  No.  4,  GMD  Forschungsstelle  an  der  Universitat
+     Karlsruhe, Sep. 1987.
+
+[GrV88]
+     J. Grosch and B. Vielsack, The Parser Generators Lalr and  Ell,  Compiler
+     Generation   Report  No.  8,  GMD  Forschungsstelle  an  der  Universitat
+     Karlsruhe, Apr. 1988.
+
+[Gro88]
+     J. Grosch, Generators for High-Speed Front-Ends, LNCS 371,  (Oct.  1988),
+     81-92, Springer Verlag.
+
+[Gro89a]
+     J. Grosch, Efficient Generation of Lexical Analysers, Software-Practice &
+     Experience 19, 11 (Nov. 1989), 1089-1103.
+
+[Gro89b]
+     J. Grosch, Efficient and Comfortable Error Recovery in Recursive  Descent
+     Parsers,  Compiler  Generation Report No. 19, GMD Forschungsstelle an der
+     Universitat Karlsruhe, Dec. 1989.
+
+[Gro89c]
+     J. Grosch, Ag - An Attribute  Evaluator  Generator,  Compiler  Generation
+     Report  No.  16,  GMD Forschungsstelle an der Universitat Karlsruhe, Aug.
+     1989.
+
+
+
+
+
+
+
+
+
+
+                                                                            14
+
+
+[Gro89d]
+     J. Grosch, Ast - A Generator for Abstract Syntax Trees (Revised Version),
+     Compiler   Generation   Report   No.  15,  GMD  Forschungsstelle  an  der
+     Universitat Karlsruhe, Aug. 1989.
+
+[Gro89e]
+     J. Grosch, Tool Support for Data Structures, Compiler  Generation  Report
+     No. 17, GMD Forschungsstelle an der Universitat Karlsruhe, Nov. 1989.
+
+[Gro90]
+     J. Grosch, Object-Oriented Attribute  Grammars,  in  Proceedings  of  the
+     Fifth International Symposium on Computer and Information Sciences (ISCIS
+     V), A. E. Harmanci and E. Gelenbe (ed.),  Cappadocia,  Nevsehir,  Turkey,
+     Oct. 1990, 807-816.
+
+[Joh75]
+     S. C. Johnson, Yacc -  Yet Another  Compiler-Compiler,  Computer  Science
+     Technical  Report  32, Bell Telephone Laboratories, Murray Hill, NJ, July
+     1975.
+
+[Kas80]
+     U. Kastens, Ordered Attribute Grammars, Acta Inf. 13, 3 (1980), 229-256.
+
+[Les75]
+     M. E. Lesk,  LEX  -  A  Lexical  Analyzer  Generator,  Computing  Science
+     Technical Report 39, Bell Telephone Laboratories, Murray Hill, NJ, 1975.
+
+[Mar90]
+     M. Martin, Entwurf und Implementierung  eines  Ubersetzers  von  Modula-2
+     nach  C, Diplomarbeit, GMD Forschungsstelle an der Universitat Karlsruhe,
+     Feb. 1990.
+
+[Roeh76]
+     J.  Rohrich,  Syntax-Error  Recovery  in   LR-Parsers,   in   Informatik-
+     Fachberichte, vol. 1, H.-J. Schneider and M. Nagl (ed.), Springer Verlag,
+     Berlin, 1976, 175-184.
+
+[Roeh80]
+     J. Rohrich, Methods for the Automatic Construction  of  Error  Correcting
+     Parsers, Acta Inf. 13, 2 (1980), 115-139.
+
+[Roeh82]
+     J. Rohrich, Behandlung syntaktischer Fehler,  Informatik  Spektrum  5,  3
+     (1982), 171-184.
+
+[Vie89]
+     B.  Vielsack,  Spezifikation  und  Implementierung   der   Transformation
+     attributierter   Baume,   Diplomarbeit,   GMD   Forschungsstelle  an  der
+     Universitat Karlsruhe, June 1989.
+
+[VSK89]
+     H. H. Vogt, S. D. Swierstra and M.  F.  Kuiper,  Higher  Order  Attribute
+     Grammars, SIGPLAN Notices 24, 7 (July 1989), 131-145.
+
+
+
+
+
+
+
+
+
+
+                                                                             1
+
+
+Inhalt
+
+        Uebersicht ......................................................    1
+1.      Aufbau eines Uebersetzers .......................................    1
+2.      Werkzeugkasten ..................................................    2
+3.      Gemeinsame Eigenschaften ........................................    3
+4.      Uebersetzer-Modell ..............................................    4
+5.      Die Werkzeuge ...................................................    4
+5.1.    Rex .............................................................    5
+5.2.    Lalr ............................................................    5
+5.3.    Ell .............................................................    6
+5.4.    Ast .............................................................    6
+5.5.    Ag ..............................................................    6
+5.6.    Estra ...........................................................    7
+5.7.    Beg .............................................................    8
+5.8.    Reuse ...........................................................    8
+6.      Erfahrungen .....................................................    9
+6.1.    Modula nach C Uebersetzer .......................................    9
+6.2.    Codegenerator fuer Modula-2-Uebersetzer .........................   11
+7.      Zusammenfassung und Ausblick ....................................   11
+        Danksagung ......................................................   12
+        Literatur .......................................................   12
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

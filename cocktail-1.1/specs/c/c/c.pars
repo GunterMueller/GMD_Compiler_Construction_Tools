@@ -1,0 +1,419 @@
+PARSER
+
+GLOBAL {
+# include "types.h"
+}
+
+BEGIN {
+   name_space_init ();
+}
+
+PREC
+   LEFT	 then
+   LEFT	 else
+
+RULE
+
+START		= translation_unit .
+
+NS_ntd		= { => { ntd (); }; } .
+
+NS_td		= { => { td (); }; } .
+
+NS_scope_push	= { => { scope_push (); td (); }; } .
+
+NS_scope_pop	= { => { scope_pop (); }; } .
+
+NS_struct_push	= { => { struct_push (); td (); }; } .
+
+NS_struct_pop	= { => { struct_pop (); }; } .
+
+NS_id		= { => { new_declaration (name_space_decl); }; } .
+
+NS_new_parm	= { => { new_declaration (name_space_decl); }; } .
+
+NS_is_typedef	= { => { set_typedef (); }; } .
+
+NS_direct_decl	= { => { direct_declarator (); }; } .
+
+NS_ptr_decl	= { => { pointer_declarator (); }; } .
+
+identifier	= <
+		= NS_ntd TYPEDEF_NAME NS_td .
+		= IDENTIFIER .
+		= ENUMERATION_CONSTANT .
+> .
+translation_unit	= <
+		= external_declaration .
+		= translation_unit external_declaration .
+> .
+external_declaration	= <
+		= NS_id function_definition .
+		= NS_id declaration .
+		= NS_id untyped_declaration .
+> .
+function_definition	= <
+		= function_declarator compound_statement NS_scope_pop .
+		= function_declarator declaration_list compound_statement NS_scope_pop .
+		= declaration_specifiers function_declarator NS_td compound_statement NS_scope_pop .
+		= declaration_specifiers function_declarator NS_td declaration_list compound_statement NS_scope_pop .
+> .
+declaration	= <
+		= declaration_specifiers NS_td ';' .
+		= declaration_specifiers init_declarator_list NS_td ';' .
+> .
+untyped_declaration	= init_declarator_list ';' .
+
+declaration_list	= <
+		= declaration .
+		= declaration_list declaration .
+> .
+declaration_specifiers	= <
+		= storage_class_specifier .
+		= storage_class_specifier declaration_specifiers .
+		= type_specifier .
+		= type_specifier declaration_specifiers .
+		= type_qualifier .
+		= type_qualifier declaration_specifiers .
+> .
+storage_class_specifier	= <
+		= NS_is_typedef typedef .
+		= extern .
+		= static .
+		= auto .
+		= register .
+> .
+type_specifier	= <
+		= NS_ntd actual_type_specifier .
+		= type_adjective .
+> .
+actual_type_specifier	= <
+		= void .
+		= char .
+		= int .
+		= float .
+		= double .
+		= TYPEDEF_NAME .
+		= struct_or_union_specifier .
+		= enum_specifier .
+> .
+type_adjective	= <
+		= short .
+		= long .
+		= signed .
+		= unsigned .
+> .
+type_qualifier	= <
+		= const .
+		= volatile .
+> .
+struct_or_union_specifier	= <
+		= struct_or_union NS_struct_push '{' struct_declaration_list NS_struct_pop '}' .
+		= struct_or_union identifier NS_struct_push '{' struct_declaration_list NS_struct_pop '}' .
+		= struct_or_union identifier .
+> .
+struct_or_union	= <
+		= struct .
+		= union .
+> .
+struct_declaration_list	= <
+		= struct_declaration .
+		= struct_declaration_list struct_declaration .
+> .
+init_declarator_list	= <
+		= init_declarator .
+		= init_declarator_list ',' init_declarator .
+> .
+init_declarator	= <
+		= declarator .
+		= declarator NS_td '=' initializer NS_ntd .
+> .
+struct_declaration	= { => { new_declaration (struct_decl); }; } specifier_qualifier_list struct_declarator_list NS_td ';' .
+
+specifier_qualifier_list	= <
+		= type_specifier .
+		= type_specifier specifier_qualifier_list .
+		= type_qualifier .
+		= type_qualifier specifier_qualifier_list .
+> .
+struct_declarator_list	= <
+		= struct_declarator .
+		= struct_declarator_list ',' struct_declarator .
+> .
+struct_declarator	= <
+		= declarator .
+		= ':' constant_expression .
+		= declarator ':' constant_expression .
+> .
+enum_specifier	= <
+		= enum '{' enumerator_list '}' .
+		= enum identifier '{' enumerator_list '}' .
+		= enum identifier .
+> .
+enumerator_list	= <
+		= enumerator .
+		= enumerator_list ',' enumerator .
+> .
+enumerator	= <
+		= IDENTIFIER .
+		= IDENTIFIER '=' constant_expression .
+> .
+declarator	= <
+		= direct_declarator NS_direct_decl .
+		= pointer direct_declarator NS_ptr_decl .
+> .
+direct_declarator	= <
+		= IDENTIFIER { => { declarator_id (IDENTIFIER:Name); }; } .
+		= '(' declarator ')' .
+		= direct_declarator '[' ']' .
+		= direct_declarator '[' constant_expression ']' .
+		= direct_declarator NS_scope_push '(' parameter_type_list ')' NS_scope_pop .
+		= direct_declarator NS_scope_push '(' ')' NS_scope_pop .
+		= direct_declarator NS_scope_push '(' identifier_list ')' NS_scope_pop .
+> .
+function_declarator	= <
+		= direct_function_declarator NS_direct_decl .
+		= pointer direct_function_declarator NS_ptr_decl .
+> .
+direct_function_declarator	= <
+		= direct_declarator NS_scope_push '(' parameter_type_list ')' .
+		= direct_declarator NS_scope_push '(' ')' .
+		= direct_declarator NS_scope_push '(' identifier_list ')' .
+> .
+pointer		= <
+		= '*' .
+		= '*' type_qualifier_list .
+		= '*' pointer .
+		= '*' type_qualifier_list pointer .
+> .
+type_qualifier_list	= <
+		= type_qualifier .
+		= type_qualifier_list type_qualifier .
+> .
+parameter_type_list	= <
+		= parameter_list .
+		= parameter_list ',' '...' .
+> .
+parameter_list	= <
+		= parameter_declaration .
+		= parameter_list ',' parameter_declaration .
+> .
+parameter_declaration	= <
+		= NS_new_parm declaration_specifiers declarator NS_td .
+		= NS_new_parm declaration_specifiers NS_td .
+		= NS_new_parm declaration_specifiers abstract_declarator NS_td .
+> .
+identifier_list	= <
+		= IDENTIFIER .
+		= identifier_list ',' IDENTIFIER .
+> .
+initializer	= <
+		= assignment_expression .
+		= '{' initializer_list '}' .
+		= '{' initializer_list ',' '}' .
+> .
+initializer_list	= <
+		= initializer .
+		= initializer_list ',' initializer .
+> .
+type_name	= <
+		= specifier_qualifier_list NS_td .
+		= specifier_qualifier_list NS_td abstract_declarator .
+> .
+abstract_declarator	= <
+		= pointer .
+		= direct_abstract_declarator .
+		= pointer direct_abstract_declarator .
+> .
+direct_abstract_declarator	= <
+		= '(' abstract_declarator ')' .
+		= '[' ']' .
+		= '[' constant_expression ']' .
+		= direct_abstract_declarator '[' ']' .
+		= direct_abstract_declarator '[' constant_expression ']' .
+		= '(' ')' .
+		= '(' parameter_type_list ')' .
+		= direct_abstract_declarator '(' ')' .
+		= direct_abstract_declarator '(' parameter_type_list ')' .
+> .
+statement	= <
+		= labeled_statement .
+		= compound_statement .
+		= expression_statement .
+		= selection_statement .
+		= iteration_statement .
+		= jump_statement .
+> .
+labeled_statement	= <
+		= identifier ':' statement .
+		= case constant_expression ':' statement .
+		= default ':' statement .
+> .
+expression_statement	= <
+		= ';' .
+		= expression ';' .
+> .
+compound_statement	= <
+		= NS_scope_push '{' NS_scope_pop '}' .
+		= NS_scope_push '{' statement_list NS_scope_pop '}' .
+		= NS_scope_push '{' declaration_list NS_scope_pop '}' .
+		= NS_scope_push '{' declaration_list statement_list NS_scope_pop '}' .
+> .
+statement_list	= <
+		= statement .
+		= statement_list statement .
+> .
+selection_statement	= <
+		= if '(' expression ')' statement PREC then .
+		= if '(' expression ')' statement else statement .
+		= switch '(' expression ')' statement .
+> .
+iteration_statement	= <
+		= while '(' expression ')' statement .
+		= do statement while '(' expression ')' ';' .
+		= for '(' ';' ';' ')' statement .
+		= for '(' ';' ';' expression ')' statement .
+		= for '(' ';' expression ';' ')' statement .
+		= for '(' ';' expression ';' expression ')' statement .
+		= for '(' expression ';' ';' ')' statement .
+		= for '(' expression ';' ';' expression ')' statement .
+		= for '(' expression ';' expression ';' ')' statement .
+		= for '(' expression ';' expression ';' expression ')' statement .
+> .
+jump_statement	= <
+		= goto identifier ';' .
+		= continue ';' .
+		= break ';' .
+		= return ';' .
+		= return expression ';' .
+> .
+expression	= <
+		= assignment_expression .
+		= expression ',' assignment_expression .
+> .
+assignment_expression	= <
+		= conditional_expression .
+		= unary_expression assignment_operator assignment_expression .
+> .
+assignment_operator	= <
+		= '=' .
+		= '*=' .
+		= '/=' .
+		= '%=' .
+		= '+=' .
+		= '-=' .
+		= '<<=' .
+		= '>>=' .
+		= '&=' .
+		= '^=' .
+		= '|=' .
+> .
+conditional_expression	= <
+		= logical_or_expression .
+		= logical_or_expression '?' expression ':' conditional_expression .
+> .
+constant_expression	= conditional_expression .
+
+logical_or_expression	= <
+		= logical_and_expression .
+		= logical_or_expression '||' logical_and_expression .
+> .
+logical_and_expression	= <
+		= inclusive_or_expression .
+		= logical_and_expression '&&' inclusive_or_expression .
+> .
+inclusive_or_expression	= <
+		= exclusive_or_expression .
+		= inclusive_or_expression '|' exclusive_or_expression .
+> .
+exclusive_or_expression	= <
+		= and_expression .
+		= exclusive_or_expression '^' and_expression .
+> .
+and_expression	= <
+		= equality_expression .
+		= and_expression '&' equality_expression .
+> .
+equality_expression	= <
+		= relational_expression .
+		= equality_expression '==' relational_expression .
+		= equality_expression '!=' relational_expression .
+> .
+relational_expression	= <
+		= shift_expression .
+		= relational_expression '<' shift_expression .
+		= relational_expression '>' shift_expression .
+		= relational_expression '<=' shift_expression .
+		= relational_expression '>=' shift_expression .
+> .
+shift_expression	= <
+		= additive_expression .
+		= shift_expression '<<' additive_expression .
+		= shift_expression '>>' additive_expression .
+> .
+additive_expression	= <
+		= multiplicative_expression .
+		= additive_expression '+' multiplicative_expression .
+		= additive_expression '-' multiplicative_expression .
+> .
+multiplicative_expression	= <
+		= cast_expression .
+		= multiplicative_expression '*' cast_expression .
+		= multiplicative_expression '/' cast_expression .
+		= multiplicative_expression '%' cast_expression .
+> .
+cast_expression	= <
+		= unary_expression .
+		= '(' type_name ')' cast_expression .
+> .
+unary_expression	= <
+		= postfix_expression .
+		= '++' unary_expression .
+		= '--' unary_expression .
+		= unary_operator cast_expression .
+		= sizeof unary_expression .
+		= sizeof '(' type_name ')' .
+> .
+unary_operator	= <
+		= '&' .
+		= '*' .
+		= '+' .
+		= '-' .
+		= '~' .
+		= '!' .
+> .
+postfix_expression	= <
+		= primary_expression .
+		= postfix_expression '[' expression ']' .
+		= postfix_expression '(' ')' .
+		= postfix_expression '(' argument_expression_list ')' .
+		= postfix_expression '.' identifier .
+		= postfix_expression '->' identifier .
+		= postfix_expression '++' .
+		= postfix_expression '--' .
+> .
+primary_expression	= <
+		= IDENTIFIER .
+		= constant .
+		= STRING .
+		= '(' expression ')' .
+> .
+argument_expression_list	= <
+		= assignment_expression .
+		= argument_expression_list ',' assignment_expression .
+> .
+constant	= <
+		= INTEGER_CONSTANT .
+		= CHARACTER_CONSTANT .
+		= FLOATING_CONSTANT .
+		= ENUMERATION_CONSTANT .
+> .
+Terminal		: [Dummy: char] { Dummy := ' '; } <
+   IDENTIFIER		: 1 [Name: tString] { Name := 0; } .
+   TYPEDEF_NAME		: 2 .
+   ENUMERATION_CONSTANT	: 3 .
+   CHARACTER_CONSTANT	: .
+   FLOATING_CONSTANT	: .
+   INTEGER_CONSTANT	: .
+   STRING		: .
+> .

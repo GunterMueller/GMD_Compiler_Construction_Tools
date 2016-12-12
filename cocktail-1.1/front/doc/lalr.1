@@ -1,0 +1,103 @@
+.TH LALR 1 "" GMD
+.SH NAME
+lalr \- LALR(1) parser generator
+.SH SYNOPSIS
+lalr [-c|-m] [-b][-d][-e][-h][-l][-p][-s][-g][-v] [-cs][n] <file>
+.SH DESCRIPTION
+\fILalr\fP is a parser generator for highly efficient parsers which
+processes the class of LALR(1) grammar.
+The grammars may be written using EBNF constructs. Each grammar rule
+may be associated with a semantic action consisting of arbitrary statements
+written in the target language. Whenever a grammar rule is recognized by the
+generated parser the associated semantic action is executed. A mechanism for
+S-attribution (only synthesized attributes) is provided to allow
+communication between the semantic actions. Ambiguities in the grammar may be
+solved by specifying precedence and associativity for tokens and grammar rules.
+.PP
+In case of LR-conflicts a derivation tree is printed to ease the location of the
+problem. The conflict can be resolved by specifying precedence and
+associativity for terminals and rules. Syntactic errors are handled fully
+automatically by the generated parsers including error reporting, recovery,
+and repair. The generated parsers are table-driven.
+.PP
+The generated parser needs a scanner, an error handler, and a few
+modules from a library of reusable modules.
+A primitive scanner can be requested with the option -s.
+The option -e produces a prototype error handler.
+Errors detected during the analysis of the grammar are reported
+on standard error. If the generator finds LR-conflicts
+and option -v is given the file _Debug will be produced.
+This file will give detailed informations about the conflicts.
+If any conflict has been repaired using precedence and associativity
+a conflict description is written to the file _Debug, too.
+.SH OPTIONS
+.IP c
+generate C source code
+.IP m
+generate Modula-2 source code (default)
+.IP a
+generate all = -d -e -p -s
+.IP b
+run the preprocessor bnf and feed its output into lalr
+.IP d
+generate definition module
+.IP e
+generate module for error handling 
+.IP p
+generate parser driver
+.IP s
+generate mini scanner
+.IP g
+generate # line directives
+.IP v
+verbose: produce debugging information in file _Debug (long and slow)
+.IP f
+fast   : produce debugging information in file _Debug (short and fast)
+.IP cs
+reduce the number of case labels in switch or case statements by mapping
+so-called read-reduce to reduce states
+(increases run time a little bit but decreases code size,
+might be necessary due to compiler restrictions)
+.IP <n>
+generate switch or case statements with at most n case labels
+(might be necessary due to compiler restrictions)
+.IP t
+print statistics about the generated parser
+.IP h
+print further help information
+.IP l
+print complete (error) listing
+.SH FILES
+.nf
+.ta 1.5i
+_Debug	file containing the debug information if grammar is not
+	LALR(1) and option -v is given
+.sp 0.5
+if output is in C:
+.sp 0.5
+<Parser>.h	specification of the generated parser
+<Parser>.c	body of the generated parser
+<Parser>Drv.c	body of the parser driver
+Errors.h	specification of error handler
+Errors.c	body of error handler
+<Scanner>.h	specification of scanner
+<Scanner>.c	body of scanner
+.sp 0.5
+if output is in Modula-2:
+.sp 0.5
+<Parser>.md	definition module of the generated parser
+<Parser>.mi	implementation module of the generated parser
+<Parser>Drv.mi	implementation module of the parser driver
+<Parser>.Tab	tables to control the generated parser
+Errors.md	definition module of error handler
+Errors.mi	implementation module of error handler
+<Scanner>.md	definition module of scanner
+<Scanner>.mi	implementation module of scanner
+.fi
+.SH SEE\ ALSO
+J. Grosch, B. Vielsack: "The Parser Generators Lalr and Ell",
+GMD Forschungsstelle an der Universitaet Karlsruhe,
+Compiler Generation Report No. 8, 1991
+.sp 0.5
+J. Grosch: "Lalr - a Generator for Efficient Parsers",
+Software - Practice & Experience, 20 (11), 1115-1135, Nov. 1990

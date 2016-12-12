@@ -1,0 +1,163 @@
+TREE Definitions
+
+EXPORT	{
+# define NoEnv	  NoDefinitions
+
+# define tObjects tDefinitions	/* type to represent sets of objects	*/
+# define tEnv     tDefinitions 	/* type to represent environments	*/
+
+# include "Tree.h"
+
+# if defined __STDC__ | defined __cplusplus
+# define ARGS(parameters)	parameters
+# else
+# define ARGS(parameters)	()
+# endif
+
+extern tObjects Identify ARGS ((register tIdent Ident, register tEnv Env));
+			/* return the object associated with 'Ident' in	*/
+			/* the environment 'Env'			*/
+
+extern bool IsDeclared	ARGS ((register tIdent Ident, register tObjects Objects));
+			/* check whether an object having the name	*/
+			/* 'Ident' is element of the set of declarations*/
+			/* 'Decls' 					*/
+
+extern void mProc2	ARGS ((register tObjects Object, int Level, int Label, int ParSize, int DataSize));
+			/* extend the description 'Object' of a		*/
+			/* procedure by the 4 given attributes		*/
+
+extern void mVar2	ARGS ((register tObjects Object, int Level, int Offset));
+			/* extend the description 'Object' of a		*/
+			/* variable by the 2 given attributes		*/
+
+extern bool IsObjectKind ARGS ((register tObjects Object, short Kind));
+			/* returns true if the kind of the 'Object'	*/
+			/* is equal to parameter 'Kind'			*/
+
+extern tTree GetFormals	ARGS ((register tObjects Object));
+			/* returns the list of formal parameters	*/
+			/* from the description 'Object' of a procedure	*/
+
+extern tTree GetType	ARGS ((register tObjects Object));
+			/* returns the type of the description 'Object'	*/
+			/* of a variable				*/
+}
+
+GLOBAL	{
+#include "Idents.h"
+#include "Tree.h"
+
+static tObjects nNoObject;
+
+bool IsDeclared
+# if defined __STDC__ | defined __cplusplus
+   (register tIdent Ident, register tObjects Objects)
+# else
+   (Ident, Objects)
+   register tIdent	Ident;
+   register tObjects	Objects;
+# endif
+   {
+      while (Objects->Kind != kNoObject)
+	 if (Objects->Object.Ident == Ident) return true;
+         else Objects = Objects->Object.Next;
+      return false;
+   }
+
+tObjects Identify
+# if defined __STDC__ | defined __cplusplus
+   (register tIdent Ident, register tEnv Env)
+# else
+   (Ident, Env)
+   register tIdent	Ident;
+   register tEnv	Env;
+# endif
+   {
+      register tObjects	Objects;
+
+      while (Env != NoEnv) {
+	 Objects = Env->Env.Objects;
+	 while (Objects->Kind != kNoObject)
+	    if (Objects->Object.Ident == Ident) return Objects;
+	    else Objects = Objects->Object.Next;
+	 Env = Env->Env.Hidden;
+      }
+      return nNoObject;
+   }
+
+void mProc2
+# if defined __STDC__ | defined __cplusplus
+   (register tObjects Object, int Level, int Label, int ParSize, int DataSize)
+# else
+   (Object, Level, Label, ParSize, DataSize)
+   register tObjects	Object;
+   int		Level, Label, ParSize, DataSize;
+# endif
+   {
+      Object->Proc3.Level	= Level;
+      Object->Proc3.Label	= Label;
+      Object->Proc3.ParSize	= ParSize;
+      Object->Proc3.DataSize	= DataSize;
+   }
+
+void mVar2
+# if defined __STDC__ | defined __cplusplus
+   (register tObjects Object, int Level, int Offset)
+# else
+   (Object, Level, Offset)
+   register tObjects	Object;
+   int		Level, Offset;
+# endif
+   {
+      Object->Var3.Level	= Level;
+      Object->Var3.Offset	= Offset;
+   }
+
+bool IsObjectKind
+# if defined __STDC__ | defined __cplusplus
+   (register tObjects Object, short Kind)
+# else
+   (Object, Kind)
+   register tObjects	Object;
+   short		Kind;
+# endif
+   {
+      return Object->Kind == Kind || Object->Kind == kNoObject;
+   }
+
+tTree GetFormals
+# if defined __STDC__ | defined __cplusplus
+   (register tObjects Object)
+# else
+   (Object) register tObjects Object;
+# endif
+   {
+      if (Object->Kind == kProc3) return Object->Proc3.Formals;
+      else return mNoFormal ();
+   }
+
+tTree GetType
+# if defined __STDC__ | defined __cplusplus
+   (register tObjects Object)
+# else
+   (Object) register tObjects Object;
+# endif
+   {
+      if (Object->Kind == kVar3) return Object->Var3.Type;
+      else return mNoType ();
+   }
+}
+
+BEGIN	{ nNoObject = mNoObject (); }
+
+RULE
+
+Env		= Objects Hidden: Env .
+Objects		= <
+   NoObject	= .
+   Object	= Next: Objects [Ident: tIdent] <
+      Proc3	= [Formals: tTree] -> [Level: short] [Label] [ParSize] [DataSize] .
+      Var3	= [Type: tTree] -> [Level: short] [Offset] .
+   > .
+> .

@@ -1,0 +1,4634 @@
+.\" use: pic | tbl | eqn | ditroff -me
+.\"
+.if t \{ \
+.pl 29.7c	\" page length
+.po 2.5c	\" page offset (left margin)
+.ll 16.5c	\" line length
+.lt 16.5c	\" title length
+.nr LL 16.5c
+.nr )l 29.7c
+.nr hm 2c
+.nr $r 9	\" factor for vertical spacing
+.nr $R \n($r
+.sz 12		\" font size
+.nr pp 12
+.nr sp 12
+.nr tp 12
+.nr fp 10
+.hc ~		\" hyphenation character
+.		\" Umlauts and sharp s
+.ds A \(A:
+.ds O \(O:
+.ds U \(U:
+.ds a \(a:
+.ds o \(o:
+.ds u \(u:
+.ds s \(ss
+.		\"  UMLAUT  \*:u, etc.
+.ds : \v'-0.6m'\h'(1u-(\\n(.fu%2u))*0.13m+0.06m'\z.\h'0.2m'\z.\h'-((1u-(\\n(.fu%2u))*0.13m+0.26m)'\v'0.6m'
+.\}
+.if n \{ \
+.po 0		\" page offset (left margin)
+.ll 78		\" line length
+.lt 78		\" title length
+.nr $r 4	\" factor for vertical spacing
+.nr $R \n($r
+.hc ~		\" hyphenation character
+.		\" Umlaute und scharfes s
+.ds A Ae
+.ds O Oe
+.ds U Ue
+.ds a ae
+.ds o oe
+.ds u ue
+.ds s sz
+.\}
+.de _
+\&\\$1\l'|0\(ul'\\$2
+..
+.de FT		\" font for programs
+.ft C
+.sz -2
+..
+.de FR
+.ft R
+.sz +2
+..
+.de []		\" start to display collected references
+.uh References
+.lp
+..
+.de $0		\" collect table of contents
+.(x
+.ta 2c
+.ie '\\$2''	\\$1
+.el \\$2.	\\$1
+.)x
+..
+.de np
+.nr $p +1
+.ip \\n($p.
+..
+.de SH
+.sp 0.5
+.in -3
+.r \\$1
+.sp 0.5
+.in +3
+..
+.de PP
+.sp 0.5
+..
+.de IP
+.ip \\$1 \\$2
+..
+.de I
+.i \\$1
+..
+.de TH
+..
+.\"	@(#)bmac.std	2.2	9/9/83;
+.\" standard format troff commands
+.\" citation formatting strings
+.ds [[ [
+.ds ]] ]
+.ds ], ,\|
+.ds ]- -
+.ds [. " \&
+.ds .] .
+.ds [, " \&
+.ds ,] ,
+.ds [? " \&
+.ds ?] ?
+.ds [: " \&
+.ds :] :
+.ds [; " \&
+.ds ;] ;
+.ds [! " \&
+.ds !] !
+.ds [" " \&
+.ds "] \&"
+.ds [' " \&
+.ds '] '
+.ds [< " \&
+.ds >]
+.\" reference formmating strings
+.ds a] " \&
+.ds b] , \&
+.ds c] , \&
+.ds n] "\& and \&
+.ds m] "\& and \&
+.ds p] .
+.\" reference formmating macros
+.de s[   \" start reference
+.nh
+.IP [\\*([F] 5m
+..
+.de e[   \" end reference
+.[-
+..
+.de []   \" start to display collected references
+.LP
+..
+.de ][   \" choose format
+.ie !"\\*([J"" \{\
+.    ie !"\\*([V"" .nr t[ 1    \" journal
+.    el            .nr t[ 5    \" conference paper
+.\}
+.el .ie !"\\*([B"" .nr t[ 3    \" article in book
+.el .ie !"\\*([R"" .nr t[ 4    \" technical report
+.el .ie !"\\*([I"" .nr t[ 2    \" book
+.el                .nr t[ 0    \" other
+.\\n(t[[
+..
+.de 0[   \" other
+.s[
+.if !"\\*([A"" \\*([A\\c
+.if !"\\*([T"" , \\*([T\\c
+.if !"\\*([V"" , Vol. \\*([V\\c
+.if !"\\*([O"" , \\*([O\\c
+.if !"\\*([D"" , \\*([D\\c
+\&.
+.e[
+..
+.de 1[ \" journal article
+.s[
+.if !"\\*([A"" \\*([A,
+.if !"\\*([T""  \\*([T,
+\\fI\\*([J \\*([V\\fP\c
+.if !"\\*([N"" ,\\*([N
+.if !"\\*([D"" (\\*([D)\c
+.if !"\\*([P"" , \\*([P\c
+.if !"\\*([I"" , \\*([I\c
+\\&.
+.if !"\\*([O"" \\*([O.
+.e[
+..
+.de 2[ \" book
+.s[
+.ie !"\\*([A"" \\*([A,
+.el .if !"\\*([E"" \{\
+.       ie \\n([E-1 \\*([E, eds.,
+.       el \\*([E, ed.,\}
+.if !"\\*([T"" \\fI\\*([T\\fP,
+.rm a[
+.if !"\\*([I"" .ds a[ \\*([I
+.if !"\\*([C"" \{\
+.       if !"\\*(a["" .as a[ , \\&
+.       as a[ \\*([C\}
+.if !"\\*([D"" \{\
+.       if !"\\*(a["" .as a[ , \\&
+.       as a[ \\*([D\}
+\\*(a[.
+.if !"\\*([G"" Gov. ordering no. \\*([G.
+.if !"\\*([O"" \\*([O.
+.e[
+..
+.de 3[ \" article in book
+.s[
+.if !"\\*([A"" \\*([A,
+.if !"\\*([T"" \\*([T,
+in \\fI\\*([B\\fP\c
+.if !"\\*([V"" , vol. \\*([V
+.if !~\\*([E~~ \{\
+.       ie , \\n([E-1  \\*([E (editors)\c
+.       el , \\*([E (editor)\c\}
+.if !"\\*([I"" , \\*([I\c
+.if !"\\*([C"" , \\*([C\c
+.if !"\\*([D"" , \\*([D\c
+.if !"\\*([P"" , \\*([P\c
+\\&.
+.if !"\\*([O"" \\*([O.
+.e[
+..
+.de 4[ \" report
+.s[
+.if !"\\*([A"" \\*([A,
+.if !~\\*([E~~ \{\
+.       ie \\n([E-1 \\*([E, editors.
+.       el \\*([E, editor.\}
+\\*([T,
+\\*([R\c
+.if !"\\*([G"" \& (\\*([G)\c
+.if !"\\*([I"" , \\*([I\c
+.if !"\\*([C"" , \\*([C\c
+.if !"\\*([D"" , \\*([D\c
+\\&.
+.if !"\\*([O"" \\*([O.
+.e[
+..
+.de 5[ \" conference paper
+.s[
+.if !"\\*([A"" \\*([A,
+.if !"\\*([T"" \\*([T,
+\\fI\\*([J\\fP,
+.if !"\\*([C"" \\*([C,
+.if !"\\*([D"" \\*([D\c
+.if !"\\*([P"" , \\*([P\c
+\\&.
+.if !"\\*([O"" \\*([O.
+.e[
+..
+.de [-   \" clean up after yourself
+.rm [A [B [C [D
+.rm [E [F [G
+.rm [I [J [K
+.rm [N [O [P
+.rm [R [T
+.rm [V [W
+..
+.\"	@(#)bmac.std	2.2	8/24/83;
+.\" standard format troff commands
+.\" citation formatting strings
+.ds [[ [
+.ds ]] ]
+.ds ], ,\|
+.ds ]- -
+.ds [. " \&
+.ds .] .
+.ds [, " \&
+.ds ,] ,
+.ds [< " \&
+.ds >]
+.\" reference formmating strings
+.ds c] , \&
+.ds n] "" and \&
+.ds m] "" and \&
+.ds a] " \&
+.\" reference formmating macros
+.de s[   \" start reference
+.nh
+.IP [\\*([F] 5m
+..
+.de e[   \" end reference
+.[-
+..
+.de []   \" start to display collected references
+.SH
+References
+.LP
+..
+.de ][   \" choose format
+.ie !"\\*([J"" \{\
+.    ie !"\\*([V"" .nr t[ 1    \" journal
+.    el            .nr t[ 5    \" conference paper
+.\}
+.el .ie !"\\*([B"" .nr t[ 3    \" article in book
+.el .ie !"\\*([R"" .nr t[ 4    \" technical report
+.el .ie !"\\*([I"" .nr t[ 2    \" book
+.el                .nr t[ 0    \" other
+.\\n(t[[
+..
+.de 0[   \" other
+.s[
+.if !"\\*([A"" \\*([A,
+.if !"\\*([T"" \\*([T,
+.if !"\\*([O"" \\*([O\c
+.if !"\\*([D"" , \\*([D\c
+\&.
+.e[
+..
+.de 1[ \" journal article
+.s[
+.if !"\\*([A"" \\*([A,
+.if !"\\*([T"" \\*([T,
+\\fI\\*([J \\*([V\\fP,
+.if !"\\*([N"" \\*([N
+.if !"\\*([D"" (\\*([D),
+.if !"\\*([P"" \\*([P\c
+.if !"\\*([I"" , \\*([I\c
+\\&.
+.if !"\\*([O"" \\*([O.
+.e[
+..
+.de 2[ \" book
+.s[
+.ie !"\\*([A"" \\*([A,
+.el .if !"\\*([E"" \{\
+.       ie \\n([E-1 \\*([E, eds.,
+.       el \\*([E, ed.,\}
+.if !"\\*([T"" \\fI\\*([T\\fP,
+.rm a[
+.if !"\\*([I"" .ds a[ \\*([I
+.if !"\\*([C"" \{\
+.       if !"\\*(a["" .as a[ , \\&
+.       as a[ \\*([C\}
+.if !"\\*([D"" \{\
+.       if !"\\*(a["" .as a[ , \\&
+.       as a[ \\*([D\}
+\\*(a[.
+.if !"\\*([G"" Gov. ordering no. \\*([G.
+.if !"\\*([O"" \\*([O.
+.e[
+..
+.de 3[ \" article in book
+.s[
+.if !"\\*([A"" \\*([A,
+.if !"\\*([T"" \\*([T,
+in \\fI\\*([B\\fP,
+.if !"\\*([V"" vol. \\*([V,
+.if !"\\*([E"" \\*([E (ed.),
+.if !"\\*([I"" \\*([I,
+.if !"\\*([C"" \\*([C,
+.if !"\\*([D"" \\*([D\c
+.if !"\\*([P"" , \\*([P\c
+\\&.
+.if !"\\*([O"" \\*([O.
+.e[
+..
+.de 4[ \" report
+.s[
+.if !"\\*([A"" \\*([A,
+\\*([T,
+\\*([R\c
+.if !"\\*([G"" \& (\\*([G)\c
+.if !"\\*([I"" , \\*([I\c
+.if !"\\*([C"" , \\*([C\c
+.if !"\\*([D"" , \\*([D\c
+\\&.
+.if !"\\*([O"" , \\*([O.
+.e[
+..
+.de 5[ \" conference paper
+.s[
+.if !"\\*([A"" \\*([A,
+.if !"\\*([T"" \\*([T,
+\\fI\\*([J\\fP,
+.if !"\\*([C"" \\*([C\c
+.if !"\\*([D"" , \\*([D\c
+.if !"\\*([P"" , \\*([P\c
+\\&.
+.if !"\\*([O"" , \\*([O.
+.e[
+..
+.de [-   \" clean up after yourself
+.rm [A [B [C [D
+.rm [E [F [G
+.rm [I [J [K
+.rm [N [O [P
+.rm [R [T
+.rm [V [W
+..
+.de s[   \" start reference
+.nh
+.IP [\\*([F] 10n
+..
+.de $0
+.(x
+.ie '\\$2''\\$1
+.el \{\
+.ta 0.8c 1.8c 3c
+.if '\\$3'1'\{\
+
+\fB\\$2.	\\$1\fP\}
+.if '\\$3'2'\{\
+	\\$2.	\\$1\}
+.if '\\$3'3' \{\
+		\\$2.	\\$1\}\}
+.)x
+..
+.de BP
+.eh ''%''
+.oh ''%''
+.bp "\\$1"
+..
+.de SH
+.if '\\$1'1'\{\
+.eh ''%''
+.oh ''%''
+.sh "\\$1" "\\$2" "\\$3" "\\$4" "\\$5"
+.eh '%''\s-2\fR\\n($1. \\$2\fP\s+2'
+.oh '\s-2\fR\\n($1. \\$2\fP\s+2''%'\}
+.if '\\$1'2'\{\
+.oh ''%''
+.sh "\\$1" "\\$2" "\\$3" "\\$4" "\\$5"
+.oh '\s-2\fR\\n($1.\\n($2. \\$2\fP\s+2''%'\}
+.if '\\$1'3'\{\
+.sh "\\$1" "\\$2" "\\$3" "\\$4" "\\$5"\}
+..
+.de UH
+.if '\\$1'1'\{\
+.eh ''%''
+.oh ''%''
+.lp
+.b "\\$2"
+.lp
+.eh '%''\s-2\fR\\$2\fP\s+2'
+.oh '\s-2\fR\\$2\fP\s+2''%'\}
+.if '\\$1'2'\{\
+.oh ''%''
+.lp
+.b "\\$2"
+.lp
+.oh '\s-2\fR\\$2\fP\s+2''%'\}
+.(x
+.ta 0.8c 1.8c 3c
+.if '\\$1'1'\{\
+
+\fB\\$2\fP\}
+.if '\\$1'2'\{\
+	\\$2\}
+.)x
+..
+.de IP
+.ip \\$1 \\$2
+..
+.de LP
+.lp
+..
+.		\" halbe Leerzeile
+.de HS
+.sp 0.5
+..
+.		\" Diagramm Anfang
+.de DS
+.(b
+\s-2
+.hl
+.sp -0.5
+..
+.		\" Diagramm Ende
+.de DE
+.hl
+.sp -1
+Abb. \\n($1.\\$1: \\$2
+.sp 1
+.)b
+..
+.		\" Diagramm Unterbrechung
+.de DB
+.)b
+.(b
+\s-2
+..
+.de $f
+..
+.\"	$Revision: 2.0 $
+.\"	$Author: vielsack $
+.\"	$Date: 89/06/22 13:22:27 $
+.\"
+.(b C
+.sz +8
+.sp 2
+Spezifikation und Implementierung
+der Transformation attributierter B\*aume
+.sz -4
+.sp 5
+Bertram Vielsack
+.sp 4
+Diplomarbeit
+.sp 2
+Universit\*at Karlsruhe Fakult\*at f\*ur Informatik
+.sp 2
+Juni 1989
+.sp 5
+Betreuer:
+.sp 1
+Prof. Dr. G. Goos
+Prof. Dr. S. J\*ahnichen
+Dr. J. Grosch
+.sz -4
+.)b
+.bp
+.(b F
+.sp 35
+Hiermit erkl\*are ich, da\*s ich die vorliegende Arbeit
+selbst\*andig erstellt habe und keine anderen als die angegebenen
+Quellen und Hilfsmittel verwendet habe.
+.sp 3
+Karlsruhe, im Juni 1989
+.sp 3
+                                                     (Bertram Vielsack)
+.)b
+.he ''%''
+.BP 4
+.SH 1 "Einleitung"
+.lp
+Bei der Erstellung von \*Ubersetzern spielen Zwischensprachen, die durch
+attributierte B\*aume dargestellt werden, eine wichtige Rolle.
+Die Zwischensprachen gliedern den komplexen \*Ubersetzungsvorgang
+in mehrere Transformationen und damit den Entwurf und die Entwicklung
+eines \*Ubersetzers in mehrere unabh\*angige Teilaufgaben.
+.lp
+Wesentliche Aufgaben beim Bau eines \*Ubersetzers bestehen also
+darin, attributierte B\*aume zu transformieren. Das Ergebnis einer
+Transformation kann wiederum ein attributierter Baum sein. Andere
+Strukturen (Graph, Liste, sequentielle Ausgabe etc.) sind ebenso
+m\*oglich. Der einheitlichen Darstellung der Eingabe steht also eine
+Vielfalt an M\*oglichkeiten zur Darstellung der Ausgabe gegen\*uber.
+.lp
+Ein Ziel der vorliegenden Arbeit ist die Entwicklung einer
+Spezifikationssprache (ESTRAL\**)
+.(f
+\**ESTRAL -
+.b "E" "fficient"
+.b "S" "tructure"
+tree
+.b "TRA" "nsformation"
+.b "L" "anguage"
+.)f
+zur Beschreibung von Transformationen. Diese Sprache mu\*s einerseits
+an die einheitliche Struktur der Eingabe angepa\*st sein.
+Andererseits m\*ussen universelle Mittel zur Beschreibung der Ausgabe
+bereit gestellt werden.
+.lp
+Zur automatischen Umsetzung einer Spezifikation in eine
+Implementierung wird ein Generator (ESTRA\**)
+.(f
+\**ESTRA -
+.b "E" "fficient"
+.b "S" "tructure"
+tree
+.b "TRA" "nsformation"
+.)f
+entwickelt.
+.lp
+Spezifikationssprache und Generator zusammen erm\*oglichen es,
+bei der Realisierung von
+Transformationen attributierter B\*aume von der Implementierung auf
+eine problemorientierte Spezifikation \*uberzugehen.
+.BP
+.SH 1 "M\*oglichkeiten zur Beschreibung von Transformationen"
+.lp
+Eine Transformation im Sinne dieser Arbeit ist jede Abbildung eines
+attributierten Baumes. Ob es sich beim Ergebnis einer solchen
+Abbildung wiederum um einen attributierten Baum handelt oder nicht
+spielt hierbei keine Rolle. Entscheidend ist einzig die Struktur der
+Eingabe.
+.lp
+Es werden drei unterschiedliche M\*oglichkeiten zur Beschreibung von
+Transformationen vorgestellt.
+.SH 2 "Attributierte Grammatiken"
+.lp
+Attributierte Grammatiken (AGs)\*([<\*([[Knu68\*(]]\*(>] werden im \*Ubersetzerbau
+vorwiegend eingesetzt, um die Semantische Analyse zu beschreiben. Sie
+werden aber auch zu Beschreibung der Codeerzeugung und -optimierung
+benutzt. AGs k\*onnen auch benutzt werden,
+um Transformationen zu beschreiben.
+.lp
+Normalerweise wird dabei so vorgegangen, da\*s das Ergebnis
+der Transformation durch den Wert eines Attributs an der Wurzel des
+Baumes dargestellt wird. Die Konsequenz dieser Vorgehensweise ist, da\*s
+das komplette Ergebnis der Transformation als Wert gespeichert werden
+mu\*s. Falls eine Ausgabe dieses Wertes erfolgen soll, mu\*s dies
+au\*serhalb des AG-Kalk\*uls beschrieben werden.
+Die Verwendung von Seiteneffekten zum sequentiellen Aufbau der
+Ausgabe ist mit diesem Ansatz nicht ohne weiteres m\*oglich,
+da die Reihenfolge, in der die einzelnen Attribute berechnet werden,
+nicht unmittelbar gesteuert werden kann.
+.lp
+Falls der Wunsch besteht, Seiteneffekte einzusetzen (z.B. zur
+Dateiausgabe), mu\*s die gew\*unschte Auswertungsreihenfolge
+durch Verwendung zus\*atzlicher Attribute mit entsprechenden
+Abh\*angigkeiten erzwungen werden. Diese komplizierte und aufwendige
+Art der Steuerung der Reihenfolge, die zudem recht unnat\*urlich ist,
+k\*onnte vermieden werden, wenn der sequentielle Ablauf durch
+imperative Programmierung unmittelbar beschrieben werden k\*onnte.
+.lp
+Transformationen realisieren in der Regel Abbildungen, die mehrere
+L\*osungen zulassen und einen sequentiellen Aufbau einer solchen
+L\*osung nahelegen. Transformationen sind also von Natur aus
+mehrdeutig und sequentiell. Es ist deshalb sinnvoll, zur Beschreibung
+einer Transformation eine mehrdeutige Spezifikation zu verwenden. Die
+Attributberechnung mu\*s allerdings auf alle F\*alle eindeutig sein.
+Mehrdeutigkeit in der Logik der Transformation mu\*s deshalb
+in der AG zur Beschreibung der Transformation durch zus\*atzliche
+Attribute und Berechnungen eindeutig gemacht werden.
+.lp
+Auf Grund der mehrdeutigen und sequentiellen Natur von
+Transformationen bieten AGs in ihrer Reinform keine ausreichenden
+Mittel, um Transformationen sinnvoll zu beschreiben.
+.SH 2 "Modifikation der Eingabe"
+.lp
+Eine weitere M\*oglichkeit, Transformationen durchzuf\*uhren besteht
+darin, die Ausgabe durch Modifikation der Eingabe zu erzeugen, wie es
+beispielsweise in\*([<\*([[MWW84\*(]]\*(>] beschrieben wird. Der Eingabebaum
+wird hier in einem iterativen Proze\*s so lange umgebaut,
+bis das Ergebnis der gew\*unschten Ausgabe entspricht.
+Die Transformation kann beschrieben werden, indem die einzelnen
+Schritte diese Proze\*ses durch Vorschriften festgelegt werden.
+Die Eleganz dieser Methode besteht darin, da\*s eine Transformation
+durch einzelne aufeinander aufbauende Schritte einfach und anschaulich
+beschrieben werden kann.
+.lp
+Die Reihenfolge und der Ort, auf den die einzelnen Vorschriften
+angewandt werden, kann die Anwendung weiterer Vorschriften und
+letztlich das gesamte Ergebnis entscheidend beeinflussen.
+Zur Beschreibung einer Transformation mu\*s deshalb neben den
+Vorschriften eine Strategie festgelegt werden, die Reihenfolge und Ort
+der Regelanwendungen bestimmt.
+.lp
+Es ist m\*oglich und i.a. sogar erw\*unscht, da\*s durch eine
+Modifikation eine weitere Modifikation erst m\*oglich wird. Das
+birgt jedoch die Gefahr in sich, da\*s der iterative Proze\*s nie
+endet, da immer weitere Modifikationen m\*oglich werden. Neben der
+Frage nach der Terminierung ergeben sich aus diesem Umstand Probleme
+bei der Absch\*atzung des Aufwands, der zur Durchf\*uhrung der
+Transformation erforderlich ist.
+.lp
+Bei einer Modifikation kann nicht ausgeschlossen werden, da\*s die
+Werte der Attribute des Baumes verloren gehen oder zumindest
+inkonsistent werden.
+Falls die einzelnen Vorschriften an Bedingungen \*uber die Attribute
+gekn\*upft werden sollen, ist es deshalb notwendig, unmittelbar nach
+jeder Modifikation eine Reattributierung durchzuf\*uhren.
+Wenn man auf eine Reattributierung verzichten will, verbleibt die
+M\*oglichkeit, die Modifikation der Eingabe einzusetzen, um
+nicht attributierte B\*aume zu transformieren.
+.SH 2 "Funktionale Abbildung"
+.lp
+Das Wesen einer funktionalen Abbildung eines attributierten Baumes
+besteht darin, da\*s der Ausgabewert neu berechnet wird,
+der alte Eingabebaum wird nur
+gelesen und bleibt somit unver\*andert. Das Pro\%blem der
+Reattributierung, wie es bei der Modifikation der Eingabe besteht,
+kann folglich nicht entstehen.
+.lp
+Durch eine imperative Beschreibung der Abbildung ist es unmittelbar
+m\*oglich, die Reihenfolge der Abarbeitung zu steuern, so da\*s eine
+sequentielle Ausgabe durch den Einsatz von Seiteneffekten ebenso
+m\*oglich ist wie der Aufbau eines neuen Baumes.
+.lp
+Eine mehrdeutige Beschreibung von Transformationen ist durch den
+Einsatz von Mustern und Kosten auf einfache und elegante Weise
+m\*oglich.
+.lp
+Das sequentielle und mehrdeutige Wesen von Transformationen kann mit
+dieser Methode unmittelbar beschrieben werden. Probleme, die durch den
+Einsatz von AGs oder die Modifikation der Eingabe entstehen, werden
+somit vermieden.
+.BP
+.SH 1 "Anforderungen an eine funktionale Beschreibung"
+.lp
+Im folgenden wird an Beispielen gezeigt, welche Anforderungen eine
+funktionale Beschreibung von Transformationen erf\*ullen mu\*s, und
+mit welchen Mitteln diese erf\*ullt werden k\*onnen.
+.lp
+Die einf\*uhrenden Beispiele aus dem Bereich der Codeerzeugung
+wurden ausgew\*ahlt, da sie sich eignen viele Probleme, die bei der
+Beschreibung von Transformationen entstehen, darzustellen. Gleichwohl
+sind dies nicht die typischen Anwendungsbeispiele, da f\*ur die
+Beschreibung der Codeerzeugung spezielle Sprachen und Werkzeuge\*([<\*([[Emm88\*(]]\*(>]
+existieren.
+.lp
+Die in den Beispielen verwendete Notation gibt einen Vorgeschmack auf
+die Spe\%zi\%fi\%ka\%tionssprache ESTRAL, die in Kapitel 5 ausf\*uhrlich
+beschrieben wird.
+.SH 2 "Abbildung der einzelnen Knoten"
+.lp
+Eine einfache Methode, Strukturb\*aume zu transformieren, besteht darin,
+alle Knoten eines Baumes zu besuchen und dabei das Ergebnis der
+Transformation sukzessive durch Abbildung der einzelnen Knoten zu
+erzeugen. W\*urde man eine feste Reihenfolge (z.B. Postfix) zum Besuch
+der einzelnen Knoten festlegen, so w\*urde es gen\*ugen, die
+Abbildung f\*ur jeden Knoten festzulegen. Diese einfache Methode
+w\*are bereits ausreichend, um Code zur Berechnung von arithmetischen
+Ausdr\*ucken auf einer Kellermaschine zu erzeugen (Abb. \n($1.1).
+.DS
+\fBTRANSFORMATION\fP T
+  A	{  Emit (Push A);	}
+  B	{  Emit (Push B);	}
+  C	{  Emit (Push C);	}
+  '*'	{  Emit (Multiply);	}
+  '+'	{  Emit (Add);		}
+
+.PS
+.sp -1
+circlerad = 0.15i
+define lo X + (-0.3i, -0.4i) X
+define ro X + (0.3i, -0.4i) X
+[
+Plus:	circle invis "+"
+Mul:	circle invis "*" at Plus lo
+A:	circle invis "A" at Mul lo
+B:	circle invis "B" at Mul ro
+C:	circle invis "C" at Plus ro
+
+  line from Plus.c to Mul.c chop
+  line from Plus.c to C.c chop
+  line from Mul.c to A.c chop
+  line from Mul.c to B.c chop
+]
+boxht = 0.1i
+box invis "T" "\(->" with .w at last [].e
+box invis "Push A" "Push B" "Multiply" "Push C" "Add" with .w at last box.e
+.sp -0.5
+.PE
+.DE 1 "Transformation eines Strukturbaumes"
+Doch ist diese Methode nur begrenzt einsetzbar. Betrachten wir
+hierzu folgendes Beispiel (Abb. \n($1.2).
+.DS
+.PS
+.sp -1
+circlerad = 0.15i
+define lo X + (-0.3i, -0.4i) X
+define ro X + (0.3i, -0.4i) X
+[
+Ass:	circle invis ":="
+A1:	circle invis "A" at Ass lo
+Plus:	circle invis "+" at Ass ro
+A2:	circle invis "A" at Plus lo
+B:	circle invis "B" at Plus ro
+
+  line from Ass.c to A1.c chop
+  line from Ass.c to Plus.c chop
+  line from Plus.c to A2.c chop
+  line from Plus.c to B.c chop
+]
+.sp -0.5
+.PE
+.DE 2 "Strukturbaum einer Zuweisung"
+Hier w\*are es offensichtlich falsch, f\*ur den ersten Operanden der
+Zuweisung ein 'Push A' zu generieren. Hingegen ist dies f\*ur den
+ersten Operanden der Addition weiterhin erforderlich. Au\*serdem
+zeigt das Beispiel, da\*s eine feste Ablaufstrategie (wie Postfix) zum
+Besuch der einzelnen Knoten nicht immer brauchbar ist, denn bevor die
+Zuweisung erfolgen kann (Abb. \n($1.2), mu\*s die Summe berechnet werden.
+D.h. die Addition mit ihren Operanden A und B ist vor dem linken Operand
+der Zuweisung zu besuchen.
+.SH 2 "Steuerung der Reihenfolge"
+.lp
+Derartige Probleme k\*onnen gel\*ost werden, wenn man die Transformation
+in \fIFunktionen\fP gliedert und sowohl die Reihenfolge als auch
+die Art der durchzuf\*uhrenden Funktionen vom Kontext abh\*angig macht.
+.DS
+\fBTRANSFORMATION\fP CODE
+.HS
+\fBFUNCTION\fP PUSH
+  ':='	{   F1 (':='.ro); F2 (':='.lo);			}
+  A	{   Emit (Push A);				}
+  B	{   Emit (Push B);				}
+  '+'	{   F1 ('+'.lo); F1 ('+'.ro); Emit (Add);		}
+.HS
+\fBFUNCTION\fP STORE
+  A	{   Emit (Store A);				}
+  B	{   Emit (Store B);				}
+
+.PS
+.sp -1
+circlerad = 0.15i
+define lo X + (-0.3i, -0.4i) X
+define ro X + (0.3i, -0.4i) X
+[
+Ass:	circle invis ":="
+Plus:	circle invis "+" at Ass ro
+A2:	circle invis "A" at Plus lo
+A1:	circle invis "A" at Ass lo
+B:	circle invis "B" at Plus ro
+
+  line from Ass.c to A1.c chop
+  line from Ass.c to Plus.c chop
+  line from Plus.c to A2.c chop
+  line from Plus.c to B.c chop
+]
+boxht = 0.1i
+box invis "CODE" "\(->" with .w at last [].e
+box invis "Push A" "Push B" "Add" "Store A" with .w at last box.e
+.sp -0.5
+.PE
+.DE 3 "Gliederung einer Transformation in mehrere Funktionen"
+In den Vorschriften (Abb. \n($1.3) erfolgt ein expliziter Aufruf von zum Teil
+verschiedenen Funktionen f\*ur die einzelnen Operanden (.lo
+bezeichnet hierbei den linken, .ro den rechten Operanden des angegebenen
+Knotens). Die Abarbeitungsreihenfolge ist nun explizit spezifiziert.
+.lp
+.SH 2 "Zugriff auf die Attribute"
+.lp
+Die Vorschriften zur Abbildung der Knoten A und B in Abb. \n($1.3 sind
+offensichtlich \*ahnlich. Dies liegt daran, da\*s es sich jeweils
+um einen Knoten handelt, der eine Variable darstellt. In solchen
+F\*allen sollte es m\*oglich sein, die Abbildung durch eine einzige Vorschrift
+zu beschreiben. Um das zu erreichen, fassen wir die Namen der Variablen
+als \fIAttribute\fP auf. Ein nunmehr attributierter Strukturbaum erh\*alt
+damit etwa folgende Gestalt (Abb. \n($1.4).
+.DS
+.PS
+.sp -1
+circlerad = 0.15i
+define lo X + (-0.3i, -0.4i) X
+define ro X + (0.3i, -0.4i) X
+[
+Ass:	circle invis ":="
+Plus:	circle invis "+" at Ass ro
+A2:	circle invis "V\s-2\d[N=A]\u\s+2" at Plus lo
+A1:	circle invis "V\s-2\d[N=A]\u\s+2" at Ass lo
+B:	circle invis "V\s-2\d[N=B]\u\s+2" at Plus ro
+
+  line from Ass.c to A1.c chop
+  line from Ass.c to Plus.c chop
+  line from Plus.c to A2.c chop
+  line from Plus.c to B.c chop
+]
+.sp -0.5
+.PE
+.DE 4 "Attributierter Strukturbaum einer Zuweisung"
+An Stelle der Knoten A und B erscheinen nur noch Knoten vom Typ
+V (Variable), die ein Attribut N (Name der Variablen) besitzen, das hier
+die Werte A und B annimmt. Die Beschreibung der Transformation nimmt
+dann folgende Form an (Abb. \n($1.5).
+.DS
+\fBTRANSFORMATION\fP CODE
+.HS
+\fBFUNCTION\fP PUSH
+  ':='	{   F1 (':='.ro); F2 (':='.lo);			}
+  V	{   Emit (Push V.N);				}
+  '+'	{   F1 ('+'.lo); F1 ('+'.ro); Emit (Add);		}
+.HS
+\fBFUNCTION\fP STORE
+  V	{   Emit (Store V.N);				}
+.DE 5 "Beschreibung der Transformation eines attributierten Strukturbaumes"
+.SH 2 "Berechnung eines synthetisierten Attributs"
+.lp
+Bei der bisher betrachteten Kellermaschine werden Ergebnisse eines
+Teilausdrucks auf dem Keller abgelegt. Hat man es dagegen mit einer
+Registermaschine zu tun, wird man Zwischenergebnisse in einem
+Register ablegen. Um nun Code f\*ur eine Operation zu erzeugen, ist
+es erforderlich, zu wissen in welchen Registern die Zwischenergebnisse
+stehen.
+.lp
+Diese Information kann zur Verf\*ugung gestellt werden, wenn
+gleichzeitig mit der Transformation eine \fIS-Attributierung\fP
+(Attributierung, bei der nur synthetisierte Attribute berechnet
+werden) durchgef\*uhrt wird. Da die Attribute bei der Transformation
+unmittelbar verarbeitet werden, ist es nicht notwendig, sie
+explizit im Baum zu speichern, es gen\*ugt, wenn die
+Attribute unmittelbar nach der Transformation eines Teilbaums zur
+Verf\*ugung stehen. Dies wird erreicht, indem die Attribute als
+Ergebnisse der einzelnen Funktionen dargestellt werden.
+.lp
+In Abb. \n($1.6 wird dieser Mechanismus benutzt um festzuhalten, in welchem
+Register das Zwischenergebnis steht. Die Funktion Reg, die die Transformation
+durchf\*uhrt, liefert dieses Register als Ergebnis.
+.DS
+\fBTRANSFORMATION\fP T
+.HS
+\fBFUNCTION\fP Reg: register
+  '+'	{
+	i := Reg ('+'.lo);
+	j := Reg ('+'.ro);
+	Emit (ADD Rj, Ri);
+	FreeReg (j);		(* Register j ist nun wieder frei *)
+	RETURN i;
+	}
+.HS
+  '*'	{
+	i := Reg ('*'.lo);
+	j := Reg ('*'.ro);
+	Emit (MULS Rj, Ri);
+	FreeReg (j);		(* Register j ist nun wieder frei *)
+	RETURN i;
+	}
+.HS
+  V	{
+	i := GetReg ();		(* Beschaffe Register f\*ur Zwischenergebnis *)
+	Emit (MOVE V.N@, Ri);
+	RETURN i;
+	}
+
+.PS
+.sp -1
+circlerad = 0.15i
+define lo X + (-0.3i, -0.4i) X
+define ro X + (0.3i, -0.4i) X
+[
+Plus:	circle invis "+"
+Mul:	circle invis "*" at Plus lo
+A:	circle invis "V\s-2\d[N=A]\u\s+2" at Mul lo
+C:	circle invis "V\s-2\d[N=C]\u\s+2" at Plus ro
+B:	circle invis "V\s-2\d[N=B]\u\s+2" at Mul ro
+
+  line from Plus.c to Mul.c chop
+  line from Plus.c to C.c chop
+  line from Mul.c to A.c chop
+  line from Mul.c to B.c chop
+]
+boxht = 0.1i
+box invis "T" "\(->" with .w at last [].e
+box invis "MOVE A@, R1" \
+	  "MOVE B@, R2" \
+	  "MULS R2, R1" \
+	  "MOVE C@, R2" \
+	  "ADD R2, R1" \
+	  with .w at last box.e
+.sp -0.5
+.PE
+.DE 6 "S-Attributierung"
+Die Registervergabe erfolgt 'on the fly'. Um das Beispiel einfach
+zu halten, wurde davon ausgegangen, da\*s immer gen\*ugend Register
+vorhanden sind, was z.B. dann der Fall ist, wenn bei der Erzeugung von
+Zwischencode Pseudoregister an Stelle der realen Register verwendet
+werden.
+.lp
+Das Beispiel in Abb. \n($1.6 zeigt, da\*s es nun prinzipiell m\*oglich ist,
+eine Transformation zu beschreiben, die Code f\*ur eine Registermaschine
+liefert. Allerdings ist der generierte Code schlecht im Vergleich zu
+der in Abb. \n($1.7 angegebenen Transformation.
+.DS
+.PS
+.sp -1
+circlerad = 0.15i
+define lo X + (-0.3i, -0.4i) X
+define ro X + (0.3i, -0.4i) X
+[
+Plus:	circle invis "+"
+Mul:	circle invis "*" at Plus lo
+A:	circle invis "V\s-2\d[N=A]\u\s+2" at Mul lo
+C:	circle invis "V\s-2\d[N=C]\u\s+2" at Plus ro
+B:	circle invis "V\s-2\d[N=B]\u\s+2" at Mul ro
+
+  line from Plus.c to Mul.c chop
+  line from Plus.c to C.c chop
+  line from Mul.c to A.c chop
+  line from Mul.c to B.c chop
+]
+boxht = 0.1i
+box invis "\(->" with .w at last [].e
+box invis "MOVE A@, R1" \
+	  "MULS B@, R1" \
+	  "ADD C@, R1" \
+	  with .w at last box.e
+.sp -0.5
+.PE
+.DE 7 "optimierte Transformation eines arithmetischen Ausdrucks"
+.SH 2 "Muster"
+.lp
+Offensichtlich ist es nicht erforderlich, die zweiten Operanden der
+Addition und Multiplikation in ein Hilfsregister zu laden, wenn es sich
+dabei wie hier um eine (direkt zugreifbare) Variable handelt. Da wir
+aber bislang immer nur einzelne Knoten abgebildet haben, konnte bei
+der Transformation der Addition (bzw. Multiplikation) nicht erkannt
+werden, ob es sich beim rechten Operanden um eine Variable handelt.
+Im folgenden werden wir deshalb an Stelle von einzelnen Knoten (kleine)
+Ausschnitte m\*oglicher Strukturb\*aume, sogenannte \fIMuster\fP, verwenden,
+um eine Transformation festzulegen.
+.lp
+Diese Muster m\*ussen nun auf den Teil des Strukturbaums passen, der
+mit dem aktuellen (d.h. dem zu transformierenden) Knoten beginnt. Die
+Muster werden durch ihre geklammerte Prefixform dargestellt. Um
+Operanden zu beschreiben, die nicht eindeutig festgelegt sind, k\*onnen
+Nichtterminale verwendet werden. So wird z.B. in Abb. \n($1.8 das
+Nichtterminal expr verwendet, wenn beliebige Ausdr\*ucke
+erlaubt sind. Um in den Anweisungen leichter auf den Baum zugreifen zu
+k\*onnen, k\*onnen die Namen der Knoten und Nichtterminale, die im
+Muster stehen, verwendet werden. Falls es hierbei zu Mehrdeutigkeit
+kommt, kann diese durch freigew\*ahlte Bezeichner, die im Muster mit
+angegeben werden, aufgel\*ost werden (siehe e1 und e2 in Abb. \n($1.8).
+.lp
+Mit Hilfe von Mustern sollte es nun m\*oglich sein, eine Transformation
+zu beschreiben, die in der Lage ist, den optimalen Code von Abb. \n($1.7 zu
+erzeugen. Dazu erweitern wir die Beschreibung von Abb. \n($1.6
+um zwei Vorschriften, die die Spezialf\*alle behandeln, da\*s es sich beim
+rechten Operanden einer Addition bzw. Multiplikation um eine (direkt
+zugreifbare) Variable handelt.
+.SH 2 "Mehrdeutigkeit und Kosten"
+.lp
+Offensichtlich mu\*s die dadurch entstandene Beschreibung mehrdeutig
+sein, da ja die alte M\*oglichkeit der nicht optimalen Codeerzeugung
+weiterhin besteht. Damit die optimale L\*osung ausgew\*ahlt werden kann,
+werden Kosten f\*ur die Vorschriften eingef\*uhrt.
+Mit Hilfe dieser Kosten lassen sich dann die Kosten der Transformation
+als Summe der Kosten aller angewandten Vorschriften berechnen. Im Falle einer
+Mehrdeutigkeit wird nun die optimale L\*osung, d.h. die L\*osung mit
+den geringsten Kosten ausgew\*ahlt.
+.lp
+Wenn die L\*ange des erzeugten Codes zur Festlegung der Kosten
+herangezogen wird, ergibt sich f\*ur unser Beispiel die Beschreibung
+von Abb. \n($1.8.
+.DS
+\fBTRANSFORMATION\fP T
+.HS
+\fBFUNCTION\fP Reg: Register
+  '+' (e1: expr, e2: expr)	\fBCOST\fP 2
+			{
+			i := Reg (e1); j := Reg (e2);
+			Emit (ADD Rj, Ri);
+			FreeReg (j); RETURN i;
+			}
+.HS
+  '*' (e1: expr, e2: expr)	\fBCOST\fP 2
+			{
+			i := Reg (e1); j := Reg (e2);
+			Emit (MULS Rj, Ri);
+			FreeReg (j); RETURN i;
+			}
+.HS
+  V ()			\fBCOST\fP 4
+			{
+			i := GetReg ();
+			Emit (MOVE V.N@, Ri);
+			RETURN i;
+			}
+.HS
+  '+' (expr, V ())		\fBCOST\fP 4
+			{	(* rechter Operand ist eine Variable *)
+			i := Reg (expr);
+			Emit (ADD V.N@, Ri)
+			RETURN i;
+			}
+.HS
+  '*' (expr, V ())		\fBCOST\fP 4
+			{	(* rechter Operand ist eine Variable *)
+			i := Reg (expr);
+			Emit (MULS V.N@, Ri)
+			RETURN i;
+			}
+.DE 8 "Mehrdeutigkeit und Kosten zur Optimierung einer Transformation"
+Betrachten wir nochmals die L\*osungen von Abb. \n($1.6 und
+\n($1.7 und berechnen jeweils die Kosten. Im ersten Fall
+ergibt sich eine Summe von 16, im zweiten (optimierten) Fall sind es
+nur 12. Die Einf\*uhrung von Kosten liefert also offensichtlich das
+gew\*unschte Ergebnis.
+.SH 2 "Bedingungen"
+.lp
+Attribute des Strukturbaumes wurden bislang nur benutzt, um die bei der
+Codeerzeugung notwendigen konkreten Werte (z.B. Adressen) zur
+Verf\*ugung zu stellen.
+Es kann aber auch vorkommen, da\*s eine Vorschrift nur dann verwendet
+werden darf, wenn Attributwerte eine spezielle \fIBedingung\fP
+erf\*ullen.
+.DS
+.PS
+.sp -1
+circlerad = 0.15i
+define lo X + (-0.3i, -0.4i) X
+define ro X + (0.3i, -0.4i) X
+Mul:	circle invis "*"
+V:	circle invis "V\s-2\d[N=A]\u\s+2" at Mul lo
+C:	circle invis "C\s-2\d[V=4]\u\s+2" at Mul ro
+line from Mul.c to V.c chop
+line from Mul.c to C.c chop
+.sp -0.5
+.PE
+.DE 9 "Produkt einer Variablen mit einer Konstanten (Zweierpotenz)"
+Um beispielsweise das Produkt einer Variablen und der Konstanten 4 (Abb. \n($1.9)
+zu berechnen, gen\*ugt es, den Wert der Variablen um zwei Bin\*arstellen
+nach links zu verschieben. Dieses Verfahren geht aber offensichtlich
+nicht f\*ur beliebige Konstanten, sondern nur f\*ur solche, die eine
+Zweierpotenz darstellen. Um dies durch eine Vorschrift beschreiben zu
+k\*onnen, f\*uhren wir die M\*oglichkeit ein, eine Vorschrift mit einer
+Bedingung (condition) zu verkn\*upfen (Abb. \n($1.10).
+.DS
+  '*' (expr, C ())		\fBCOST\fP 2
+			\fBCONDITION\fP { IsPowerOf2 (C.V) }
+			{
+			i := Reg (expr);
+			d := Log2 (C.V);
+			Emit (ASL #d, Ri)
+			RETURN i;
+			}
+.DE 10 "Vorschrift mit einer Bedingung"
+Durch die Kombination Mehrdeutigkeit, Bedingungen und Kosten ist es
+auf einfache Weise m\*oglich, Transformatoren zu beschreiben, die in
+der Lage sind, eine optimierte Abbildung durchzuf\*uhren.
+.SH 2 "Mehrfachtransformation"
+.lp
+Eine weiteres Mittel bei der Beschreibung von Transformationen, das in
+den bisherigen Beispielen noch nicht verwendet wurde, ist die
+\fIMehrfachtransformation\fP. Eine Mehr\%fach\%trans\%formation liegt dann vor,
+wenn ein Teilbaum mehrmals auf die selbe (Abb. \n($1.13) oder auf unterschiedliche
+Weise transformiert wird.
+.DS
+\fBTRANSFORMATION\fP T
+.HS
+\fBFUNCTION\fP Copy: tree
+  WHILE (expr, stmt)	{
+			e1 := Copy (expr);
+			s  := Copy (stmt);
+			e2 := Copy (expr);
+			e3 := MakeNOT (e2);
+			r  := MakeREPEAT (s, e3);
+			RETURN MakeIF (e1, r);
+ 			}
+
+.PS
+.sp -1
+circlerad = 0.15i
+define lo X + (-0.3i, -0.4i) X
+define ro X + (0.3i, -0.4i) X
+define o X + (0i, -0.4i) X
+[
+Whi:	circle invis "WHILE"
+Exp:	circle invis "expr" at Whi lo
+Sta:	circle invis "stmt" at Whi ro
+
+  line from Whi.c to Exp.c chop
+  line from Whi.c to Sta.c chop
+]
+boxht = 0.1i
+box invis "Copy" "\(->" with .w at last [].e + (0.2i, 0i)
+[
+If:	circle invis "IF"
+Exp1:	circle invis "Copy(expr)  " at If lo
+Rep:	circle invis "REPEAT" at If ro
+Sta:	circle invis "Copy(stmt)" at Rep lo
+Not:	circle invis "NOT" at Rep ro
+Exp2:	circle invis "Copy(expr)" at Not o
+
+  line from If.c to Exp1.c chop
+  line from If.c to Rep.c chop
+  line from Rep.c to Sta.c chop
+  line from Rep.c to Not.c chop
+  line from Not.c to Exp2.c chop 0.1i
+] with .w at last box.e
+.sp -0.5
+.PE
+.DE 11 "Transformation einer While-Schleife"
+Eine While-Schleife kann durch eine Repeat-Schleife ersetzt werden,
+wenn letztere in eine bedingte Anweisung (IF) eingeschlossen wird.
+Der Ausdruck (expr) der Bedingung mu\*s hierzu offensichtlich
+dupliziert werden. Abb. \n($1.11 zeigt, wie dies durch eine
+Mehrfachtransformation realisiert wird.
+.lp
+Eine andere Form der Mehrfachtransformation ist die mehrfache
+Transformation eines Strukturbaumes auf unterschiedliche Weise. Bei
+dieser Form der Mehrfachtransformation werden verschiedene Funktionen
+auf einen Teilbaum angewandt.
+.lp
+.SH 2 "Synthetisierte und vererbte Attribute"
+.lp
+Bei komplexen Transformation reicht eine S-Attributierung, wie sie 2.4.
+eingef\*uhrt, nicht aus.
+.lp
+Ein Beispiel f\*ur eine solche Transformation ist die Normierung
+des Strukturbaumes eines regul\*aren Ausdrucks. Ein regul\*arer
+Ausdruck ist ein Ausdruck, der den folgenden Regeln gehorcht:
+.np
+jeder Bezeichner (Identifier) ist ein regul\*arer Ausdruck
+.np
+wenn R1 und R2 regul\*are Ausdr\*ucke sind, dann sind auch:
+  R1 '\(or' R2	(Alternative)
+  R1 R2	(Sequenz)
+  (R1)
+  R1 '*'	(Wiederholung)
+.br
+Regul\*are Ausdr\*ucke.
+.lp
+Da es sich bei der Sequenz (das selbe gilt f\*ur die Alternative) um
+eine assoziative Operation handelt, gibt es unterschiedliche
+M\*oglichkeiten zur Darstellung des selben regul\*aren Ausdrucks in
+Form eines Strukturbaumes. Durch die unn\*otige Verwendung von
+Klammern oder die automatische Erzeugung von regul\*aren
+Ausdr\*ucken ist es unter Umst\*anden unvermeidlich, da\*s diese
+verschiedenen Strukturb\*aume tats\*achlich aufgebaut werden.
+.DS
+.PS
+.sp -1
+circlerad = 0.15i
+define lo X + (-0.45i, -0.4i) X
+define llo X + (-0.9i, -0.4i) X
+define ro X + (0.45i, -0.4i) X
+define rro X + (0.9i, -0.4i) X
+define o X + (0i, -0.4i) X
+[
+boxht = 0.1i
+box invis "(ab)((c*)b)"
+]
+boxht = 0.1i
+box invis "\(==" with .w at last [].e
+[
+S1:	circle invis "SEQ"
+S2:	circle invis "SEQ" at S1 llo
+S3:	circle invis "SEQ" at S1 rro
+I1:	circle invis "   IDENT\s-2\d[Name=a]\u\s+2" at S2 lo
+I2:	circle invis "       IDENT\s-2\d[Name=b]\u\s+2" at S2 ro
+R:	circle invis "" "*" at S3 lo
+I3:	circle invis "     IDENT\s-2\d[Name=c]\u\s+2" at R o
+I4:	circle invis "   IDENT\s-2\d[Name=b]\u\s+2" at S3 ro
+
+line from S2.c to S1.c chop 0.25i
+line from S3.c to S1.c chop 0.25i
+line from I1.c to S2.c chop
+line from I2.c to S2.c chop
+line from R.c to S3.c chop 0.1i
+line from I3.c to R.c chop
+line from I4.c to S3.c chop
+] with .w at last box.e
+.PE
+.PS
+[
+boxht = 0.1i
+box invis "(((ab)c*)b)"
+]
+boxht = 0.1i
+box invis "\(==" with .w at last [].e
+[
+S1:	circle invis "SEQ"
+S2:	circle invis "SEQ" at S1 llo
+S3:	circle invis "SEQ" at S2 llo
+I1:	circle invis "     IDENT\s-2\d[Name=a]\u\s+2" at S3 llo
+I2:	circle invis "   IDENT\s-2\d[Name=b]\u\s+2" at S3 ro
+R:	circle invis "" "*" at S2 ro
+I3:	circle invis "       IDENT\s-2\d[Name=c]\u\s+2" at R o
+I4:	circle invis "   IDENT\s-2\d[Name=b]\u\s+2" at S1 ro
+
+line from S2.c to S1.c chop 0.25i
+line from S3.c to S2.c chop 0.25i
+line from I1.c to S3.c chop 0.25i
+line from I2.c to S3.c chop
+line from R.c to S2.c chop 0.1i
+line from I3.c to R.c chop
+line from I4.c to S1.c chop
+] with .w at last box.e
+.sp -0.5
+.PE
+.DE 12 "verschiedene Darstellungen des selben regul\*aren Ausdrucks"
+Um solche Strukturb\*aume (Abb. \n($1.12) zu normieren, d.h. f\*ur
+eine einheitliche Darstellung der regul\*aren Ausdr\*ucke zu sorgen,
+geht man zweckm\*a\*sigerweise wie folgt vor:
+.np
+Nicht assoziative und un\*are Operatoren werden eins zu eins
+abgebildet.
+.np
+Beim Antreffen eines assoziativen Operators werden alle
+darunterliegenden Knoten mit demselben Operator zusammengefa\*st.
+Die darunterliegenden Teilb\*aume werden der Reihe nach
+transformiert. Dabei wird ein normierter (zur Liste entarteter) Baum
+mit dem aktuellen Operator aufgebaut, dessen Bl\*atter durch die
+Transformationsergebnisse der Teilb\*aume gebildet werden.
+.lp
+Um dies zu realisieren reicht eine
+S-Attributierung deshalb nicht aus, weil die B\*aume zur Normierung
+nicht nur hochgereicht, d.h. \fIsynthetisiert\fP, sondern auch nach unten
+gegeben d.h. \fIvererbt\fP werden m\*ussen.
+.lp
+Um diese Vererbung beschreiben zu k\*onnen, ordnen wir einer
+Funktion zus\*atzlich zum Ergebnisattribut noch weitere
+vererbte und synthetisierte Attribute zu. Diese Attribute m\*ussen
+beim Aufruf einer Funktion neben dem zu transformierenden
+Strukturbaum, der immer das erste Argument bildet, \*ubergeben werden.
+.DS
+.ta 5c 7c
+\fBTRANSFORMATION\fP OrderTree
+
+\fBFUNCTION\fP Order: tTree
+  Alt (r1: RegExpr, r2: RegExpr)		{ RETURN OrderAlt (r2, Order (r1)); }
+  Seq (r1: RegExpr, r2: RegExpr)		{ RETURN OrderSeq (r2, Order (r1)); }
+  Star (RegExpr)		{ RETURN MakeSTAR (Order (RegExpr)); }
+  Ident ()		{ RETURN MakeIdent (Ident.Name); }
+
+\fBFUNCTION\fP OrderSeq	List: tTree \(mi> : tTree
+  Seq (r1: RegExpr, r2: RegExpr)	\fBCOST\fP 1	{ RETURN OrderSeq (r2, OrderSeq (r1, List)); }
+  Ident ()	\fBCOST\fP 1	{ RETURN MakeSEQ (List, MakeIdent (Ident.Name)); }
+  RegExpr	\fBCOST\fP 2	{ RETURN MakeSEQ (List, Order (RegExpr)); }
+
+\fBFUNCTION\fP OrderAlt	List: tTree \(mi> : tTree
+  Alt (r1: RegExpr, r2: RegExpr)	\fBCOST\fP 1	{ RETURN OrderAlt (r2, OrderAlt (r1, List)); }
+  Ident ()	\fBCOST\fP 1	{ RETURN MakeALT (List, MakeIdent (Ident.Name)); }
+  RegExpr	\fBCOST\fP 2	{ RETURN MakeALT (List, Order (RegExpr)); }
+.DE 13 "Normierung eines regul\*aren Ausdruckes durch Transformation"
+Die Funktion OrderSeq sammelt die gesamte Sequenz ein und baut mit
+Hilfe des vererbten Attributs List (vererbte Attribute stehen links
+von Pfeil ('\(mi>'), synthetisierte rechts)
+und dem Ergebnisattribut sukzessive
+den normierten Baum f\*ur die Sequenz auf. Die allgemeine Vorschrift (die
+Vorschrift mit dem Muster 'RegExpr') wird aufgrund der Kosten nur f\*ur die
+\*ubrigen Operatoren (nicht f\*ur die Sequenz) gew\*ahlt. Sie
+st\*o\*st dann wiederum die Funktion Order f\*ur den
+aktuellen Knoten an. Die Funktion OrderAlt arbeitet entsprechend
+f\*ur Alternativen.
+.BP
+.SH 1 "Begriffe"
+.lp
+Bevor weiter auf die Spezifikation und die Implementierung von Transformationen
+eingegangen wird, m\*ussen einige zentrale Begriffe gekl\*art werden.
+.SH 2 "Baumgrammatik"
+.lp
+Eine Baumgrammatik ist eine spezielle kontextfreie Grammatik,
+die hier eingesetzt wird, um die Struktur der zu transformierenden B\*aume zu
+beschreiben.
+.lp
+Eine Baumgrammatik ist ein Viertupel G = (C, N, \(*P, Z) mit
+.np
+C = Menge der Klassen
+.np
+N = Menge der Knoten
+.np
+\(*P = Menge der Produktionen \(ib C \(mu (C \(cu N C*)
+.np
+Z = Menge der Startsymbole \(ib C
+.lp
+Die Klassen C einer Baumgrammatik entsprechen den Nichtterminalen,
+die Knoten den Terminalen einer gew\*ohnlichen kontextfreien Grammatik.
+.lp
+Bei den Produktionen \(*P einer Baumgrammatik werden zwei Typen unterschieden:
+.np
+Kettenproduktion:
+.br
+c\*<0\*> \(-> c\*<1\*> mit c\*<0\*>, c\*<1\*> \(mo C
+.np
+Knotenproduktion:
+.br
+c\*<0\*> \(-> n (c\*<1\*>, ..., c\*<m\*>)
+mit
+n \(mo N, c\*<0\*>, c\*<1\*>, ..., c\*<m\*> \(mo C
+.lp
+Die \fIKettenproduktion\fP ersetzt eine Klasse c\*<0\*> durch eine
+Klasse c\*<1\*>; c\*<0\*> hei\*st Oberklasse von c\*<1\*>.
+.lp
+Bei der \fIKnotenproduktion\fP werden ein Knoten n aufgebaut, und die
+Klassen c\*<1\*>, ..., c\*<m\*> seiner S\*ohne festgelegt.
+Da die rechte Seite einer Knotenproduktion einen Knoten n beschreibt wird
+sie auch als Knotenbeschreibung (oder kurz Beschreibung) des Knotens
+n bezeichnet.
+Die Klammern in den Knotenproduktionen haben keine Bedeutung, sie
+erh\*ohen jedoch die Lesbarkeit und erm\*oglichen au\*serdem die
+Unterscheidung von Ketten- und Knotenproduktionen aufgrund der Darstellung.
+.lp
+Damit eine Grammatik f\*ur unsere Zwecke brauchbar ist, m\*ussen weitere
+Forderungen erf\*ullt werden:
+.np
+Zyklenfreiheit:
+.br
+c\*<0\*>
+\(-> c\*<1\*>
+\(-> ...
+\(-> c\*<m\*>
+\(RA
+c\*<0\*> \(!= c\*<m\*>
+.br
+die Kettenproduktionen m\*ussen azyklisch sein
+.np
+Eindeutigkeit der Oberklasse:
+.br
+c\*<1\*> \(-> c\*<0\*>,
+c\*<2\*> \(-> c\*<0\*>
+\(RA
+c\*<1\*> = c\*<2\*>
+.br
+jede Klasse besitzt h\*ochstens eine Oberklasse:
+.np
+Feste Wertigkeit:
+.br
+c\*<0\*> \(-> n (c\*<1\*>, ..., c\*<m\*>),
+c\*'\*<0\*> \(-> n (c\*'\*<1\*>, ..., c\*'\*<m'\*>) 
+\(RA
+m = m'
+.br
+die Anzahl der S\*ohne ist f\*ur alle Knotenbeschreibungen eines
+Knotens identisch
+.np
+Eindeutigkeit der Knotenbeschreibung innerhalb einer Klasse:
+.br
+c\*<0\*> \(-> n (c\*<1\*>, ..., c\*<m\*>),
+c\*<0\*> \(-> n (c\*'\*<1\*>, ..., c\*'\*<m\*>) 
+\(RA
+c\*<1\*> = c\*'\*<1\*>, ..., c\*<m\*> = c\*'\*<m\*>,
+.br
+ein Knoten darf in einer Klasse nur einmal beschrieben sein
+.np
+Prinzip der Hauptbeschreibung:
+.br
+\(fa n \(mo N:
+\(te c\*<0\*> \(-> n (c\*<1\*>, ..., c\*<m\*>) \(mo \(*P:
+.br
+c\*'\*<0\*> \(-> n (c\*'\*<1\*>, ..., c\*'\*<m\*>) \(mo \(*P
+\(RA
+c\*<0\*> \(-> ... \(-> c\*'\*<0\*>,
+c\*<1\*> \(-> ... \(-> c\*'\*<1\*>, ...,
+c\*<m\*> \(-> ... \(-> c\*'\*<m\*>
+.br
+f\*ur jeden Knoten existiert eine Beschreibung, aus der alle andern
+Beschreibungen des selben Knotens abgeleitet werden k\*onnen.
+.np
+Reduziertheit:
+.br
+Von der Baumgrammatik wird verlangt, da\*s sie reduziert ist, d.h.
+alle Klassen und Knoten m\*ussen von den Startsymbolen aus erreichbar
+sein und alle Klassen m\*ussen terminalisierbar sein.
+.lp
+Die Eigenschaften erleichtern zum einen die Darstellung und den Umgang mit
+der Baumgrammatik, andererseits sind sie notwendig damit die B\*aume
+vern\*unftig implementiert werden k\*onnen.
+.DS
+.ta 1c 2c 3c 4.5c
+G = (C, N, \(*P, Z)
+
+C = {expr, const, index}
+N = {'+', Const, Ident}
+\(*P = {	expr	\(->	const,
+	expr	\(->	index,
+	expr	\(->	'+'	(expr, expr),
+	const	\(->	Const	(),
+	const	\(->	'+'	(const, const),
+	index	\(->	Ident	() }
+Z = {expr}
+.DE 1 "Baumgrammatik f\*ur arithmetische Ausdr\*ucke"
+Abb. \n($1.1 zeigt eine Baumgrammatik f\*ur arithmetische Ausdr\*ucke,
+die diese Forderungen erf\*ullt. Die Grammatik ist zyklenfrei (1).
+Die Klassen const und index besitzen beide die eindeutige Oberklasse
+expr (2). Beide Beschreibungen von '+' haben die Wertigkeit
+zwei (3) und liegen in unterschiedlichen Klassen (4). Die Produktion
+expr \(-> '+' (expr, expr) legt die Hauptbeschreibung fest. Die zweite
+Knotenproduktion f\*ur '+' (const \(-> '+' (const, const)) kann aus
+der ersteren abgeleitet werden (5). Die Grammatik ist reduziert (6).
+.SH 2 "Muster"
+.lp
+Wenn man ausgehend von einer Klasse endlich viele Produktionen anwendet,
+entsteht ein Ausdruck, den wir als Muster bezeichnen. Muster werden verwendet,
+um die Menge aller aus ihnen ableitbaren B\*aumen darzustellen.
+.lp
+Wenn ein Baum aus einem Muster abgeleitet werden kann, dann
+\fIpa\*st\fP das Muster auf diesen Baum.
+.lp
+Bei der Darstellung von Mustern ist es zul\*assig, Klassen wegzulassen,
+wenn diese aufgrund der Hauptbeschreibung ohnehin festgelegt sind.
+Diese Freiheit hat zur Folge, da\*s es verschiedene Muster gibt, die
+die selbe Menge von B\*aumen darstellen.
+.lp
+Abb. \n($1.2 zeigt ein Beispiel. Die Doppelpunkte in den Mustern dienen
+als Platzhalter f\*ur die weggelassenen Klassen. Der Doppelpunkt stellt
+das sogenannte \fIallgemeine Muster\fP, das immer pa\*st, dar.
+.DS
+.ta 1c 3.5c
+\&'+'	(:, :)	\fI(normiert)\fP
+\&'+'	(expr, :)
+\&'+'	(:, expr)
+\&'+'	(expr, expr)
+.DE 2 "verschiedene Muster zur Darstellung der selben Mengen von B\*aumen"
+Da in der Grammatik von Abb. \n($1.1 \fIIdent\fP der einzige Knoten ist,
+der aus der Klasse \fIindex\fP abgeleitet werden kann, stellen die beiden
+Muster von Abbildung \n($1.3 ebenfalls die selbe Menge von B\*aumen dar.
+.DS
+.ta 1c 3.5c
+index		\fI(normiert)\fP
+Ident	()
+.DE 3 "verschiedene Muster zur Darstellung der selben Mengen von B\*aumen"
+.lp
+Der Grund f\*ur die M\*oglichkeit, ein Menge von B\*aumen durch
+verschiedene Muster darzustellen, ist also zum einen die
+M\*oglichkeit, die Klasse des Sohnes nicht zu
+spezifizieren, zum anderen die Eigenschaft, da\*s ein
+Knoten mitunter bereits durch eine Klasse eindeutig festgelegt ist.
+.lp
+Um diese unterschiedliche Darstellungen zu vermeiden,
+wird der Begriff des \fInormierten Musters\fP eingef\*uhrt. Ein Muster
+hei\*st normiert, wenn es durch die zwei oben genannten
+Eigenschaften (Klasse der S\*ohne mu\*s nicht spezifiziert werden,
+Knoten ist durch Klasse festgelegt) nicht vereinfacht werden kann.
+.lp
+Eine dritte M\*oglichkeit besteht, wenn die Oberklasse einer Klasse
+keine eigenen Knotenbeschreibungen enth\*alt und f\*ur keine
+weitere Klasse Oberklasse ist. In diesem Fall kann aus der Oberklasse
+nichts abgeleitet werden, was nicht auch aus der Klasse selbst entstehen
+k\*onnte. Somit sind diese beide Klassen bei der Darstellung eines
+Musters vollkommen austauschbar.
+.lp
+In der Praxis wird diese M\*oglichkeit in der Regel nicht auftreten,
+da man normalerweise versuchen wird, mit einer m\*oglichst einfachen
+Grammatik auszukommen und deshalb das Auftreten \*aquivalenter Klassen
+vermieden wird.
+.SH 2 "Beziehungen zwischen Mustern"
+.lp
+Um die Beziehungen zwischen zwei Mustern beschreiben zu k\*onnen,
+werden die folgenden Begriffe und Notationen verwendet.
+.np
+p\*<1\*> = p\*<2\*>
+.br
+Zwei Muster sind \fIgleich\fP, falls gilt, da\*s entweder beide Muster
+passen oder keines der Muster pa\*st.
+.np
+p\*<1\*> < p\*<2\*>
+.br
+Ein Muster p\*<1\*> ist \fIkleiner\fP als p\*<2\*>, wenn das Passen von
+p\*<1\*> aus dem Passen von p\*<2\*> folgt und die beiden Muster
+nicht gleich sind.
+.np
+p\*<1\*> > p\*<2\*>
+.br
+Ein Muster p\*<1\*> ist \fIgr\*o\*ser\fP als p\*<2\*>, wenn
+p\*<2\*> kleiner als p\*<1\*> ist.
+.np
+p\*<1\*> \(or\(or p\*<2\*>
+.br
+Ein Muster p\*<1\*> ist \fIinkonsistent\fP zu p\*<2\*>, wenn
+es keinen Baum gibt, auf den sowohl p\*<1\*> als auch p\*<2\*>
+pa\*st.
+.np
+p\*<1\*> \(ap p\*<2\*>
+.br
+Ein Muster p\*<1\*> ist \fIunabh\*angig\fP von p\*<2\*>, wenn
+p\*<1\*> und p\*<2\*> unabh\*angig voneinander passen k\*onnen.
+.lp
+Die Begriffe sind\*([<\*([[HoO82\*(]]\*(>]
+entnommen. Dort werden jedoch keine
+unterschiedlichen Klassen betrachtet, wie es hier geschieht.
+Statt dessen gibt es lediglich ein Symbol, das f\*ur beliebige
+B\*aume steht.
+.lp
+Die Einf\*uhrung von Klassen hat zur Folge, da\*s es aufwendiger
+wird zu berechnen, welche Be\%zie\%hung zwischen zwei Mustern gilt.
+.lp
+Betrachten wir den Fall, da\*s es sich bei den beiden
+Mustern jeweils nur um eine Klasse handelt. Die Frage nach der
+Beziehung zwischen den beiden Mustern ist dann gleichbedeutend zu
+entscheiden, ob die Sprachen, die durch zwei unterschiedliche
+Baumgrammatiken definiert werden, identisch sind (gleich), ob eine Sprache
+eine Untermenge der anderen ist (kleiner/gr\*o\*ser), ob der Schnitt
+der beiden Sprachen leer ist (inkonsistent) oder ob es sich um Quermengen
+handelt (unabh\*angig).
+.lp
+In der Praxis ist es jedoch m\*oglich, mit einer N\*aherungsl\*osung
+auszukommen. Diese N\*aherungsl\*osung entsteht, indem in einzelnen
+F\*allen in Kauf genommen wird, da\*s zwei Muster als unabh\*angig
+betrachtet werden, obwohl eine der anderen Beziehungen gilt.
+Dieser Fehler kann in Kauf genommen werden, da er nur in pathologischen
+F\*allen eintritt und keine Folgefehler verursacht. 
+.lp
+Im Al\%go\%rith\%mus zur Berechnung der Beziehung zwischen zwei
+(normierten) Mustern (Abb. \n($1.5) werden folgende Hilfsfunktionen
+verwendet (Abb. \n($1.4).
+.DS
+.ta 1.5c 6c 14.5c
+Ident	(pat: tPattern): tIdent	(* liefert den Bezeichner der Wurzel von pat	*)
+Type	(id: tIdent): tType	(* liefert den Typ (class oder node) von id	*)
+Arity	(node: tIdent): INTEGER	(* liefert die Wertigkeit des Knotens	*)
+Classes	(pat: tPattern): tSet	(* liefert die Klassen zu denen pat geh\*ort	*)
+Subclasses (class: tIdent): tSet	(* liefert die Unterklassen von class	*)
+ClassesOfNode (node: tIdent): tSet	(* liefert alle Klassen in denen node beschrieben ist	*)
+NodesOfClass (class: tIdent): tSet	(* liefert alle Knoten die aus class hervorgehen k\*onnen	*)
+.DE 4 "Hilfsfunktionen zur Berechnung der Beziehung zwischen zwei Mustern"
+.DS
+.ta 9c 13c
+Relation (pat1, pat2: tPattern): tRelation;
+.HS
+\fBif\fP (pat1 = NoPat) & (pat2 = NoPat) \fBthen return\fP equal	(* pat1 = pat2	*)
+\fBif\fP (pat1 = NoPat) \fBthen return\fP less	(* pat1 < pat2	*)
+\fBif\fP (pat2 = NoPat) \fBthen return\fP greater	(* pat1 > pat2	*)
+.HS
+id1 := Ident (pat1)
+type1 := Type (id1)
+id2 := Ident (pat2)
+type2 := Type (id2)
+.HS
+\fBif\fP (type1 = class) & (type2 = class) \fBthen\fP	(* A *)
+  \fBif\fP (id1 = id2) \fBthen return\fP equal	(* pat1 = pat2	*)
+  \fBelsif\fP (id1 \(mo Classes (pat2)) \fBthen return\fP less	(* pat1 < pat2	*)
+  \fBelsif\fP (id2 \(mo Classes (pat1)) \fBthen return\fP greater	(* pat1 > pat2	*)
+  \fBif\fP NodesOfClass (id1) \(ca NodesOfClass (id2) \(eq \(es \fBthen\fP
+    \fBreturn\fP inconsistent	(* pat1 \(ap pat2	*)
+  \fBelse return\fP independent	(* pat1 \(or\(or pat2	*)
+.HS
+\fBelsif\fP (type1 = class) \fBthen\fP	(* B *)
+  \fBif\fP (id1 \(mo Classes (pat2)) \fBthen return\fP less	(* pat1 < pat2	*)
+  \fBelse\fP
+    common := (Subclasses (id1)\(cu{id1}) \(ca ClassesOfNode (id2)
+    \fBif\fP common = \(es \fBthen return\fP inconsistent	(* pat1 \(or\(or pat2	*)
+    \fBelse return\fP independent	(* pat1 \(ap pat2	*)
+.HS
+\fBelsif\fP (type2 = class) \fBthen\fP	(* C *)
+  \fBif\fP (id2 \(mo Classes (pat1)) \fBthen return\fP greater	(* pat1 > pat2	*)
+  \fBelse\fP
+    common :=  (Subclasses (id2)\(cu{id2}) \(ca ClassesOfNode (id1)
+    \fBif\fP common = \(es \fBthen return\fP inconsistent	(* pat1 \(or\(or pat2	*)
+    \fBelse return\fP independent	(* pat1 \(ap pat2	*)
+.DB
+\fBelse\fP	(* D *)
+  \fBif\fP id1 = id2 \fBthen\fP
+    relation := equal;	(* up to now: pat1 = pat2	*)
+    \fBfor\fP pos := 1 to Arity (id1) \fBdo\fP
+      \fBcase\fP Relation (Son (pat1, pos), Son (pat2, pos)) \fBof\fP
+      | equal:
+      | independent:
+            relation := independent	(* now: pat1 \(ap pat2	*)
+      | inconsistent:
+          \fBreturn\fP inconsistent	(* pat1 \(or\(or pat2	*)
+      | greater:
+          \fBif\fP relation = equal
+            \fBthen\fP relation := greater	(* now: pat1 > pat2	*)
+          \fBelsif\fP relation = less
+            \fBthen\fP relation := independent	(* now: pat1 \(ap pat2	*)
+      | less:
+          \fBif\fP relation = equal
+            \fBthen\fP relation := less	(* now: pat1 < pat2	*)
+          \fBelsif\fP relation = greater
+            \fBthen\fP relation := independent	(* now: pat1 \(ap pat2	*)
+    \fBreturn\fP relation
+  \fBelse return\fP inconsistent	(* pat1 \(or\(or pat2	*)
+.DE 5 "Algorithmus zur Berechnung der Beziehung von zwei Mustern"
+Zu Beginn des Algorithmus Relation (Abb. \n($1.5) werden
+die einfachen F\*alle behandelt, die entstehen, wenn eines der
+Muster oder beide Muster leer sind (NoPat). Falls hier keine Entscheidung
+f\*allt, ist sichergestellt, da\*s beide Muster eine Klasse oder
+einen Knoten als Wurzel enthalten.
+.lp
+Handelt es sich um zwei Klassen (A), so gilt Gleichheit, falls die Klassen
+identisch sind. Trifft dies nicht zu wird gepr\*uft, ob ein Muster aus
+der Klasse des anderen abgeleitet werden kann und somit kleiner als
+dieses ist. Zuletzt wird noch gepr\*uft ob es Knoten gibt, die aus
+beiden Klassen hervorgehen k\*onnen, die beiden Klassen werden dann als
+unabh\*angig bezeichnet. Bei dieser Festlegung handelt es sich um
+einen N\*aherung, denn tats\*achlich kann hier (in pathologischen
+F\*allen) auch jede andere Beziehung gelten. Im \*ubrigen sind
+die Klassen und damit die Muster mit Sicherheit inkonsistent.
+.lp
+Bei den beiden n\*achsten F\*allen (B, C) liegen jeweils eine Klasse und
+ein Knoten als Wurzel vor. Kann das Muster mit dem Knoten als Wurzel
+aus der Klasse abgeleitet werden, steht die Beziehung fest. Im anderen
+Falle wird gepr\*uft ob es \*uberhaupt Muster gibt, die aus der
+Klasse abgeleitet werden k\*onnen und den Knoten als Wurzel haben, denn
+dann werden die Muster als unabh\*angig betrachtet. Ansonsten
+sind die beiden Muster inkonsistent.
+.lp
+Falls beide Muster einen Knoten als Wurzel haben (D), gibt es zwei
+M\*oglichkeiten. Sind die beiden Knoten identisch, m\*ussen die
+S\*ohne betrachtet werden. Hierzu wird ein Hilfsvariable
+(relation) auf gleich (equal) initialisiert. Diese Hilfsvariable stellt
+die Beziehung der bereits be\%trach\%te\%ten Teile der beiden Muster dar. In
+Abh\*angigkeit von den Beziehungen der S\*ohne wird der Wert von
+relation gegebenenfalls angepa\*st, bis sp\*atestens nach
+Betrachten aller S\*ohne das Ergebnis feststeht.
+Sind die beiden Knoten hingegen verschieden, steht sofort Inkonsistenz
+fest.
+.BP
+.SH 1 "Spezifikation von Transformationen mit ESTRAL"
+.lp
+Im folgenden wird die Eingabesprache zur Spezifikation von
+Transformationen beschrieben.
+.SH 2 "Reservierte W\*orter und Symbole"
+.lp
+Die folgende Liste enth\*alt die reservierten W\*orter in ESTRAL:
+.(l I
+.b
+.sz -2
+BEGIN, CLOSE, CONDITION, COSTS, DECLARE, EXPORT,
+FUNCTION, GLOBAL, GRAMMAR, TRANSFORMATION
+.sz +2
+.)l
+Die Symbole
+.(l I
+.b
+.sz -2
+(     )     {     }     ,     .     /     :     ;     =     \(or     \(mi>
+.sz +2
+.)l
+werden als Operatoren und Begrenzer verwendet.
+.SH 2 "Bezeichner"
+.lp
+Bezeichner (identifiers) sind Folgen aus Buchstaben (letters),
+Ziffern (digits) und dem Unterstreichungsstrich (underscore). Ein
+Bezeichner mu\*s immer mit einem Buchstaben beginnen.
+Wenn reservierte W\*orter als Bezeichner verwendet werden, sind sie mit
+einem '\e' als Fluchtsymbol zu maskieren. Dieses
+Fluchtsymbol, das auch vor jedem anderen Bezeichner stehen darf, ist
+jedoch nicht Bestandteil des Bezeichners, es dient lediglich zur
+Unterscheidung von Schl\*usselw\*ortern und Bezeichnern.
+.lp
+Abb. \n($1.1 zeigt einen regul\*aren Ausdruck, der den Aufbau eines
+Bezeichners beschreibt.
+.DS
+.ta 3c
+ident =	['\e'] letter (letter \(or digit \(or '_')*
+.DE 1 "regul\*arer Ausdruck f\*ur Bezeichner"
+Beispiele f\*ur korrekte Bezeichner sind:
+.(l I
+.sz -2
+Bezeichner, Doppel_Wort, \eSTOP, END, \eBEGIN, A2, b4
+.sz +2
+.)l
+Die folgende Zeichenfolgen sind hingegen keine g\*ultigen Bezeichner:
+.(l I
+.sz -2
+BEGIN	\fI(Schl\*usselw\*orter sind nicht erlaubt)\fP
+\e\eEND	\fI(nur ein ' \e' ist erlaubt)\fP
+4A	\fI(Ziffer darf nicht am Anfang stehen)\fP
+A-Z	\fI(Bindestrich ist nicht erlaubt)\fP
+.sz +2
+.)l
+Bei der Verwendung von Bezeichnern ist au\*serdem zu beachten, da\*s
+sie vom Generator verwendet werden, um
+Bezeichner f\*ur das Zielprogramm zu bilden. Einschr\*ankungen, die in
+der Zielsprache f\*ur Bezeichner gelten, sollten deshalb unbedingt
+auch eingehalten werden.
+.lp
+Beispiele f\*ur solche Einschr\*ankungen sind das Verbot von '_' in
+Bezeichnern der Programmiersprache Modula-2\*([<\*([[Wir85\*(]]\*(>] oder die Beschr\*ankung
+der signifikanten L\*ange von Bezeichnern in C\*([<\*([[KeR83\*(]]\*(>].
+.SH 2 "Zeichenketten"
+.lp
+Zeichenketten (strings) sind in Anf\*uhrungszeichen ('"')  oder
+Apostrophe ("'") eingeschlossene Zeichenfolgen. Die Zeichenfolge darf
+alle Zeichen au\*ser dem Zeilenende und dem Begrenzer selbst enthalten.
+.lp
+.SH 2 "Zahlen"
+.lp
+Da nur positive ganze Zahlen ben\*otigt werden, gen\*ugt es, Zahlen
+(numbers) als Folgen von Ziffern aufzufassen.
+.SH 2 "Kommentare"
+.lp
+Kommentare k\*onnen in den von Modula-2 und C gewohnten Formen
+geschrieben werden, so da\*s es m\*oglich ist, Kommentare innerhalb und
+au\*serhalb von Quelltexten in der selben Weise zu schreiben.
+.SH 2 "Quelltext"
+.lp
+Zur Darstellung von Bedingungen, Kosten, Vereinbarungen und Anweisungen
+wird Quelltext (source text) der
+Zielsprache verwendet. Der Quelltext wird in geschweifte Klammern
+eingeschlossen. Da dieser Text nicht immer direkt \*ubernommen
+werden kann, sondern zum Teil umgesetzt werden mu\*s, sind einige
+Regeln zu beachten, die es dem Generator erlauben, den Quelltext zu
+analysieren.
+.lp
+Kommentare, Zeichenketten und Bezeichner, die im Quelltext stehen,
+werden als Einheiten betrachtet, die nicht weiter untergliedert werden.
+Geschweifte Klammern d\*urfen innerhalb des Quelltextes nur paarweise
+auftreten, damit das Ende des Quelltextes erkennbar ist. Klammern
+innerhalb von Kommentaren und Zeichenketten werden hierbei
+nat\*urlich nicht mitgez\*ahlt.
+.lp
+Obwohl diese Regeln so gew\*ahlt wurden, da\*s sie beim Schreiben
+von Quelltexten m\*oglichst wenig einschr\*anken, gibt es einige
+Fehlerquellen, auf die man achten sollte.
+.lp
+So darf folgendes korrekte C-Programmfragment keinesfalls in dieser Form
+geschrieben werden.
+.(l
+.sz -2
+{ i = 3 * (*p + i); }
+.sz +2
+.)l
+Die Folge w\*are, da\*s ein (nicht geschlossener)
+Modula-2-Kommentar erkannt w\*urde. Doch kann dieses Problem leicht
+beseitigt werden, indem man ein Leerzeichen zur Trennung der Klammer
+und des Adre\*soperators benutzt.
+.(l
+.sz -2
+{ i = 3 * ( *p + i) }
+.sz +2
+.)l
+Nun kann nicht mehr f\*alschlich ein Kommentar erkannt werden.
+.lp
+Weitere Probleme k\*onnen bei Zeichenketten in C entstehen,
+da sich die Festlegung der Schreibweise von Zeichenketten an den
+Konventionen von Modula-2 orientierte.
+.(l
+.sz -2
+{ c = '\e''; }
+{ printf ("\e""; }
+.sz +2
+.)l
+Solche Eingaben f\*uhren zu Fehlermeldungen, da jeweils eine nicht
+geschlossene Zeichenkette erkannt wird.
+.SH 2 "Transformation"
+.lp
+Die Beschreibung einer Transformation (Abb. \n($1.2) besteht
+aus einer \fIBaumgrammatik\fP (grammar), zur Beschreibung
+der Struktur der zu transformierenden B\*aume und mehreren
+\fIFunktionen\fP (function), die die Abbildung beschreiben.
+Die \fIIntegration\fP des generierten Programms in eine Umgebung
+wird in einem weiteren Abschnitt (integration) beschrieben.
+.DS
+.TS
+llll.
+transformation	\(eq	\fBTRANSFORMATION\fP
+		  ident	\fIName der Transformation\fP
+		  integration	\fIIntegration\fP
+		  grammar	\fIBaumgrammatik\fP
+		  function *	\fIFunktionen\fP
+.TE
+.DE 2 "Transformation"
+Um mehrere Transformationen unterscheiden zu k\*onnen, wird jeder
+Transformation ein \fIName\fP zugeordnet.
+.SH 2 "Baumgrammatik"
+.lp
+Die Baumgrammatik wird benutzt, um die Struktur der zul\*assigen
+B\*aume zu beschreiben und bildet die Grundlage f\*ur alle
+Konsistenzpr\*ufungen (vgl. 4.1.) denen die Eingabe unterzogen wird.
+.DS
+.TS
+llll.
+grammar	\(eq	\fBGRAMMAR\fP
+		  ident	\fIName der Grammatik\fP
+		  class *	\fIBeschreibung der Klassen\fP
+.TE
+.DE 3 "Baumgrammatik"
+Der \fIName der Grammatik\fP wird in der Implementierung benutzt, um
+das Modul, das die B\*aume realisiert, zu bezeichnen. Die
+eigentliche Grammatik wird mit Hilfe der \fIKlassen\fP beschrieben.
+.SH 2 "Klassen"
+.lp
+Klassen werden durch einen Bezeichner, dem ein Gleichheitszeichen
+folgt, definiert. Zusammen mit den Klassen werden auch die Produktionen
+der Baumgrammatik festgelegt. Die Kettenproduktionen k\*onnen
+aufgrund des Oberklassenprinzips (vgl. Kapitel 4) durch die optionale
+Angabe einer
+Oberklasse beschrieben werden. Die Knotenproduktionen werden beschrieben,
+indem alle Knotenbeschreibungen bei der zugeh\*origen Klasse
+aufgez\*ahlt werden.
+.DS
+.TS
+llll.
+class	\(eq	[ ident '\(mi>' ]	\fIBezeichner der Oberklasse\fP
+		  ident '='	\fIBezeichner der Klasse\fP
+		  node *	\fIKnotenbeschreibungen\fP
+.TE
+.DE 4 "Klassen"
+.SH 2 "Knoten"
+.lp
+Die Knotenbeschreibung ordnet dem Knoten einen \fINamen\fP in Form einer
+Zeichenkette oder eines Bezeichners zu und z\*ahlt seine S\*ohne auf.
+.DS
+.TS
+llll.
+node	\(eq	'\(or' (string \(or ident)	\fIName des Knotens\fP
+		  [ ':' ident ]	\fIBezeichner des Knotens (siehe Hauptbeschreibung)\fP
+		  '(' [ son \(or\(or ',' ] ')'	\fIS\*ohne\fP
+.TE
+.DE 5 "Knoten"
+Beispiele:
+.(l I
+.ta 5 10 15 20
+.sz -2
+| '+'	: Plus	(e1: expr, e2: expr)
+| ':='	: Asgn	(index, expr)
+| While		(expr, then: stats, else: stats)
+| Const		()
+.sz +2
+.)l
+.SH 2 "S\*ohne"
+.lp
+Um den Sohn eines Knotens festzulegen, wird seine \fIKlasse\fP angegeben.
+.DS
+.TS
+llll.
+son	\(eq	[ ident ':' ]	\fIName des Sohnes (nur in der Hauptbeschreibung)\fP
+		  ident	\fIKlasse des Sohnes\fP
+.DE 6 "S\*ohne"
+.TE
+Beispiele:
+.(l I
+.sz -2
+expr
+e1: expr
+const
+.sz +2
+.)l
+.he ''%''
+.bp 1
+.he '\s-2\fRInhaltsverzeichnis\fP\s+2''%'
+.lp
+.b Inhaltsverzeichnis
+.lp
+.sp
+.xp
+.BP 28
+.SH 2 "Hauptbeschreibung" 5 12
+.lp
+Aufgrund des in Kapitel 4.1. geforderten Prinzips der
+Hauptbeschreibung, mu\*s f\*ur jeden Knoten eine Hauptbeschreibung
+existieren. Diese Hauptbeschreibung hat neben ihrer Funktion als
+Knotenproduktion der Baumgrammatik die Aufgabe, die Implementierung des
+Knotens zu beschreiben. In der Hauptbeschreibung eines Knotens
+werden deshalb der \fIBezeichner des Knotens\fP (Abb. \n($1.5) und die
+\fINamen der Klassen\fP (Abb. \n($1.6) festgelegt. Diese werden in der
+Implementierung verwendet, um auf den Knoten, dessen Attribute und
+S\*ohne zuzugreifen und die Art des Knotens festzustellen (vgl. Kapitel 9.1.).
+Falls keine explizite Festlegung erfolgt, wird der Bezeichner des Knotens
+mit seinem Namen und die Namen der S\*ohne mit den Klassen
+gleichgesetzt.
+Klassen gleichgesetzt.
+.SH 2 "Funktionen"
+.lp
+Die Funktionen beschreiben die Abbildung, die durch die Transformation
+realisiert werden soll.
+.lp
+Die Beschreibung einer \fIFunktion\fP (function) (Abb. \n($1.7)
+umfa\*st den \fINamen\fP (ident) der Funktion, die Beschreibung der
+\fIvererbten\fP und \fIsynthetisierten Attribute\fP (attributes),
+die Festlegung des \fIErgebnistyps\fP und des \fIDefinitionsbereichs\fP,
+sowie \fIVorschriften\fP (directive) zur Durchf\*uhrung der Transformation.
+.DS
+.TS
+llll.
+Function	\(eq	\fBFUNCTION\fP
+		  ident	\fIName der Funktion\fP
+		  [ attributes '\(mi>' attributes ]	\fIvererbte und synthetisierte Attribute\fP
+		  [ ':' type ]	\fIErgebnistyp\fP
+		  domain	\fIDefinitionsbereich\fP
+		  directive *	\fIVorschriften zur Beschreibung der Funktion\fP
+.TE
+.DE 7 "Funktionen"
+Die Transformation wird durchgef\*uhrt, indem die erste Funktion auf
+den zu transformierenden Baum angewandt wird. Der Definitionsbereich
+der Transformation kann deshalb mit dem Definitionsbereich der ersten
+Funktion gleichgesetzt werden.
+.lp
+Die Vollst\*andigkeit wird in der in Kapitel 8 beschriebenen Weise
+\*uberpr\*uft.
+.SH 2 "Typen"
+.lp
+Typen (Abb. \n($1.8) werden durch einen Bezeichner wie z.B.
+.ip
+\s-2\&INTEGER, REAL, BOOLEAN\s+2
+.lp
+beschrieben.
+.lp
+Um einen qualifizierten Import, wie er in Modula-2
+m\*oglich ist, zu beschreiben, kann ein weitere Bezeichner
+verwendet werden, um das Modul festzulegen.
+Damit sind auch Angaben der Form
+.ip
+\s-2\&SYSTEM.TSIZE, Sets.tSet, IO.WriteS\s+2
+.lp
+m\*oglich.
+.DS
+.TS
+llll.
+type	\(eq	[ ident '.' ]	\fIAngabe des Moduls zur Qualifikation\fP
+		  ident 	\fIBezeichner des Typs\fP
+.TE
+.DE 8 "Typen"
+.SH 2 "Attribute"
+.lp
+Die Angabe der Attribute ist optional. Einzelne Attribute werden
+durch einen Bezeichner und einen Typ beschrieben. Um mehrere Attribute
+des selben Typs zu beschreiben, werden die Bezeichner, durch Komma
+getrennt, aufgez\*ahlt. Wenn Attribute mit unterschiedlichen Typen
+beschrieben werden, sind die einzelnen Beschreibungen durch
+Strichpunkte zu trennen.
+.DS
+.TS
+llll.
+attributes	\(eq	[ ( (ident \(or\(or ','	\fIListe von Bezeichnern\fP
+		  ':' type)	\fIAngabe des Typs\fP
+		  \(or\(or ';' ) ]	\fI mehrere solche Listen durch ';' getrennt\fP
+.TE
+.DE 9 "Attribute"
+.lp
+Beispiel:
+.ip
+\s-2\&A: INTEGER; B,C: REAL\s+2
+.SH 2 "Definitionbereich"
+.lp
+Der \fIDefinitionsbereich\fP (domain) einer Funktion wird
+festgelegt, indem die \fIKlassen\fP (ident), f\*ur die die Funktion
+definiert ist, aufgez\*ahlt werden.
+.DS
+.TS
+llll.
+domain	\(eq	'/' ident \(or\(or ',' '/'	\fIListe von Klassen\fP
+.TE
+.DE 10 "Definitionsbereich"
+Beispiel:
+.(l I
+.sz -2
+/ stats, expr /
+.sz +2
+.)l
+Der Definitionsbereich der ersten Funktion legt au\*serdem die
+Startsymbole fest und bildet somit die Basis f\*ur die
+\*Uberpr\*ufung der Reduziertheit der Grammatik (vgl. 4.1.).
+.SH 2 "Vorschriften"
+.lp
+Die \fIVorschriften\fP (directive), die die Abbildungen im einzelnen
+beschreiben, bestehen im einfachsten Falle aus einem \fIMuster\fP
+(pattern), das festlegt, auf welche (Teil-) B\*aume die Vorschrift
+angewandt werden kann und \fIAnweisungen\fP (instructions), die
+festlegen, wie der betreffende (Teil-) Baum behandelt werden mu\*s.
+.DS
+.TS
+llll.
+directive	\(eq	pattern	\fIMuster\fP
+		  [ condition ]	\fIBedingung\fP
+		  [ costs ]	\fIKosten\fP
+		  [ declarations ]	\fIlokale Vereinbarungen\fP
+		  instructions	\fIAnweisungen\fP
+.TE
+.DE 11 "Vorschriften"
+.SH 2 "Muster"
+.lp
+Das Muster beschreibt einen Ausschnitt des Baumes, der in den
+Anweisungen bearbeitet wird. Mit Hilfe der Selektoren kann in den
+Vorschriften auf die entsprechenden Knoten des Strukturbaumes
+zugegriffen werden. Die Selektoren
+werden, falls sie nicht explizit angegeben sind, aus den Namen der
+Knoten bzw. Klassen abgeleitet. Falls es hierbei zu Mehrdeutigkeit
+kommt, liegt ein Fehler vor. Die automatische Erzeugung eines
+Selektors wird unterdr\*uckt, wenn ein Doppelpunkt angegeben wird,
+dem kein Bezeichner vorangestellt ist. Wenn auf spe\%zielle Knoten in den
+Anweisungen nicht zugegriffen werden mu\*s, k\*onnen durch die
+Unterdr\*uckung Mehrdeutigkeiten vermieden werden.
+.DS
+.TS
+llll.
+pattern	\(eq	[ [ ident ] ':' ]	\fISelektor\fP
+		  (ident \(or string)	\fIName des Knotens\fP
+		  '(' [ pattern \(or\(or ',' ] ')'	\fIS\*ohne\fP
+	\(or	[ ident ] ':'	\fISelektor\fP
+		  [ ident ]	\fIBezeichner der Klasse\fP
+	\(or	ident	\fISelektor und Bezeichner der Klasse\fP
+.TE
+.DE 12 "Muster"
+Beispiele:
+.(l I
+.sz -2
+\&'+' (e1:, e2:)
+\&':=' (index, expr)
+If (expr, then:, else:)
+:'+' (:'+' (e1: const, e2: const), e3:)
+expr
+const
+.sz +2
+.)l
+.SH 2 "Anweisungen"
+.DS
+.TS
+llll.
+instructions	\(eq	'{' source_text '}'
+.TE
+.DE 13 "Anweisungen"
+.lp
+Die \fIAnweisungen\fP (instructions) sind der Kern jeder Vorschrift,
+sie werden vom Transformator ausgef\*uhrt, wenn die Vorschrift
+angewandt wird.
+.lp
+Zum Zugriff auf den durch das Muster beschriebenen Teil des Baumes
+k\*onnen die Selektoren des Musters verwendet werden, wobei zwei
+F\*alle zu unterscheiden sind. Folgt dem Selektor ein Punkt, wird
+ein Zugriff auf ein Attribut angenommen und der Selektor wird
+automatisch durch den Zugriff auf den entsprechenden Knoten im Baum
+ersetzt. Folgt kein Punkt, wird der Selektor durch einen Zeiger auf den
+Baum ersetzt.
+.lp
+Bei Funktionsaufrufen innerhalb der Vorschrift sollte das erste
+Argument, das den zu transformierenden Baum beschreibt, normalerweise
+eine Selektor sein, da nur dann vom Ge\%ne\%ra\%tor gepr\*uft werden
+kann, ob das
+Argument im Definitionsbereich liegt. Da es jedoch in speziellen F\*allen
+zweckm\*a\*sig ist, einen Baum zu transformieren, der durch ein
+vererbtes Attribut beschrieben wird, wird es auch akzeptiert, wenn der zu
+transformierende Baum auf andere Weise spezifiziert wird.
+.SH 2 "Bedingungen"
+.lp
+Um die Anwendbarkeit einer Vorschrift einzuschr\*anken, kann eine
+\fIBedingung\fP (condition) an die Attribute gestellt werden.
+Eine Bedingung wird durch eine booleschen Ausdruck in Form von
+Quelltext beschrieben.
+.lp
+Selektoren k\*onnen in den Bedingungen ebenfalls verwendet werden.
+.lp
+Der Aufruf von Funktionen und Prozeduren ist in Bedingungen
+prinzipiell m\*oglich,
+die verwendeten Funktionen sollten jedoch keine Seiteneffekte
+haben, da die Reihenfolge, in der die Bedingungen getestet werden
+nicht festgelegt ist. Au\*serdem darf keine Funktion f\*ur die
+Wurzel des Musters aufgerufen werden, da die Vorschrift die hierzu
+ben\*otigt wird, von eben dieser Bedingung abh\*angen k\*onnte.
+.DS
+.TS
+llll.
+condition	\(eq	\fBCONDITION\fP
+		  '{' source_text '}'	\fIAusdruck zur Berechnung der Bedingung\fP
+.TE
+.DE 14 "Bedingungen"
+Beispiel:
+.(l I
+.ta 5 10 15 20 25 30 35 40 45
+.sz -2
+\&'*' (expr, const)	\fBCONDITION\fP	{ IsPowerOf2 (const.value) }
+		{
+		...
+		}
+.sz +2
+.)l
+.SH 2 "Kosten"
+.lp
+Um die \fIKosten\fP, die bei Anwendung eine Vorschrift entstehen,
+zu beschreiben, gibt es zwei M\*oglichkeiten.
+Die Kosten werden entweder durch eine Konstante (number) festgelegt
+oder es wird ein Ausdruck (source text) angegeben, die die Kosten
+f\*ur den gesamten durch das Muster abgedeckten Baum berechnen.
+Im ersten Fall werden die Kosten, die durch Funktionsaufrufe innerhalb
+der Vorschriften verursacht werden, automatisch mit einfacher
+Gewichtung ber\*ucksichtigt.
+Im zweiten Fall ist dies Aufgabe des Anwenders.
+.DS
+.TS
+llll.
+costs	\(eq	\fBCOSTS\fP
+		  (number	\fIBeschreibung der Kosten durch eine Konstante\fP
+		  \(or '{' source_text '}')	\fIAusdruck zur Berechnung der Kosten\fP
+.TE
+.DE 15 "Kosten"
+Um diese Kosten zu ber\*ucksichtigen, stehen dem Anwender Prozeduren zur
+Verf\*ugung, die die Kosten f\*ur eine bestimmte Funktion liefern. Die
+Namen dieser Prozeduren setzen sich aus dem Wort 'Cost' und dem Name
+der betreffenden Funktion zusammen. Als einziges Argument wird der
+Selektor des betreffenden Teilbaums erwartet.
+.lp
+Beispiel:
+.(l I
+.sz -2
+\&'+' (e1: expr, e2:expr)	\fBCOSTS\fP	{ 1 + 2 * CostF (e1) + CostF (e2) }
+					{
+					...  F (e1); ...  F (e2); ...
+					}
+.sz +2
+.)l
+Falls die Kosten nicht explizit angegeben werden, wird \fICOSTS 1\fP
+angenommen.
+.SH 2 "Vereinbarungen"
+.lp
+Die \fIVereinbarungen\fP (declarations) sind lokal d.h. nur f\*ur die
+Anweisungen einer Vorschrift sichtbar.
+Sie k\*onnen z.B. benutzt werden, um Variablen zu vereinbaren, die nur
+in den Anweisungen einer Vorschrift ben\*otigt werden.
+.DS
+.TS
+llll.
+declarations	\(eq	\fBDECLARE\fP '{' source_text '}'
+.TE
+.DE 16 "Vereinbarungen"
+Beispiel:
+.(l I
+.sz -2
+\fBDECLARE\fP	{
+VAR I,J: INTEGER;
+.sz +2
+}
+.)l
+.SH 2 "Integration"
+.lp
+Die optionalen EXPORT-, LOCAL-, BEGIN- und CLOSE-Abschnitte 
+werden verwendet, um das generierte Programm in die Umgebung zu
+integrieren. Der Quelltext im EXPORT-Abschnitt dient zur
+Vereinbarung globaler Daten, die auch au\*serhalb des generierten
+Programms sichtbar sein sollen. Der GLOBAL-Abschnitt enth\*alt von
+au\*sen nicht sichtbare globale Vereinbarungen. Die Anweisungen im
+BEGIN-Abschnitt werden vor der Transformation ausgef\*uhrt, die im
+CLOSE-Abschnitt danach. Der Zweck der beiden letzten Abschnitte
+besteht darin, globale Daten zu initialisieren, bevor eine
+Transformation durchgef\*uhrt wird, sowie Abschlu\*sarbeiten (z.B.
+Speicherbereinigung oder Schlie\*sen von Dateien) durchzuf\*uhren,
+nachdem die Transformation abgeschlossen ist.
+.DS
+.TS
+llll.
+
+integration	\(eq	[ \fBEXPORT\fP '{' source_text '}' ]	\fI\*offentliche Vereinbarungen\fP
+		[ \fBGLOBAL\fP '{' source_text '}' ]	\fIglobale Vereinbarungen\fP
+		[ \fBBEGIN\fP '{' source_text '}' ]	\fIAnweisungen zur Initialisierung\fP
+		[ \fBCLOSE\fP '{' source_text '}' ]	\fIAnweisungen zum Abschlu\*s\fP
+.TE
+.DE 17 "Integration"
+.BP
+.SH 1 "Implementierung von Transformationen durch ESTRA"
+.lp
+Im folgenden werden die Struktur von mit ESTRA erzeugten Transformatoren
+und deren wesentliche Eigenschaften beschrieben. Es kann jedoch nicht
+Aufgabe diese Kapitels sein, s\*amtliche Details der erzeugten
+Implementierungen zu besprechen. Diese Details kann der interessierte
+Leser im Anhang B.2 finden. Das Beispiel im Anhang ist \*uberdies
+geeignet, die folgenden Ausf\*uhrungen zu erg\*anzen.
+.lp
+Mit ESTRA generierte Transformatoren f\*uhren die Transformation in
+zwei Schritten durch. Im ersten Schritt (Vorbereitung) wird festgelegt, welche
+Vorschriften zur Transformation des speziellen Baumes im einzelnen
+anzuwenden sind. Im zweiten Schritt (Durchf\*uhrung) werden diese
+Vorschriften angewandt.
+.lp
+Zur Vorbereitung der Transformation werden in jedem Knoten des Baumes
+die Vorschriften mit den geringsten Kosten f\*ur die Durchf\*uhrung
+einer Funktion festgehalten. Um diese Vorschriften zu ermitteln, ist es
+notwendig, f\*ur jede Vorschrift zu pr\*ufen, ob das Muster auf den
+Knoten pa\*st und die Bedingung (sofern vorhanden) erf\*ullt ist.
+Dann mu\*s f\*ur jede Funktion von den verbliebenen Vorschriften
+diejenige mit den geringsten Kosten im Knoten festgehalten werden.
+.lp
+Da die Kosten f\*ur die Anwendung einer Vorschrift im allgemeinen
+von den Kosten der S\*ohne (bzw. 'Nachkommen') des Knotens
+abh\*angig sind, mu\*s diese Berechnung in einem Bottom-Up-Durchlauf
+durch den Baum erfolgen.
+.lp
+Die Durchf\*uhrung der Transformation erfolgt durch Anwendung der
+ersten Funktion auf die Wurzel, d.h. die Vorschrift, die in der Wurzel
+f\*ur diese Funktion festgehalten wurde, wird ausgef\*uhrt.
+Funk\%tions\%aufrufe f\*ur Teilb\*aume, die bei der Abarbeitung
+einer Vorschrift anfallen, werden rekursiv abgearbeitet.
+.SH 2 "Vorbereitung der Transformation"
+.lp
+Bevor die Transformation in der obengenannten Weise durchgef\*uhrt
+werden kann, mu\*s sie durch die Festlegung der L\*osung mit
+minimalen Kosten vorbereitet werden.
+.lp
+Die Vorbereitung entspricht einer S-Attributierung, bei der f\*ur jeden
+Knoten die folgenden Attribute berechnet werden:
+.np
+die Menge der Klassen, zu denen der Knoten geh\*ort
+.np
+die Vorschriften, die auf den Knoten (genauer dessen Teilbaum)
+anwendbar sind
+.np
+f\*ur jede Funktion die Vorschrift, die diese mit den geringsten
+Kosten realisiert und die hierbei entstehenden Kosten
+.lp
+Die rekursive Prozedur yyTraverse, die diese Attribute berechnet, hat
+folgenden Aufbau:
+.np
+Beschaffung von Speicher f\*ur die Attribute
+.np
+Prozeduraufrufe zur Berechnung der Attribute der S\*ohne
+des Knotens
+.np
+Berechnung der Klassen des aktuellen Teilbaums
+.np
+Berechnung der zul\*assigen Vorschriften
+.np
+Berechnung der kosteng\*unstigsten Vorschrift f\*ur die einzelnen
+Funktionen
+.SH 2 "Darstellung von Funktionen und Vorschriften"
+.lp
+In Modula-2\*([<\*([[Wir85\*(]]\*(>] werden sowohl die Funktionen als auch die Vorschriften
+(genauer die Vereinbarungen und Anweisungen der Vorschriften) als
+Prozeduren realisiert. Die Prozeduren, die den Funktionen entsprechen,
+w\*ahlen hierbei lediglich die Vorschrift aus und rufen die
+entsprechende Prozedur auf. Das bedeutet, da\*s bei der
+Durchf\*uhrung einer Transformation f\*ur jede Anwendung einer
+Vorschrift zwei Prozeduraufrufe notwendig sind. Besser w\*are es,
+wenn man mit je einem Aufruf ausk\*ame.
+.lp
+Um dies zu erreichen gibt es zwei M\*oglichkeiten. Entweder man spart
+die Prozeduren der Funktionen, d.h. die Auswahl der Vorschrift wird an
+den Ort des Funk\%tions\%aufrufs verschoben, oder man spart die Prozeduren
+f\*ur die Vorschriften, d.h. alle Vorschriften einer Funktion werden
+in die Prozedur der Funktion eingebettet.
+.lp
+Die Information, welche Vorschriften im einzelnen anzuwenden sind,
+wird nicht unmittelbar in den Knoten gespeichert. Es ist vielmehr so,
+da\*s dort lediglich eine Adresse zu finden ist, die einen Verweis
+auf diese Information darstellt (vgl. Kapitel 9).
+Infolgedessen ist vor dem Zugriff auf diese Information eine
+Typwandlung, die die Adresse in den erforderlichen Zeigertyp wandelt,
+notwendig.
+.lp
+Um aber in Modula-2 eine Adresse in einen Zeiger umzuwandeln und auf
+die zugeh\*orige Information \*uber diesen Zeiger zuzugreifen, ist eine
+Zuweisung erforderlich. Dies bedeutet, da\*s beim Verschieben der
+Auswahl an den Ort des Funk\%tions\%aufrufs f\*ur jeden Aufruf eine
+zus\*atzliche Anweisung, eben diese Zuweisung, erforderlich ist. Da der
+Aufwand, diese Anweisung in die vom Anwender vorgegebenen Anweisungen
+einzuf\*ugen, recht gro\*s w\*are, wurde diese M\*oglichkeit
+verworfen.
+.lp
+Die zweite M\*oglichkeit, die darin besteht, alle Vorschriften einer
+Funktion in eine Prozedur zu packen, scheitert in Modula-2 daran, da\*s die
+lokalen Vereinbarungen, die zu den einzelnen Vorschriften geh\*oren,
+in der Regel nicht in einer Prozedur untergebracht werden k\*onnen, da es
+sonst zu Namenskonflikten zwischen diesen Vereinbarungen kommt.
+.lp
+In der Programmiersprache C\*([<\*([[KeR83\*(]]\*(>] sind hingegen
+beide L\*osung realisierbar, da weder die Typwandlung (type cast)
+noch die Vereinbarung von lokalen Daten (innerhalb von Bl\*ocken)
+Probleme darstellen. Da bei der zweiten L\*osung insgesamt weniger
+Funktionen (die Unterprogramme in C werden als Funktionen bezeichnet)
+ben\*otigt werden und bei dieser L\*osung au\*serdem weniger
+Aufwand beim Umsetzen der Anweisungen der einzelnen Vorschriften
+erforderlich ist, ist diese bei der Verwendung von C vorzuziehen.
+.SH 2 "Darstellung der Attribute"
+.lp
+Die Klassen des aktuellen Teilbaums werden als Menge dargestellt und
+in Modula-2 als ARRAY OF BITSET realisiert. Zur Darstellung der
+einzelnen Klassen werden diese durch\%numeriert.
+Die zul\*assigen Vorschriften werden durch ein boolesches Feld
+realisiert.
+Die kosteng\*unstigste Vorschrift jeder Funktion wird durch den Wert
+einer Prozedur-Variablen und die zugeh\*origen Kosten durch einen INTEGER-Wert
+dargestellt.
+.lp
+Mit Ausnahme der zul\*assigen Vorschriften werden alle Attribute im
+Knoten abgespeichert. Bei den zul\*assigen Vorschriften ist dies
+nicht notwendig, da diese nur solange ben\*otigt werden, bis die
+kosteng\*unstigsten Vorschriften feststehen. Lokale Variablen der
+Prozedur yyTraverse w\*urden deshalb zu Realisierung vollkommen
+ausreichen.
+.lp
+Da aber au\*serdem der Zeitraum von Berechnung bis Auswertung
+der zul\*assigen Vorschriften f\*ur verschiedene Knoten v\*ollig
+disjunkt ist, gen\*ugt sogar ein einziges globales Feld zur Darstellung.
+.SH 2 "Speicherverwaltung"
+.lp
+Da Gr\*o\*se und Struktur der Daten, die zur Vorbereitung der
+Transformation ben\*otigt werden, bei der Implementierung des Baumes
+i.a. nicht bekannt sind, wird im Baum lediglich Platz f\*ur eine
+Adresse reserviert. Bei der Vorbereitung der Transformation wird dann
+f\*ur jeden Knoten dynamischer Speicher beschafft, um die Attribute
+abzuspeichern. Der Zeiger auf den dynamischen Speicher wird im Knoten
+abgelegt, soda\*s \*uber die Knoten jederzeit auf die Attribute
+zugegriffen werden kann.
+.lp
+Da diese Attribute nach Durchf\*uhrung der Transformation nicht mehr
+ben\*otigt werden, sollte der belegte Speicher wieder freigegeben
+werden. Um dies effizient durchzuf\*uhren, enth\*alt der generierte
+Transformator eine eigene Speicherverwaltung, die nach dem
+Haldenprinzip arbeitet. Die Speicherverwaltung beschafft den
+Speicher in gr\*o\*seren Einheiten vom System und vergibt ihn im
+ben\*otigten Umfang. Nach der Transformation wird der Speicher
+schlie\*slich in den gro\*sen Einheiten, die bereits bei der
+Beschaffung linear verkettet wurden, wieder freigegeben.
+.lp
+Durch diese Methode wird zweierlei erreicht. Zum einen kann die
+Speicherfreigabe sehr schnell durchgef\*uhrt werden, da kein
+aufwendiger Durchlauf durch den Baum notwendig ist, wie er
+entst\*unde, wenn der vergebene Speicher nur \*uber
+die Knoten zu erreichen w\*are. Au\*serdem wird vermieden, da\*s
+der Speicher durch die Verwendung in kleine, kaum wiederverwendbare
+St\*ucke zerf\*allt.
+.SH 2 "Berechnung der Klassen"
+.lp
+Grundlage zur Berechnung der Klassen des aktuellen Teilbaums sind die
+Knotenbeschreibungen. Da die Berechnung abh\*angig vom aktuellen
+Knoten durchgef\*uhrt wird, gen\*ugt es hierbei, die
+Knotenbeschreibungen zu betrachten, die zum aktuellen Knoten passen.
+.lp
+Falls alle S\*ohne eines Knotens zu den jeweiligen Klassen aus
+der Knotenbeschreibung passen, pa\*st auch der
+aktuelle Teilbaum zu dieser Knotenbeschreibung. Folglich pa\*st
+auch die Klasse auf der linken Seite der zugeh\*origen
+Knotenproduktion.
+.lp
+Da mit einer Klasse immer auch deren Oberklasse auf einen Teilbaum
+pa\*st, wird hier nicht nur diese Klasse, sondern auch deren transitive
+H\*ulle bez\*uglich der Oberklassenrelation erkannt.
+.lp
+Da die Hauptbeschreibung eines Knotens immer auf diesen Knoten
+passen mu\*s, wird deren transitive H\*ulle immer in die Klassen
+des aktuellen Teilbaumes aufgenommen. Beim Erkennen einer
+Knotenbeschreibung k\*onnen diese deshalb vernachl\*assigt werden,
+da sie ja ohnehin erkannt werden.
+.SH 2 "Berechnung der zul\*assigen Vorschriften"
+.lp
+Um die zul\*assigen Vorschriften festzulegen, werden die Muster der
+Vorschriften, mit dem Teilbaum verglichen. Zu diesem Zweck werden alle
+Muster betrachtet, die mit dem aktuellen Knoten vertr\*aglich sind.
+Es werden als nur solche Muster untersucht, die mit dem aktuellen
+Knoten beginnen, oder einer Klasse darstellen, aus der der aktuelle
+Knoten ableitbar ist.
+.lp
+Um festzustellen, ob ein Muster mit dem
+aktuellen Teilbaum \*ubereinstimmt, wird jeder Knoten und jede Klasse
+des Muster mit dem aktuellen Teilbaum verglichen. Falls es sich bei
+der Wurzel eines Musters um einen Knoten handelt, mu\*s dieser nicht
+\*uberpr\*uft werden, da seine \*Ubereinstimmung bereits durch die
+Auswahl der Muster gegeben ist. Ebenso ist es nicht erforderlich,
+Klassen im Muster zu \*uberpr\*ufen, die bei einer Normierung des Musters
+entfallen, da diese immer vorliegen, wenn der Baum der gegebenen
+Grammatik gen\*ugt.
+.lp
+Bei \*Ubereinstimmung des Musters mit dem
+Teilbaum und Zutreffen der eventuell vorhandenen Bedingung wird
+die Vorschrift festgehalten.
+.SH 2 "Berechnung der kosteng\*unstigsten Vorschriften"
+.lp
+Zur Festlegung der kosteng\*unstigsten Vorschrift werden die Kosten
+aller anwendbaren Vorschriften bestimmt. Ergeben sich dabei
+f\*ur eine Funktion geringere Kosten als sie zuvor vorlagen, werden die
+betreffende Funktion und diese Kosten festgehalten. Da die Kosten
+einer Vorschrift von den Kosten einer Funktion f\*ur den selben
+Knoten abh\*angen k\*onnen, gen\*ugt es i.a. jedoch nicht,
+f\*ur jede Vorschrift einmal die Kosten zu berechnen. Die einfachste
+Vorgehensweise besteht darin, die Berechnung der Kosten f\*ur
+alle Vorschriften solange zu wiederholen, bis sich keine Verbesserungen
+der Kosten mehr ergeben. Da dieses Verfahren zu sehr vielen unn\*otigen
+Berechnungen f\*uhren mu\*s, wird eine Optimierung durchgef\*uhrt,
+die in den meisten praktischen F\*allen mit einem Durchlauf auskommt.
+.lp
+Offensichtlich ist eine Wiederholung der Berechnung, wenn \*uberhaupt
+dann nur f\*ur solche Vorschriften erforderlich, deren Kosten von den
+Kosten einer anderen Funktion f\*ur den aktuellen Knoten abh\*angen.
+Die Vorschriften werden deshalb gem\*a\*s diesem Kriterium in zwei
+Gruppen gegliedert. Die
+eine Gruppe (und die umfa\*st in der Praxis alle oder zumindest die
+meisten Vorschriften) mu\*s nur einmal abgearbeitet werden. Die
+\*ubrigen Vorschriften werden (sofern mindestens zwei verbleiben)
+wiederholt abgearbeitet, bis sich bei einem Durch\%lauf keine
+Verbesserung ergibt.
+.BP
+.SH 1 "Bottom-Up Pattern-Matching mit einem Baumautomaten"
+.lp
+Bei dem in Kapitel 6 vorgestellten Verfahren zum Festlegen der
+auf einen Teilbaum anwendbaren Vorschriften wird
+jedes Muster getrennt betrachtet. Das
+hat zur Folge, da\*s der Aufwand f\*ur diesen Schritt mit Zahl
+und Gr\*o\*se der zu untersuchenden Muster zunimmt.
+Beim sogenannten Bottom-Up Pattern-Matching mit einem Baumautomaten
+\*([[HoO82\*(]] wird dies vermieden.
+.lp
+Bei diesem Verfahren werden zum Zeitpunkt der Generierung alle Mengen
+von Mustern be\%stimmt, die f\*ur das Pattern-Matching von Bedeutung sind.
+Diese Mengen bilden den Zu\%stands\%raum des Baumautomaten. Das Pattern-Matching
+erfolgt dann, indem f\*ur jeden Knoten des Baumes der Zustand berechnet wird,
+der die Menge von Mustern darstellt, welche auf den zugeh\*origen
+Teilbaum passen.
+Aus diesem Zustand l\*a\*st sich unmittelbar ablesen, welche
+Vorschriften aufgrund ihrer Muster in Frage kommen.
+Eventuell vorhandene Bedingungen m\*ussen weiterhin 
+gesondert \*uberpr\*uft werden.
+.SH 2 "Relevante Muster"
+.lp
+Bevor der Zustandsraum bestimmt werden kann, m\*ussen die relevanten
+Muster, d.h. die Muster, die f\*ur das Bottom-Up Pattern-Matching
+von Bedeutung sind, festgelegt werden. Grundlage f\*ur die
+Bestimmung der relevanten Muster sind die normierten Muster der
+gegebenen Vorschriften.
+.lp
+F\*ur eine gegebene Menge P\*<N\*> normierter Muster ist die Menge
+relevanter Muster die kleinste Menge P\*<R\*> mit den Eigenschaften:
+.np
+P\*<N\*> \(ib P\*<R\*>
+.br
+Die vorgegeben normierten Muster sind relevant.
+.np
+n (p\*<1\*>, ..., p\*<m\*>) \(mo P\*<R\*>
+\(RA p\*<1\*> \(mo  P\*<R\*>, ..., p\*<m\*> \(mo  P\*<R\*>
+.br
+Wenn ein Muster relevant ist, sind auch alle seine
+Teilmuster relevant.
+.np
+c \(mo P\*<R\*>, c \(-> n (p\*<1\*>, ..., p\*<m\*>)
+\(RA Normalize (n (p\*<1\*>, ..., p\*<m\*>)) \(mo P\*<R\*>
+.br
+Ist ein einer Klasse entsprechendes Muster relevant, dann ist auch jedes
+normierte Muster einer aus dieser Klasse ableitbaren Knotenbeschreibung
+relevant.
+.lp
+Durch (1) wird sichergestellt, da\*s die vorgegebenen Muster, die beim
+Pattern-Matching erkannt werden sollen, in der Menge P\*<R\*> enthalten
+sind. Mit (2) wird daf\*ur gesorgt, da\*s auch die Teilmuster,
+die zum Erkennen eines Musters beitragen, in P\*<R\*> enthalten sind.
+Da die Klassen zwar in den Mustern, nicht aber im realen Baum
+vorkommen, m\*ussen die normierten Muster aller Knotenbeschreibungen,
+die einer in P\*<R\*> enthaltenen Klasse entsprechen, ebenfalls in
+P\*<R\*> liegen (3), damit die Klassen anhand dieser Muster erkannt
+werden k\*onnen.
+.lp
+Abb. \n($1.1 zeigt die relevanten Muster, die entstehen, wenn
+wir die Mustern '+' (const, const) und '+' (expr, expr) zugrunde
+legen.
+.DS 
+.ta 1.5c 3c 6c
+P\*<N\*> = { p\*<0\*>, p\*<1\*> }
+P\*<R\*> = { p\*<0\*>, p\*<1\*>, p\*<2\*>, p\*<3\*> }
+
+mit:
+p\*<0\*> =	'+'	(const, const)
+p\*<1\*> =	'+'	(:, :)	\fINormierung von '+' (expr, expr)\fP
+p\*<2\*> =	const		\fITeilmuster von p\*<0\*>\fP
+p\*<3\*> =	Const	()	\fIBeschreibung eines Knotens der Klasse const\fP
+.DE 1 "relevante Muster"
+.SH 2 "Zust\*ande"
+.lp
+Zur Beschreibung der Zust\*ande Q des Baumautomaten k\*onnte die
+Menge 2\u\s-2P\d\s-2R\s+2\u\s+2\d verwendet werden.
+Tats\*achlich k\*onnen jedoch nicht alle Teilmengen von P\*<R\*> als
+Zust\*ande vorkommen, da alle Zust\*ande notwendigerweise die folgenden
+Bedingungen erf\*ullen m\*ussen.
+.np
+p\*<1\*>, p\*<2\*> \(mo q \(RA \(no p\*<1\*>\(or\(orp\*<2\*>
+.np
+p\*<1\*> \(mo P\*<R\*>, p\*<2\*> \(mo q, p\*<1\*><p\*<2\*>
+\(RA p\*<1\*> \(mo q
+.lp
+Die Bedingungen resultieren daraus, das jeder Zustand einen realen
+Baum beschreiben mu\*s. Es ist deshalb nicht m\*oglich, da\*s ein
+Zustand zwei sich widersprechende Muster enth\*alt (1). Au\*serdem
+mu\*s mit dem gr\*o\*seren Muster p\*<2\*> immer auch das kleinere
+Muster p\*<1\*> in q liegen.
+.lp
+In unserem Beispiel erf\*ullen nur sechs der 16 Mengen diese
+Eigenschaften (Abb. \n($1.2). Die \*ubrigen scheiden aus (Abb. \n($1.3).
+.DS
+Q = { q\*<0\*>, q\*<1\*>, q\*<2\*>, q\*<3\*>, q\*<4\*>, q\*<5\*> }
+
+mit:
+q\*<0\*> =	{ p\*<0\*>, p\*<1\*>, p\*<2\*> }
+q\*<1\*> =	{ p\*<1\*>, p\*<2\*> } 
+q\*<2\*> =	{ p\*<1\*> } 
+q\*<3\*> =	{ p\*<2\*>, p\*<3\*> }
+q\*<4\*> =	{ p\*<2\*> }
+q\*<5\*> =	{ } 
+.DE 2 "Zust\*ande des Baumautomaten"
+Da\*s die angegebenen Bedingungen nicht hinreichend sind,
+zeigt sich an unserem Beispiel. Auf Grund der Grammatik (Abb. 7.1.) mu\*s
+immer, wenn die Muster p\*<1\*> und p\*<2\*> passen, auch p\*<0\*> passen. Damit
+scheidet der Zustand q\*<1\*>, der nur aus p\*<1\*> und p\*<2\*> besteht, aus. Der Zustand
+q\*<4\*> kann ebenfalls nie auftreten, da p\*<2\*> nur passen kann, wenn
+auch p\*<1\*> oder p\*<3\*> pa\*st.
+.DS
+.ta 4c
+{ p\*<0\*>, p\*<1\*>, p\*<2\*>, p\*<3\*> }	nicht relevant da: p\*<0\*> \(or\(or p\*<3\*>
+{ p\*<0\*>, p\*<1\*>, p\*<3\*> }	nicht relevant da: p\*<0\*> \(or\(or p\*<3\*>
+{ p\*<0\*>, p\*<1\*> }	nicht relevant da: p\*<2\*> < p\*<0\*>
+{ p\*<0\*>, p\*<2\*>, p\*<3\*> }	nicht relevant da: p\*<0\*> \(or\(or p\*<3\*>
+{ p\*<0\*>, p\*<2\*> }	nicht relevant da: p\*<1\*> < p\*<0\*>
+{ p\*<0\*>, p\*<3\*> }	nicht relevant da: p\*<2\*> < p\*<0\*>
+{ p\*<0\*> }	nicht relevant da: p\*<1\*> < p\*<0\*>
+{ p\*<1\*>, p\*<2\*>, p\*<3\*> }	nicht relevant da: p\*<1\*> \(or\(or p\*<3\*>
+{ p\*<1\*>, p\*<3\*> }	nicht relevant da: p\*<1\*> \(or\(or p\*<3\*>
+{ p\*<3\*> }	nicht relevant da: p\*<1\*> < p\*<3\*>
+.DE 3 "nicht relevante Mengen von Mustern"
+Ein Ansatz zur Beseitigung dieses Mangel wird in Kapitel \n($1.7
+gegeben.
+.lp
+In der Hauptbeschreibung eines Knotens ist f\*ur jeden Sohn eine
+Klasse festgelegt. F\*ur jeden Sohn sind deshalb nur die Zust\*ande
+relevant, die ausschlie\*slich Muster enthalten, die aus dieser Klasse
+abgeleitet werden k\*onnen.
+.lp
+Jeder Klasse c wird deshalb die Menge der f\*ur diese Klasse
+relevanten Muster P\*<c\*> und der f\*ur diese Klasse relevante
+Zust\*ande Q\*<c\*> zugeordnet.
+.ip
+P\*<c\*> := { p \(mo P\*<R\*> \(|? p < c \(bo p = c }
+.br
+Q\*<c\*> := { q \(mo Q \(|? q \(ib P\*<c\*> }
+.lp
+Ebenso wie den Klassen kann man auch jedem Knoten n die Menge der f\*ur
+diesen Knoten relevanten Muster P\*<n\*> und die f\*ur diesen Knoten
+relevanten Zust\*ande Q\*<n\*> zuordnen.
+.ip
+P\*<n\*> := { p \(mo P\*<R\*> \(|? p < n \(bo p = n }
+.br
+Q\*<n\*> := { q \(mo Q \(|? q \(ib P\*<n\*> }
+.SH 2 "Zustands\*ubergangsfunktionen"
+.lp
+Um das Bottom-Up Pattern-Matching durchzuf\*uhren, wird f\*ur jeden
+Knoten n eine Zustands\*ubergangsfunktion f\*<n\*> ben\*otigt.
+Die Stelligkeit von f\*<n\*> entspricht der Wertigkeit m des Knotens n.
+.ip
+f\*<n\*>: Q\d\s-2\&c\d\s-2\&1\s+2\u\s+2\u \(mu ... \(mu
+Q\d\s-2\&c\d\s-2\&m\s+2\u\s+2\u \(mt Q\*<n\*> 
+.lp
+Die Funktion f\*<n\*> bestimmt aufgrund der Zust\*ande q\*<1\*>, ...,
+q\*<m\*> der S\*ohne eines Knotens n den Zustand f\*ur diesen Knoten.
+.lp
+Um f\*ur gegebene Zust\*ande q\*<1\*>, ..., q\*<m\*>, q = f\*<n\*> (q\*<1\*>,
+\&..., q\*<m\*>) festzulegen, wird so vorgegangen, da\*s f\*ur alle
+Muster p \(mo P\*<n\*> gepr\*uft wird, ob sie in q enthalten sein m\*ussen. 
+.np
+n (p\*<1\*>, ..., p\*<m\*>) \(mo P\*<n\*>,
+p\*<1\*> \(mo q\*<1\*>, ..., p\*<m\*> \(mo q\*<m\*>
+\(RA n (p\*<1\*>, ..., p\*<m\*>) \(mo q
+.np
+c \(-> n (c\*<1\*>, ..., c\*<m\*>),
+Normalize (n (c\*<1\*>, ..., c\*<m\*>)) \(mo q \(RA c \(mo q
+.np
+c \(-> n (c\*<1\*>, ..., c\*<m\*>),
+Normalize (n (c\*<1\*>, ..., c\*<m\*>)) \(eq c \(RA
+c \(mo q
+.lp
+Ein Muster das mit einem Knoten beginnt liegt in q, wenn alle
+Teilmuster p\*<i\*> bereits im entsprechenden Zustand q\*<i\*> liegen (1).
+Das Muster einer Klasse liegt in q falls, eine Knotenbeschreibung dieser Klasse in
+normierter Form bereits in q enthalten ist (2), oder diese normierte
+Form mit der Klasse \*ubereinstimmt (3).
+.lp
+F\*ur unser Beispiel ergeben sich damit folgenden \*Ubergangsfunktionen.
+.DS
+.TS
+lll.
+f\*<'+'\*> (q\*<0\*>, q\*<0\*>) = q\*<0\*>	f\*<'+'\*> (q\*<0\*>, q\*<1\*>) = q\*<0\*>	f\*<'+'\*> (q\*<0\*>, q\*<2\*>) = q\*<2\*>
+f\*<'+'\*> (q\*<0\*>, q\*<3\*>) = q\*<0\*>	f\*<'+'\*> (q\*<0\*>, q\*<4\*>) = q\*<0\*>	f\*<'+'\*> (q\*<0\*>, q\*<5\*>) = q\*<2\*>
+f\*<'+'\*> (q\*<1\*>, q\*<0\*>) = q\*<0\*>	f\*<'+'\*> (q\*<1\*>, q\*<1\*>) = q\*<0\*>	f\*<'+'\*> (q\*<1\*>, q\*<2\*>) = q\*<2\*>
+f\*<'+'\*> (q\*<1\*>, q\*<3\*>) = q\*<0\*>	f\*<'+'\*> (q\*<1\*>, q\*<4\*>) = q\*<0\*>	f\*<'+'\*> (q\*<1\*>, q\*<5\*>) = q\*<2\*>
+f\*<'+'\*> (q\*<2\*>, q\*<0\*>) = q\*<2\*>	f\*<'+'\*> (q\*<2\*>, q\*<1\*>) = q\*<2\*>	f\*<'+'\*> (q\*<2\*>, q\*<2\*>) = q\*<2\*>
+f\*<'+'\*> (q\*<2\*>, q\*<3\*>) = q\*<2\*>	f\*<'+'\*> (q\*<2\*>, q\*<4\*>) = q\*<2\*>	f\*<'+'\*> (q\*<2\*>, q\*<5\*>) = q\*<2\*>
+f\*<'+'\*> (q\*<3\*>, q\*<0\*>) = q\*<0\*>	f\*<'+'\*> (q\*<3\*>, q\*<1\*>) = q\*<0\*>	f\*<'+'\*> (q\*<3\*>, q\*<2\*>) = q\*<2\*>
+f\*<'+'\*> (q\*<3\*>, q\*<3\*>) = q\*<0\*>	f\*<'+'\*> (q\*<3\*>, q\*<4\*>) = q\*<0\*>	f\*<'+'\*> (q\*<3\*>, q\*<5\*>) = q\*<2\*>
+f\*<'+'\*> (q\*<4\*>, q\*<0\*>) = q\*<0\*>	f\*<'+'\*> (q\*<4\*>, q\*<1\*>) = q\*<0\*>	f\*<'+'\*> (q\*<4\*>, q\*<2\*>) = q\*<2\*>
+f\*<'+'\*> (q\*<4\*>, q\*<3\*>) = q\*<0\*>	f\*<'+'\*> (q\*<4\*>, q\*<4\*>) = q\*<0\*>	f\*<'+'\*> (q\*<4\*>, q\*<5\*>) = q\*<2\*>
+f\*<'+'\*> (q\*<5\*>, q\*<0\*>) = q\*<2\*>	f\*<'+'\*> (q\*<5\*>, q\*<1\*>) = q\*<2\*>	f\*<'+'\*> (q\*<5\*>, q\*<2\*>) = q\*<2\*>
+f\*<'+'\*> (q\*<5\*>, q\*<3\*>) = q\*<2\*>	f\*<'+'\*> (q\*<5\*>, q\*<4\*>) = q\*<2\*>	f\*<'+'\*> (q\*<5\*>, q\*<5\*>) = q\*<2\*>
+.TE
+f\*<Const\*> () = q\*<3\*>
+f\*<Ident\*> () = q\*<5\*>
+.DE 4 "Zustands\*ubergangsfunktionen"
+.lp
+Das Pattern-Matching l\*auft nun so ab, da\*s in einem
+Bottom-Up-Durchlauf durch den Baum f\*ur jeden Knoten ein Zustand
+q\(moQ berechnet wird. Diese Berechnung erfolgt, indem die zum jeweiligen
+Knoten n geh\*orige Funktion f\*<n\*> auf die bereits berechneten
+Zust\*ande q\*<1\*>, ..., q\*<m\*> der S\*ohne angewandt wird.
+.SH 2 "Felder zur Darstellung der Zustands\*ubergangsfunktionen"
+.lp
+Um die Zustands\*ubergangsfunktionen darzustellen, k\*onnte man
+f\*ur jeden Knoten ein Feld vorsehen. Die Felder h\*atten
+jeweils soviele Dimensionen, wie der zugeh\*orige Knoten S\*ohne
+hat. Die Eintr\*age der Felder k\*onnen zum Zeitpunkt der Generierung
+bestimmt werden.  Zur Laufzeit w\*are lediglich ein Zugriff auf das Feld
+erforderlich, um den Zustand f\*ur den aktuellen Knoten zu bestimmen.
+.DS
+\&'+'	(i, j)
+.TS
+box;
+r|rrrrrr.
+i \e j	q\*<0\*>	q\*<1\*>	q\*<2\*>	q\*<3\*>	q\*<4\*>	q\*<5\*>
+_
+q\*<0\*>	q\*<0\*>	q\*<0\*>	q\*<2\*>	q\*<0\*>	q\*<0\*>	q\*<2\*>
+q\*<1\*>	q\*<0\*>	q\*<0\*>	q\*<2\*>	q\*<0\*>	q\*<0\*>	q\*<2\*>
+q\*<2\*>	q\*<2\*>	q\*<2\*>	q\*<2\*>	q\*<2\*>	q\*<2\*>	q\*<2\*>
+q\*<3\*>	q\*<0\*>	q\*<0\*>	q\*<2\*>	q\*<0\*>	q\*<0\*>	q\*<2\*>
+q\*<4\*>	q\*<0\*>	q\*<0\*>	q\*<2\*>	q\*<0\*>	q\*<0\*>	q\*<2\*>
+q\*<5\*>	q\*<2\*>	q\*<2\*>	q\*<2\*>	q\*<2\*>	q\*<2\*>	q\*<2\*>
+.TE
+
+Const	()
+.TS
+box;
+r.
+q\*<3\*>
+.TE
+
+Ident	()
+.TS
+box;
+r.
+q\*<5\*>
+.TE
+.DE 5 "Felder zur Darstellung der Zustands\*ubergangsfunktionen"
+Abb. \n($1.5 zeigt die Felder zur Darstellung der
+Zustands\*ubergangsfunktionen, die sich f\*ur unser Beispiel
+ergeben.
+.lp
+Da f\*ur S\*ohne aus der Klasse c nur Zust\*ande aus
+Q\*<c\*> vorkommen k\*onnen, w\*urde es ausreichen die Felder f\*ur
+diesen Teil zu realisieren. Da aber Muster und damit auch Zust\*ande
+durchaus f\*ur verschiedene Klassen relevant sein k\*onnen, kann die
+Codierung dieser Zust\*ande nicht immer dicht liegen. 
+Bei realistischen Beispielen w\*aren die Felder deshalb sehr
+gro\*s jedoch nicht vollst\*andig besetzt.
+.lp
+Um den enormen Speicherbedarf f\*ur die mehrdimensionalen Felder
+zu vermeiden, liegt es nahe, eine Komprimierung durchzuf\*uhren.
+.SH 2 "Automaten zur Darstellung der \*Ubergangsfunktionen"
+.lp
+Die Komprimierung erfolgt in Anlehnung an das in\*([<\*([[BMW87\*(]]\*(>]
+vorgestellte Verfahren.
+Im ersten Schritt werden an Stelle der Felder Automaten aufgebaut.
+Diese Automaten arbeiten horizontal, die S\*ohne eines Knotens werden
+hierbei von links nach rechts abgearbeitet, wobei jeweils
+ein durch den Zustand des Sohnes gesteuerter \*Ubergang im
+Automat stattfindet. Anstelle des Zugriffs auf ein
+n-dimensionales Feld erfolgen also n \*Uberg\*ange in einem
+Automaten.
+.DS
+.PS
+circlerad = 0.15i
+boxht = 0.3i
+boxwid = 0.3i
+define r X (1.6i, 0i) X
+define u X (0i, 1.2i) X
+define d X (0i, -1.2i) X
+define ru X (1.6i, 0.3i) X
+define rd X (1.6i, -0.3i) X
+A:	circle invis
+B:	circle invis at A + d
+C:	circle invis at B + d
+S6:	circle "S1" at A + r
+S3:	box "q\d\s-2\&3\s+2\u" at B + r
+S5:	box "q\d\s-2\&5\s+2\u" at C + r
+arrow "'+'" "" from A to S6 chop
+arrow "Const" "" from B to S3 chop
+arrow "Ident" "" from C to S5 chop
+S7:	circle "S2" at S6 + r + u + u
+S8:	circle "S3" at S6 + r + u
+S9:	circle "S4" at S6 + r
+S10:	circle "S5" at S6 + r + d
+S11:	circle "S6" at S6 + r + d + d
+S12:	circle "S7" at S6 + r + d + d + d
+arrow "q\d\s-2\&0\s+2\u    " "" from S6 to S7 chop
+arrow "q\d\s-2\&1\s+2\u   " "" from S6 to S8 chop
+arrow "q\d\s-2\&2\s+2\u  " "" from S6 to S9 chop
+arrow "  q\d\s-2\&3\s+2\u" "" from S6 to S10 chop
+arrow "   q\d\s-2\&4\s+2\u" "" from S6 to S11 chop
+arrow "    q\d\s-2\&5\s+2\u" "" from S6 to S12 chop
+S7a:	box "q\d\s-2\&0\s+2\u" at S7 + ru
+S7b:	box "q\d\s-2\&2\s+2\u" at S7 + rd
+arrow "q\d\s-2\&0\s+2\u,q\d\s-2\&1\s+2\u,     " "    q\d\s-2\&3\s+2\u,q\d\s-2\&4\s+2\u" from S7 to S7a chop
+arrow "" "q\d\s-2\&2\s+2\u,q\d\s-2\&5\s+2\u  " from S7 to S7b chop
+S8a:	box "q\d\s-2\&0\s+2\u" at S8 + ru
+S8b:	box "q\d\s-2\&2\s+2\u" at S8 + rd
+arrow "q\d\s-2\&0\s+2\u,q\d\s-2\&1\s+2\u,     " "    q\d\s-2\&3\s+2\u,q\d\s-2\&4\s+2\u" from S8 to S8a chop
+arrow "" "q\d\s-2\&2\s+2\u,q\d\s-2\&5\s+2\u  " from S8 to S8b chop
+S9a:	box "q\d\s-2\&2\s+2\u" at S9 + r
+arrow "q\d\s-2\&0\s+2\u,q\d\s-2\&1\s+2\u,q\d\s-2\&2\s+2\u," "q\d\s-2\&3\s+2\u,q\d\s-2\&4\s+2\u,q\d\s-2\&5\s+2\u" from S9 to S9a chop
+S10a:	box "q\d\s-2\&0\s+2\u" at S10 + ru
+S10b:	box "q\d\s-2\&2\s+2\u" at S10 + rd
+arrow "q\d\s-2\&0\s+2\u,q\d\s-2\&1\s+2\u,     " "    q\d\s-2\&3\s+2\u,q\d\s-2\&4\s+2\u" from S10 to S10a chop
+arrow "" "q\d\s-2\&2\s+2\u,q\d\s-2\&5\s+2\u  " from S10 to S10b chop
+S11a:	box "q\d\s-2\&0\s+2\u" at S11 + ru
+S11b:	box "q\d\s-2\&2\s+2\u" at S11 + rd
+arrow "q\d\s-2\&0\s+2\u,q\d\s-2\&1\s+2\u,     " "    q\d\s-2\&3\s+2\u,q\d\s-2\&4\s+2\u" from S11 to S11a chop
+arrow "" "q\d\s-2\&2\s+2\u,q\d\s-2\&5\s+2\u  " from S11 to S11b chop
+S12a:	box "q\d\s-2\&2\s+2\u" at S12 + r
+arrow "q\d\s-2\&0\s+2\u,q\d\s-2\&1\s+2\u,q\d\s-2\&2\s+2\u," "q\d\s-2\&3\s+2\u,q\d\s-2\&4\s+2\u,q\d\s-2\&5\s+2\u" from S12 to S12a chop
+.PE
+.DE 6 "Automaten zur Darstellung der Zustands\*ubergangsfunktionen"
+In Abb. \n($1.6 sind die Automaten dargestellt, die den Feldern von
+Abb. \n($1.5 entsprechen. Die durch Kreise dargestellten Zust\*ande
+werden bei der Abarbeitung der S\*ohne eines Knotens durchlaufen.
+Die durch Quadrate dargestellten Endzust\*ande, stellen das Ergebnis
+der Zustands\*ubergangsfunktion dar.
+.lp
+Es ist unschwer zu erkennen, da\*s die Automaten zum Teil vereinfacht
+werden kann. Offensichtlich sind die Zust\*ande S2, S3, S5 und S6
+\*aquivalent. 
+Das selbe gilt f\*ur S4 und S7. Fa\*st man diese Zust\*ande zusammen
+so erh\*alt man einen reduzierten Automaten (Abb. \n($1.7).
+.DS
+.PS
+circlerad = 0.15i
+boxht = 0.3i
+boxwid = 0.3i
+define r X (1.6i, 0i) X
+define u X (0i, 1.2i) X
+define d X (0i, -1.2i) X
+define ru X (1.6i, 0.4i) X
+define rd X (1.6i, -0.4i) X
+A:	circle invis
+B:	circle invis at A + d
+C:	circle invis at B + d
+S6:	circle "S1" at A + r
+S3:	box "q\d\s-2\&3\s+2\u" at B + r
+S5:	box "q\d\s-2\&5\s+2\u" at C + r
+arrow "'+'" "" from A to S6 chop
+arrow "Const" "" from B to S3 chop
+arrow "Ident" "" from C to S5 chop
+S7:	circle "S2" at S6 + r 
+S9:	circle "S3" at S6 + r + d
+arrow "q\d\s-2\&0\s+2\u,q\d\s-2\&1\s+2\u,q\d\s-2\&3\s+2\u,q\d\s-2\&4\s+2\u" "" from S6 to S7 chop
+arrow "q\d\s-2\&2\s+2\u,   q\d\s-2\&5\s+2\u" from S6 to S9 chop
+S7a:	box "q\d\s-2\&0\s+2\u" at S7 + ru
+S7b:	box "q\d\s-2\&2\s+2\u" at S7 + rd
+arrow "q\d\s-2\&0\s+2\u,q\d\s-2\&1\s+2\u,     " "    q\d\s-2\&3\s+2\u,q\d\s-2\&4\s+2\u" from S7 to S7a chop
+arrow "" "q\d\s-2\&2\s+2\u,q\d\s-2\&5\s+2\u  " from S7 to S7b chop
+S9a:	box "q\d\s-2\&2\s+2\u" at S9 + r
+arrow "q\d\s-2\&0\s+2\u,q\d\s-2\&1\s+2\u,q\d\s-2\&2\s+2\u," "q\d\s-2\&3\s+2\u,q\d\s-2\&4\s+2\u,q\d\s-2\&5\s+2\u" from S9 to S9a chop
+.PE
+.DE 7 "reduzierte Automaten zur Berechnung der Zust\*ande"
+Um diese Komprimierung zu erreichen, wird so vorgegangen, da\*s man
+vertr\*agliche Zust\*ande zusammenfa\*st, wobei Zust\*ande dann
+vertr\*aglich sind, wenn sie bei der gleichen Eingabe zum selben
+Zustand f\*uhren. Da sich die Zusammenfassung von Zust\*anden im
+allgemeinen positiv auf die Vertr\*aglichkeit der Vorg\*anger
+auswirkt, sollten dabei alle Nachfolger eines Zustandes auf m\*ogliche
+Vertr\*aglichkeiten untersucht und m\*ogliche Zusammenfassungen
+durchgef\*uhrt sein, bevor der Zustand selbst betrachtet wird.
+.SH 2 "Realisierung der Automaten"
+.lp
+Um den Automaten zu realisieren, werden die zu einem Zustand
+geh\*origen \*Uberg\*ange als eindimensionale Felder
+dargestellt (Abb. \n($1.8).
+.DS
+.TS
+box;
+l|llllll.
+	q\*<0\*>	q\*<1\*>	q\*<2\*>	q\*<3\*>	q\*<4\*>	q\*<5\*>
+_
+S1	S2	S2	S3	S2	S2	S3
+.TE
+.TS
+box;
+l|llllll.
+	q\*<0\*>	q\*<1\*>	q\*<2\*>	q\*<3\*>	q\*<4\*>	q\*<5\*>
+_
+S2	q\*<0\*>	q\*<0\*>	q\*<2\*>	q\*<0\*>	q\*<0\*>	q\*<2\*>
+.TE
+.TS
+box;
+l|llllll.
+	q\*<0\*>	q\*<1\*>	q\*<2\*>	q\*<3\*>	q\*<4\*>	q\*<5\*>
+_
+S3	q\*<2\*>	q\*<2\*>	q\*<2\*>	q\*<2\*>	q\*<2\*>	q\*<2\*>
+.TE	
+.DE 8 "Felder zur Berechnung der Zustands\*uberg\*ange"
+Um den Speicherbedarf f\*ur diese Felder zu reduzieren, werden alle
+in ein gemeinsames Feld eingebettet. Bei diesem unter dem
+Begriff Kammvektortechnik bekannten Verfahren werden soweit m\*oglich
+identische Eintr\*age verschiedener Felder \*uberlagert, und L\*ucken
+in den Feldern durch die Eintr\*age andere Felder gef\*ullt.
+.DS
+.TS
+box;
+lllllllllllllllll.
+S2	S2	S3	S2	S2	S3
+						q\*<0\*>	q\*<0\*>	q\*<2\*>	q\*<0\*>	q\*<0\*>	q\*<2\*>
+											q\*<2\*>	q\*<2\*>	q\*<2\*>	q\*<2\*>	q\*<2\*>	q\*<2\*>
+.TE	
+.TS
+box;
+lllllllllllllllll.
+S2	S2	S3	S2	S2	S3	q\*<0\*>	q\*<0\*>	q\*<2\*>	q\*<0\*>	q\*<0\*>	q\*<2\*>	q\*<2\*>	q\*<2\*>	q\*<2\*>	q\*<2\*>	q\*<2\*>
+.TE	
+.DE 8 "Einbettung des Automaten in ein eindimensionales Feld"
+In unserem Beispiel (Abb. \n($1.9) ist die erzielte Einsparung sehr
+gering, da es keine L\*ucken gibt. Dies liegt daran, da\*s die
+zugrunde gelegte Grammatik extrem einfach ist. Die Klasse (expr), die
+bei der Festlegung der zul\*assigen S\*ohne von '+' verwendet wurde,
+f\*uhrt zu keinerlei Einschr\*ankungen, und somit sind alle
+Zust\*ande f\*ur die S\*ohne m\*oglich (Q\*<expr\*> = Q).
+.lp
+In realistischen Beispielen wird durch diese Ma\*snahme jedoch eine
+drastische Einsparung erzielt, da dort durch Verwendung vieler
+sich gegenseitig ausschlie\*sender Klassen in den einzelnen Felder
+viele L\*ucken entstehen, die bei der Einbettung in ein
+gemeinsames Feld zum Teil geschlossen werden.
+.SH 2 "Vermeidung unn\*otiger Zust\*ande"
+.lp
+In 9.2. wurde festgestellt, da\*s die Bedingungen zur Festlegung der
+Zust\*ande des Baumautomaten nicht hinreichend sind, um sicher zu
+stellen, da\*s nur solche Zust\*ande betrachtet werden, die wirklich
+eintreten k\*onnen. Es gibt jedoch eine M\*oglichkeit, diesen Mangel
+im nachhinein zu beheben.
+.lp
+Offensichtlich ist es so, da\*s die m\*oglichen Zust\*ande
+des Baumautomaten genau den erreichbaren Endzust\*anden der
+Automaten zur Darstellung der \*Ubergangsfunktionen entsprechen.
+Um sie zu erkennen, gen\*ugt es also, die
+erreichbaren Zust\*ande dieser Automaten zu berechnen.
+.SH 2 "Implementierung des Bottom-Up Pattern-Matching"
+.lp
+Neben dem eindimensionalen Feld (yyComb), das die horizontalen Automaten
+beschreibt, wird f\*ur die Realisierung des Pattern-Matching noch
+ein Feld ben\*otigt, das jedem Zustand des Baumautomaten die Menge
+der Vorschriften, deren Muster pa\*st, zuordnet (yySets).
+.lp
+Das Pattern-Matching l\*auft dann f\*ur jeden Knoten c
+folgenderma\*sen ab:
+.np
+state := const\*<c\*>
+.np
+\(fa S\*ohne s\*<i\*> von c
+.br
+state := yyComb [state + yyTraverse (s\*<i\*>)]
+.np
+match := ADR (yySets [state])
+.np
+RETURN state
+.lp
+Zu Beginn (1) wird eine lokale Variable \fIstate\fP mit einem
+knotenspezifischen Wert initialisiert. Die Variable state beschreibt
+sowohl die Zust\*ande des horizontalen Automaten als auch die des
+Baumautomaten. Im zweiten Schritt (2) werden die S\*ohne rekursiv
+abgearbeitet. Gleichzeitig werden, gesteuert durch die Zust\*ande der
+S\*ohne, die von yyTraverse als Ergebnis geliefert werden, die
+\*Uberg\*ange im horizontalen Automaten durchgef\*uhrt.
+Schlie\*slich wird das Ergebnis f\*ur den eigenen Teilbaum, das
+durch die Variable state beschrieben wird, benutzt, um die Vorschriften
+zu bestimmen, deren Muster auf den aktuellen Teilbaum passen (3) und
+anschlie\*send zur\*uckgeliefert (4).
+.lp
+Wenn das Pattern-Matching in die Prozedur yyTraverse, die in Kapitel 6
+beschrieben ist, integriert wird, ergeben sich folgende \*Anderungen.
+.np
+Die Abarbeitung der S\*ohne wird mit der Abarbeitung des horizontalen
+Automaten kombiniert (Punkte (1) und (2) von oben)
+.np
+Die Berechnung der Klassen entf\*allt, da diese beim
+Bottom-Up Pattern-Matching nicht ben\*otigt werden.
+.np
+Um die zul\*assigen Vorschriften zu bestimmen, wird neben den
+Bedingungen lediglich die \*uber die Variable match zug\*angliche
+Menge benutzt (Punkt (3) von oben).
+.np
+Die Prozedur yyTraverse liefert nun einen Zustand als Ergebnis
+zur\*uck (Punkt (4) von oben).
+.lp
+Da Modula-2 keine initialisierte Variablen kennt, m\*ussen au\*serdem
+die Felder yySets und yyComb eingelesen werden, bevor die
+Transformation vorbereitet werden kann.
+.lp
+Die hier beschriebenen Unterschiede k\*onnen im Anhang B.2, der beide
+L\*osungen im Vergleich zeigt, im Detail studiert werden.
+.BP
+.SH 1 "Vollst\*andigkeit"
+.lp
+Eine wesentliche Forderung, die an eine Spezifikation gestellt wird,
+ist die der Voll\%st\*andigkeit. Eine Spezifikation hei\*st
+vollst\*andig, wenn sie geeignet ist, f\*ur
+jede zul\*assige Eingabe die Transformation zu beschreiben.
+.lp
+Die allgemeine Frage, ob eine Spezifikation vollst\*andig ist, ist
+nicht entscheidbar. Im folgenden wird deshalb eine sch\*arfere
+Eigenschaft betrachtet, die die Vollst\*andigkeit impliziert. Obwohl
+auch diese Eigenschaft nicht entscheidbar ist, hilft sie uns einen
+Schritt weiter, denn einzelnen Teile dieser Eigenschaft k\*onnen
+entschieden werden und eignen sich, bestimmte L\*ucken in der
+Vollst\*andigkeit aufzusp\*uren.
+.lp
+Um eine Transformation durchzuf\*uhren, wird die Aufgabe gestellt,
+die Wurzel mit der ersten Funktion der Spezifikation zu bearbeiten.
+Um eine solche Aufgabe zu l\*osen, mu\*s eine passende Vorschrift
+gefunden werden. Funk\%tions\%aufrufe in den Anweisungen dieser
+Vorschrift bilden neue Aufgaben, die ebenfalls bearbeitet werden
+m\*ussen.
+.lp
+Falls man sicherstellen kann, da\*s zur Durchf\*uhrung der
+Transformation nur zul\*assige Aufgaben gestellt werden (Einhaltung
+des Definitionsbereichs), da\*s f\*ur jede zul\*assige Aufgabe
+eine passende Vorschrift existiert (\*Uberdeckung des
+Definitionsbereichs) und da\*s alle zul\*assigen Aufgaben
+abgearbeitet werden k\*onnen (Terminierung), dann ist die
+Spezifikation sicher vollst\*andig.
+.lp
+.SH 2 "Einhaltung des Definitionsbereichs"
+.lp
+Um die Einhaltung des Definitionsbereichs sicherzustellen, mu\*s
+gepr\*uft werden, ob die Teilb\*aume, auf die eine Funktion
+angewandt wird, in den durch den Definitionsbereich festgelegten
+Klassen liegen.
+.lp
+Wenn beim Funktionsaufruf ein Selektor verwendet wird, wird diese
+Pr\*ufung vorgenommen, indem das Teilmuster, das durch den Selektor
+bestimmt ist, analysiert wird. Die Einhaltung des
+Definitionsbereichs ist sichergestellt, falls dieses Teilmuster aus
+einer Klasse des Definitionsbereichs abgeleitet werden kann.
+.lp
+Wird der zu transformierende Baum beim Funktionsaufruf auf
+eine andere Weise festgelegt (z.B. durch eine Variable), kann die
+Einhaltung des Definitionsbereichs nicht automatisch \*uberpr\*uft
+werden, da dann zur Generierungszeit keine M\*oglichkeit besteht, die
+Klassenzugeh\*origkeit dieses Baumes zu bestimmen.
+Der Anwender von ESTRAL wird in solchen F\*allen durch eine Warnung
+auf die Gefahr hingewiesen.
+.SH 2 "\*Uberdeckung des Definitionsbereichs"
+.lp
+Der wesentliche Bestandteil der Vollst\*andigkeitspr\*ufung ist die
+Pr\*ufung, ob der Definitionsbereich durch die Vorschriften abgedeckt
+wird.
+.lp
+Dieser Test wird durchgef\*uhrt, indem jede Klasse (c) des
+Definitionsbereichs (Domain) als (zun\*achst einelementige)
+Menge von synthetisierten Mustern (syn) aufgefa\*st wird und alle
+realen Muster (real) ausgefiltert werden, die durch
+eine Vorschrift abgedeckt werden. Die (in syn) verbliebenen Muster
+k\*onnen mit den Vorschriften nicht bearbeitet werden, sie
+dokumentieren die Unvollst\*andigkeit.
+.lp
+Um die Bedingungen der Vorschriften zu ber\*ucksichtigen,
+werden zwei Durchl\*aufe unterschieden. Im ersten Durchlauf wird
+versucht, mit den Vorschriften auszukommen, die nicht mit einer
+Bedingung verkn\*upft sind. Falls dies nicht gelingt, werden die
+bedingten Vorschriften ebenfalls zum Test herangezogen. Schlie\*slich
+wird f\*ur jedes Muster, das zum Schlu\*s \*ubrig geblieben ist, ein
+Fehler (Error) gemeldet. Muster die erst beim zweiten Durch\%lauf ausgefiltert
+werden, f\*uhren zu einer Warnung (Warning).
+.DS
+Cover
+.HS
+\fBfor\fP \fBall\fP functions f \fBdo\fP
+  \fBfor\fP \fBall\fP c \(mo Domain (f) \fBdo\fP
+    cp := MakePattern (c)
+    syn := EmptyList
+    Append (syn, cp)
+    real := GetUnCondPatterns (f)
+    match := EmptyList
+    Filter (syn, real, match)
+    real := GetCondPatterns (f)
+    match := EmptyList
+    Filter (syn, real, match)
+    \fBwhile\fP \(no IsEmpty (match) \fBdo\fP
+      p := TakeHead (match)
+      Warning ('no unconditional pattern matching', p)
+    \fBwhile\fP \(no IsEmpty (syn) \fBdo\fP
+      p := TakeHead (syn)
+      Error ('no pattern at all matching', p)
+.DE 7 "\*Uberdeckung des Definitionsbereich"
+Zum Filtern (Abb. \n($1.8) wird die Funktion Relation von Abb. 7.6
+herangezogen. Wenn ein synthetisiertes Muster (sp) durch ein reales
+Muster (rp) vollst\*andig \*uberdeckt wird, mu\*s sp nicht
+weiter betrachtet werden. Ist rp nicht geeignet, um sp vollst\*andig
+zu \*uberdecken, mu\*s so vorgegangen werden, da\*s sp durch
+Anwenden der Produktionen der Grammatik durch weitere synthetisierte
+Muster ersetzt wird (Extend), die das urspr\*ungliche
+vollst\*andig beschreiben.
+.lp
+Um diese Erweiterung des synthetisierten Musters (sp) zu unterst\*utzen,
+wird eine Funktion RelationP benutzt. RelationP ist eine Erweiterung von
+Relation, die f\*ur die F\*alle unabh\*angig (independent) und
+gr\*o\*ser (greater) eine Position zur\*uckliefert, an der eine
+sinnvolle Erweiterung ansetzen kann. Mit Hilfe dieser Position und
+anhand der Grammatik wird dann von Extend die Erweiterung,
+d.h. die Synthese von weiteren Mustern durchgef\*uhrt. Die entstandenen
+Muster werden in die Liste syn eingef\*ugt, um im folgenden bearbeitet zu
+werden.
+.lp
+Schlie\*slich wird es m\*oglich sein, einige der generierten Muster
+auszufiltern (match), andere Muster werden \*ubrig bleiben (rest).
+Der Rest bildet den Ausgangspunkt f\*ur den n\*achsten Durchlauf.
+Nach Betrachten aller realen Muster enth\*alt syn alle
+synthetisierten Muster, die nicht durch die realen Muster \*uberdeckt
+werden konnten.
+.DS
+Filter (VAR syn, real, match: tPatternList)
+.HS
+\fBwhile\fP \(no Empty (syn) & \(no Empty (real) \fBdo\fP
+  rest := EmptyList
+  rp := TakeHead (real)
+  \fBwhile\fP \(no Empty (syn) \fBdo\fP
+    sp := TakeHead (syn)
+    \fBcase\fP RelationP (sp, rp, pos) \fBof\fP
+    | equal, less:
+        Append (match, sp)
+    | inconsistent:
+        Append (rest, sp)
+    | independent, greater:
+        \fBif\fP pos = undefined \fBthen\fP
+          Append (rest, sp)
+        \fBelse\fP
+          Extend (sp, pos, syn)
+  syn := rest
+.DE 8 "Filtern von Mustern"
+Abb. \n($1.9 zeigt zwei unabh\*angige Muster, die der Grammatik von Abb. 4.1
+entsprechen, f\*ur die RelationP jedoch keine sinnvolle
+Position zur\*uckliefern kann (pos = undefined).
+.DS
+sp = '+' (:,:)
+rp = const
+.DE 9 "Muster ohne sinnvolle Erweiterung"
+F\*ur die beiden Muster sp und rp existiert keine sinnvolle
+Erweiterung. Zwar w\*urde die Belegung
+der Bl\*atter von sp mit allen M\*oglichkeiten, die durch die Grammatik
+gegeben sind, dazu f\*uhren, da\*s ein Teil der dadurch entstandenen
+Muster ausgefiltert werden kann, doch w\*urden dabei immer neue von rp
+unabh\*angige Muster entstehen, die weiterbearbeitet werden m\*u\*sten.
+Um die Terminierung des Algorithmus an dieser Stelle sicherzustellen,
+wird in solchen F\*allen auf
+eine Erweiterung verzichtet. In pathologischen F\*allen kann das
+zwar dazu f\*uhren, da\*s eine Eingabe irrt\*umlich als unvollst\*andig
+erkannt wird, doch kommt dies in der Praxis kaum vor.
+.SH 2 "Terminierung"
+.lp
+Die Terminierung kann meist dadurch sichergestellt werden, da\*s sich
+die Funktionsaufrufe auf tieferliegende Teilb\*aume beziehen. Da der
+Eingabebaum endlich ist, werden schlie\*slich die Bl\*atter erreicht
+und folglich keine weiteren Funktionen aufgerufen.
+.lp
+Falls sich Funktionsaufrufe hingegen auf den aktuellen Teilbaum
+insgesamt beziehen, wird die Terminierung in Frage gestellt. Denn durch
+einen solchen Funktionsaufruf wird die Terminierung einer Vorschrift
+unmittelbar von der Terminierung der aufgerufenen Funktion abh\*angig.
+Damit entsteht eine Abh\*angigkeiten zwischen Funktionen (aufrufende
+und aufgerufene Funktion). Die Abh\*angigkeit beschr\*ankt sich
+allerdings auf das Muster der be\%tref\%fenden Vorschrift. Au\*serdem ist
+die Abh\*angigkeit nur dann unvermeidbar, wenn es keine andere Vorschrift
+gibt, die alternativ angewandt werden k\*onnte und keine
+Abh\*angigkeit hervorruft. Um unter solchen Bedingungen die
+Terminierung nachzuweisen, m\*u\*ste gezeigt werden, da\*s die
+Entstehung von zyklischen Abh\*angigkeiten vermieden werden kann.
+.lp
+Falls diese Frage \*uberhaupt entscheidbar ist, ist die hierzu
+notwendige Untersuchung auf alle F\*alle \*au\*serst aufwendig.
+Andererseits sind die
+Abh\*angigkeiten zwischen Funktionen in der Praxis recht gering und
+somit auch von Hand zu \*uberschauen. Von ESTRA wird deshalb zum
+Zeitpunkt der Generierung kein Test auf Terminierung durchgef\*uhrt.
+.\"\*([<\*([[Knu68\*(]]\*(>]
+.\"\*([<\*([[MWW84\*(]]\*(>]
+.\"\*([<\*([[Emm88\*(]]\*(>]
+.\"\*([<\*([[HoO82\*(]]\*(>]
+.\"\*([<\*([[Wir85\*(]]\*(>]
+.\"\*([<\*([[KeR83\*(]]\*(>]
+.\"\*([<\*([[BMW87\*(]]\*(>]
+.\"\*([<\*([[Gro89\*(]]\*(>]
+.\"\*([<\*([[AGT87\*(]]\*(>]
+.\"\*([<\*([[MWW84\*(]]\*(>]
+.BP
+.SH 1 "Schnittstellen des Transformators" 9
+.SH 2 "Struktur der Eingabeb\*aume"
+.lp
+Bei der Entwicklung von ESTRA wurde eine Darstellung der
+attributierten B\*aume vorausgesetzt, wie sie von ast\*([<\*([[Gro89\*(]]\*(>] zur
+Verf\*ugung gestellt wird.
+.DS
+.ta 1.5c
+CONST
+.HS
+   Plus	= 1;
+   Const	= 2;
+   Ident	= 3;
+.HS
+   expr	= 4;
+   const	= 5;
+   index	= 6;
+
+TYPE
+.HS
+   tTree	= POINTER TO tNode;
+.HS
+   yexpr	= RECORD pos: tPosition END;
+   yconst	= RECORD pos: tPosition END;
+   yindex	= RECORD pos: tPosition END;
+.HS
+   yPlus	= RECORD pos: tPosition; lo: tTree; ro: tTree; END;
+   yConst	= RECORD pos: tPosition; value: INTEGER; END;
+   yIdent	= RECORD pos: tPosition; ident: tIdent; END;
+.HS
+   tNode	= RECORD
+.ta 2.5c 4c
+     yyEstraInfo:	ADDRESS;
+     CASE Kind:	INTEGER OF
+     | expr:	expr:	yexpr;
+     | const:	const:	yconst;
+     | index:	index:	yindex;
+     | Plus:	Plus:	yPlus;
+     | Const:	Const:	yConst;
+     | Ident:	Ident:	yIdent;
+     END;
+   END;
+.DE 1 "Darstellung der attributierten B\*aume in Modula-2"
+Die attributierten B\*aume werden als Zeiger auf variante
+Strukturen realisiert (tTree). Die Struktur (tNode) enth\*alt
+f\*ur jede Knotenart und jede Klasse eine Variante. Die g\*ultige
+Variante wird durch das Tag-Feld (Kind) angezeigt.
+.lp
+W\*urde immer \*uber die Variante, die durch das Tag-Feld ausgezeichnet
+ist, auf den Knoten zugegriffen, w\*aren die Varianten, die den
+Klassen entsprechen, \*uberfl\*ussig. Tats\*achlich ist es aber so,
+da\*s diese Varianten benutzt werden, um auf Attribute von S\*ohnen
+zuzugreifen, deren Knotenart nicht feststeht. In unserem Beispiel
+kann auf diese Weise in jedem Knoten auf das Attribut \fIPos\fP
+zugegriffen werden. Damit dies wirklich funktioniert, gen\*ugt es
+nicht, da\*s dieses Attribut in jeder Variante vorkommt, es mu\*s
+auch immer an der selben Stelle stehen. Dies kann im allgemeinen
+sichergestellt werden, wenn die Variante eines Knotens eine
+Erweiterungen der Varianten der
+Klassen darstellen, aus denen er hervorgehen kann.
+.lp
+Das Feld yyEstraInfo dient zur Aufnahme der Attribute, die zur
+Festlegung der Transformation ben\*otigt werden.
+.SH 2 "Schnittstelle des generierten Moduls"
+.lp
+Von ESTRA wird ein Modul generiert, das den Namen der Transformation
+(z.B. Trans) erh\*alt.
+.DS
+.ta 2c
+DEFINITION MODULE Trans;
+.HS
+IMPORT	Tree;
+.HS
+TYPE	tTree = Tree.tTree
+.HS
+(* for bottom-up pattern-matching only *)
+VAR	TransTabName: ARRAY [0..127] OF CHAR;
+.HS
+PROCEDURE BeginTrans;
+PROCEDURE DoTrans (yyt: Tree.tTree);
+PROCEDURE CloseTrans;
+.HS
+END Trans.
+.DE 2 "Schnittstelle des generierten Transformators"
+Die parameterlosen Prozeduren BeginTrans und CloseTrans dienen zur
+Initialisierung und zur Durchf\*uhrung von Abschlu\*sarbeiten.
+DoTrans f\*uhrt die Transformation des Baumes yyt durch. Die
+Schnittstelle von DoTrans entspricht der Schnittstelle der ersten
+Funktion, die in Trans spezifiziert wurde. D.h. falls diese Funktion
+vererbte oder synthetisierte Attribute hat, wird die Schnittstelle von
+DoTrans entsprechend erweitert.
+.lp
+Der Typ tTree, der zur Darstellung der B\*aume verwendet wird, mu\*s
+im EXPORT-Abschnitt bekannt gemacht werden, damit er f\*ur die
+Prozedur DoTrans zur Verf\*ugung steht.
+.lp
+Die Variable TransTabName wird bei Verwendung des Bottom-Up
+Pattern-Matching Al\%go\%rith\%mus benutzt, um den Namen der Tabellendatei
+(hier "Trans.tab") aufzunehmen. Damit besteht die M\*oglichkeit, den
+Namen vor dem Aufruf von BeginTrans zu umzusetzen, falls ein anderer
+Dateiname benutzt werden soll.
+.BP
+.SH 1 "Vergleich mit anderen Werkzeugen"
+.SH 2 "Twig"
+.lp
+Twig\*([<\*([[AGT87\*(]]\*(>] ist ein Werkzeug zur Erstellung von Codegeneratoren.
+Die Beschreibung der Codegeneratoren erfolgt durch Regeln, die
+aus einer Umschreibregel, Kosten und Aktionen, bestehen.
+.lp
+Eine Umschreibregel besteht aus einem Muster und einem Nichtterminal,
+dem sogenannten \fIreplacement node\fP. Das Muster legt fest, wo die
+Regel benutzt werden kann. Nachdem dann die zugeh\*orige Aktion
+ausgef\*uhrt wurde, wird der Teilbaum durch den replacement node
+ersetzt.
+.lp
+Bei der Ausf\*uhrung von Aktionen werden bei Twig verschiedene
+Strategien unterschieden. Neben dem \fItopdown-mode\fP, dessen
+Vorgehensweise der von ESTRA entspricht, kennt Twig noch den
+\fIrewrite-mode\fP und den \fIdeferred-mode\fP. Der
+\fIdeferred-mode\fP entspricht der Postfixstrategie und stellt somit
+lediglich eine Abk\*urzung dar, da die Transformation nicht explizit
+f\*ur die einzelnen S\*ohne aufgerufen werden mu\*s.
+.lp
+Diese Abk\*urzung ist deshalb m\*oglich, weil Twig keine explizite
+Auswahl der Funktionen kennt, mit der die einzelnen Bl\*atter des
+Musters zu bearbeiten sind. Die Bearbeitung der Bl\*atter wird hier
+durch die Nichtterminale im Muster bestimmt. Diese Nichtterminale
+m\*ussen mit den \fIreplacement nodes\fP der zur Transformation der
+Bl\*atter angewandten Regeln
+\*ubereinstimmen. Eine mehrfache Abbildung eines Teilbaums mit
+unterschiedlichen Funktionen, wie ESTRA sie zul\*a\*st, ist folg\%lich
+mit Twig nicht m\*oglich.
+.lp
+Beim \fIrewrite-mode\fP, der von ESTRA nicht unterst\*utzt wird,
+wird der aktuelle Teilbaum durch die Aktion ersetzt und
+anschlie\*send neu bearbeitet. Diese Methode wird bei Twig angeboten,
+obwohl die Gefahr besteht, da\*s es zu einem endlosen Umschreiben
+kommt. Ma\*snahmen zur automatischen Vermeidung eines solchen
+endlosen Umschreibens werden von Twig nicht getroffen (vgl. Kapitel 5).
+.lp
+Der Zugriff auf den Baum erfolgt bei Twig \*uber einen abstrakten
+Datentyp (ADT), wodurch eine weitgehende Unabh\*angigkeit von der
+Darstellung des Baumes erreicht wird.
+.lp
+In ESTRAL wurde auf die Verwendung eines ADTs hingegen verzichtet, um
+den Verlust an Effizienz, der durch die in MODULA-2 notwendige
+Realisierung der Operationen
+als Unterprogramme entsteht, zu vermeiden. Auf der anderen Seite ist
+dadurch die Flexibilit\*at in der Darstellung der B\*aume genommen.
+Dies ist jedoch nicht problematisch, da davon ausgegangen wird,
+da\*s der Anwender von ESTRA bei der Darstellung der B\*aume das
+Werkzeug Ast\*([<\*([[Gro89\*(]]\*(>] zu Hilfe nimmt. Denn das von Ast verwendete Format
+wurde bei der Entwicklung von ESTRA zugrundegelegt und wird somit voll
+unterst\*utzt.
+.lp
+Zur Darstellung der zur Transformation n\*otigen Attribute wird bei
+Twig kein Platz in den Knoten
+des Baumes reserviert. Stattdessen wird eine neuer Baum mit der selben
+Struktur aufgebaut, der diese Attribute sowie Verweise auf die Knoten des
+urspr\*unglichen Baumes aufnimmt.
+.SH 2 "BEG"
+.lp
+BEG (Back End Generator)\*([<\*([[Emm88\*(]]\*(>] ist ein Werkzeug zur automatischen
+Erzeugung effizienter Codegeneratoren. Die Beschreibung erfolgt durch
+Baumersetzungsregeln. 
+.lp
+Eine Baumersetzungsregel beschreibt die Reduktion eines Teilbaumes auf
+ein Nichtterminal. Die Transformation des gesamten Baumes wird durch
+die Reduktion des Baumes auf das Startsymbol bewirkt. Die
+Nichtterminale spielen somit die selbe Rolle wie bereits bei Twig, sie
+stellen sicher, da\*s die Regeln zusammenpassen.
+.lp
+Die einzelnen Regeln k\*onnen hier ebenfalls mit Kosten und
+Bedingungen versehen werden.
+.lp
+Da\*s es sich bei BEG um ein spezielles Werkzeug zur Beschreibung von
+Codegeneratoren handelt, zeigt die Tatsache, da\*s BEG spezielle Mittel
+zur Beschreibung der Registervergabe zur Verf\*ugung stellt.
+.lp
+Au\*serdem beschr\*ankt sich BEG auf die f\*ur die Codeerzeugung
+ausreichende
+Postfixstrategie. Dies hat den Vorteil, da\*s in den Regeln kein
+expliziter Aufruf zur Transformation der S\*ohne erforderlich ist.
+Andererseits ist BEG damit f\*ur allgemeine Transformationen
+unbrauchbar.
+.SH 2 "OPTRAN"
+.lp
+Die Spezifikationssprache OPTRAN\*([<\*([[MWW84\*(]]\*(>] wurde entwickelt, um die
+Transformation attributierter B\*aume zu beschreiben. Da hier
+verlangt wird, da\*s das Ergebnis der Transformation wieder ein
+attributierter Baum ist, k\*onnen die Strukturen der Ein- und Ausgabe
+durch attributierte Grammatiken beschrieben werden.
+.lp
+Zur Beschreibung der Transformation werden Regeln benutzt, die
+die Abbildung eines Eingabe-Musters in ein Ausgabe-Muster festlegen,
+wobei die Regeln so geartet sein m\*ussen, da\*s sie
+entweder innerhalb einer Struktur (Ein- oder Ausgabe) bleiben, oder
+den \*Ubergang von der Eingabe- zur Ausgabe-Struktur beschreiben.
+.lp
+Wie bereits in Kapitel 2 erw\*ahnt wurde, spielt die Reihenfolge, in
+der die Regeln angewandt werden, bei dieser Methode eine entscheidende
+Rolle. In OPTRAN wird deshalb vom Benutzer verlangt, eine Strategie zu
+bestimmen, die diese festlegt.
+.lp
+Im Unterschied zu ESTRA legt OPTRAN besonderen Wert auf die Attributierung.
+Dabei wird zwischen einer Erstattributierung und einer
+Reattributierung unterschieden. Die Erstattributierung dient dazu, vor
+der Transformation die Attribute gem\*a\*s der Eingabe-Grammatik zu
+berechnen. Nach der Transformation mu\*s der Baum gem\*a\*s der
+Ausgabe-Grammatik attributiert sein. Um dies zu erreichen, wird nach
+der Anwendung von Regeln eine Reattributierung durchgef\*uhrt, die
+sicherstellt, da\*s Attribute, die sich aufgrund der Regelanwendung
+ge\*andert haben, neu berechnet werden.
+.BP
+.SH 1 "Zusammenfassung"
+.lp
+Mit ESTRAL wurde eine universelle Spezifikationssprache entwickelt,
+die geeignet ist, beliebige Transformationen attributierter B\*aume
+zu beschreiben.
+.lp
+Durch die Verwendung von Mustern, Bedingungen und Kosten
+k\*onnen Transformationen auf nat\*urliche Weise, d.h. mehrdeutig
+beschrieben werden. Der sequentiellen Natur der Transformation wird
+durch die imperative Beschreibung der einzelnen Vorschriften Rechnung
+getragen.
+.lp
+Um die Beschreibung einer Transformation automatisch in eine
+Implementierung umzusetzen, wurde der Generator ESTRA entwickelt.
+Zur Umsetzung werden von ESTRA zwei Versionen angeboten, die sich in
+Bezug auf das Pattern-Matching unterscheiden.
+.lp
+Zum einen wird ein naives Pattern-Matching angeboten, bei dem jedes
+Muster getrennt betrachtet wird, zum anderen kann auch ein Bottom-Up
+Pattern-Matching, das alle Muster im Zusammenhang sieht, benutzt
+werden. Das Bottom-Up Pattern-Matching zahlt sich insbesondere dann
+aus, wenn bei der Beschreibung der Transformationen viele tiefe
+Muster verwendet werden. Falls es hingegen nur sehr einfache Muster
+gibt, ist das naive Pattern-Matching \*uberlegen.
+.lp
+Erste eigene Eins\*atze von ESTRA haben gezeigt, da\*s
+die in ESTRAL erstellten Spezifikationen in Bezug auf die Wartbarkeit
+deutliche Vorteile gegen\*uber einer direkten Implementierung
+aufweisen. Neben dem h\*oheren Abstraktionsniveau zahlt sich vor allem
+die M\*oglichkeit aus, Spezifikation zu verbessern, in dem man
+Vorschriften hinzuf\*ugt, um Spezialf\*alle zu optimieren.
+.lp
+Zielsprache des Generators ist MODULA-2.
+Erweiterungen des Generators zur Unterst\*utzung anderer
+Programmiersprachen (insbesondere C) wurden aber bereits beim Entwurf
+und der Implementierung des Generators vorbereitet.
+.BP
+.UH 1 "Anhang A: Syntax von ESTRAL"
+.(l L
+.sz -2
+.ta 8 10 30
+transformation	\(eq	\fBTRANSFORMATION\fP
+		  ident	\fIName der Transformation\fP
+		  [ \fBEXPORT\fP '{' source_text '}' ]	\fI\*offentliche Vereinbarungen\fP
+		  [ \fBGLOBAL\fP '{' source_text '}' ]	\fIglobale Vereinbarungen\fP
+		  [ \fBBEGIN\fP '{' source_text '}' ]	\fIAnweisungen zur Initialisierung\fP
+		  [ \fBCLOSE\fP '{' source_text '}' ]	\fIAnweisungen zum Abschlu\*s\fP
+		  grammar	\fIBaumgrammatik\fP
+		  function *	\fIFunktionen\fP
+.HS
+grammar	\(eq	\fBGRAMMAR\fP
+		  ident	\fIName der Grammatik\fP
+		  production *	\fIKlassen\fP
+.HS
+production	\(eq	class	\fIKlasse\fP
+		  node *	\fIKnotenbeschreibungen\fP
+.HS
+class	\(eq	[ ident '\(mi>' ]	\fIBezeichner der Oberklasse\fP
+		  ident '='	\fIBezeichner der Klasse\fP
+.HS
+node	\(eq	'\(or' (string \(or ident)	\fIName des Knotens\fP
+		  [ ':'ident ]	\fIBezeichner des Knotens\fP
+		  '(' [ son \(or\(or ',' ] ')'	\fIS\*ohne\fP
+.HS
+son	\(eq	[ ident ':' ]	\fIName des Sohnes\fP
+		ident	\fIBezeichner der Klasse des Sohnes\fP
+.HS
+function	\(eq	\fBFUNCTION\fP
+		  ident	\fIName der Funktion\fP
+		  [attributes	\fIvererbte Attribute\fP
+		   '\(mi>'
+		   attributes]	\fIsynthetisierte Attribute\fP
+		  [':' type]	\fIErgebnistyp\fP
+		  domain	\fIDefinitionsbereich\fP
+		  directive *	\fIVorschriften zur Beschreibung der Funktion\fP
+.HS
+attributes	\(eq	[ (ident \(or\(or ','	\fIListe von Bezeichnern\fP
+		  ':' type)	\fIAngabe des Typs\fP
+		  \(or\(or ';' ]	\fImehrere solche Listen durch ';' getrennt\fP
+.HS
+type	\(eq	[ ident '.' ]	\fIAngabe des Moduls zur Qualifikation\fP
+		  ident	\fIBezeichner des Typs\fP
+.HS
+domain	\(eq	'/' ident \(or\(or ',' '/'	\fIListe von Klassenbezeichnern\fP
+.HS
+directive	\(eq	pattern	\fIMuster\fP
+		  [ \fBCONDITION\fP '{' source_text '}' ]	\fIBedingung\fP
+		  [ \fBCOSTS\fP (number \(or '{' source_text '}') ]	\fIKosten\fP
+		  [ \fBDECLARE\fP '{' source_text '}' ]	\fIlokale Vereinbarungen\fP
+		  '{' source_text '}'	\fIAnweisungen zur Umsetzung\fP
+.HS
+pattern	\(eq	[ ident ] ':'	\fI Selektor\fP
+		  [ ident ]	\fIBezeichner der Klasse\fP
+.HS
+	\(or	ident	\fISelektor und Bezeichner der Klasse\fP
+.HS
+	\(or	[ [ ident ] ':' ]	\fISelektor\fP
+		  (ident \(or string)	\fIName des Knotens\fP
+		  '(' [ pattern \(or\(or ',' ] ')'	\fIMuster der S\*ohne\fP
+.)l
+.BP
+.UH 1 "Anhang B: Beispiel f\*ur die Anwendung von ESTRA"
+.UH 2 "Anhang B1: Spezifikation in ESTRAL"
+.(l L
+.sz -2
+.ta 5 10 15 20 25 30 35 40 45
+TRANSFORMATION Trans
+.HS
+/*
+ *	Quelltexterzeugung und Konstantenfaltung:
+ *	- es wird MODULA-2 Quelltext ausgegeben
+ *	- arithmetische und boolesche Konstanten werden gefaltet
+ */
+.HS
+EXPORT	{
+FROM	Tree	IMPORT	tTree;
+}
+.HS
+GLOBAL	{
+FROM	StdIO	IMPORT	BeginIO, CloseIO, WriteS, WriteI, WriteNl, WriteIdent;
+FROM	Tree	IMPORT	tTree;
+}
+.HS
+BEGIN	{
+BeginIO;
+}
+.HS
+CLOSE	{
+CloseIO;
+}
+.HS
+.HS
+.HS
+GRAMMAR	Tree
+.HS
+.HS
+/* statements */
+.HS
+stats	=
+| Stats		(stat, stats)
+| Stats0	()
+.HS
+stat	=
+| If		(bExpr, then: stats, else: stats)
+| ':=':	Assign	(index, aExpr)
+.HS
+.HS
+/* arithmetic expressions */
+.HS
+aExpr	=	
+| '+':	Plus	(lo: aExpr, ro: aExpr)
+.HS
+aExpr	->
+index	=
+| aIdent	()
+.HS
+aExpr	->
+aConst	=
+| Const		()
+| '+'		(aConst, aConst)
+.HS
+.HS
+/* boolean expressions */
+.HS
+bExpr	=
+| '<': Less	(lo: aExpr, ro: aExpr)
+| bIdent	()
+.HS
+bExpr	->
+bConst	=
+| True		()
+| False		()
+| '<'		(aConst, aConst)
+.HS
+.HS
+.HS
+FUNCTION	Code			/stats, stat, aExpr, bExpr/
+.HS
+/*	Ausgabe von MODULA-2 Quelltext		*/
+.HS
+/* statements */
+.HS
+Stats	(stat, stats)				COSTS	1
+.HS
+{	Code	(stat);
+	WriteS	(';'); WriteNl;
+	Code	(stats);			}
+.HS
+.HS
+Stats0	()				COSTS	0
+.HS
+{}
+.HS
+.HS
+If	(bConst, then: stats, else: stats)		CONDITION { BFold (bConst) = TRUE }
+							COSTS	0
+.HS
+{	Code	(then);			}
+.HS
+.HS
+If	(bConst, then: stats, else: stats)		CONDITION { BFold (bConst) = FALSE }
+							COSTS	0
+.HS
+{	Code	(else);			}
+.HS
+.HS
+If	(bExpr, then: stats, else: Stats0 ())		COSTS	3
+.HS
+{	WriteS	('IF ');
+	Code	(bExpr);
+	WriteS	(' THEN'); WriteNl;
+	Code	(then);
+	WriteS	(' END;');			}
+.HS
+.HS
+If	(bExpr, then: Stats0 (), else: stats )		COSTS	3
+.HS
+{	WriteS	('IF NOT (');
+	Code	(bExpr);
+	WriteS	(') THEN'); WriteNl;
+	Code	(else);
+	WriteS	(' END;');			}
+.HS
+.HS
+If	(bExpr, then: stats, else: stats)		COSTS	4
+.HS
+{	WriteS	('IF ');
+	Code	(bExpr);
+	WriteS	(' THEN'); WriteNl;
+	Code	(then);
+	WriteS	(' ELSE'); WriteNl;
+	Code	(else);
+	WriteS	(' END;');			}
+.HS
+.HS
+\&':='	(index, aExpr)			COSTS	1
+.HS
+{	Code	(index);
+	WriteS	(' := ');
+	Code	(aExpr);			}
+.HS
+.HS
+/* arithmetic expressions */
+.HS
+\&'+'	(lo: aExpr, ro: aExpr)			COSTS	1
+.HS
+{	WriteS	('( ');
+	Code	(lo);
+	WriteS	(' + ');
+	Code	(ro);
+	WriteS	(' )');			}
+.HS
+.HS
+aConst					COSTS	1
+.HS
+{	WriteI	(AFold (aConst));		}
+.HS
+.HS
+aIdent	()				COSTS	1
+.HS
+{	WriteIdent	(aIdent.ident);		}
+.HS
+.HS
+\&'<'	(lo:aExpr, ro:aExpr)			COSTS	1
+.HS
+{	WriteS	('( ');
+	Code	(lo);
+	WriteS	(' < ');
+	Code	(ro);
+	WriteS	(')');			}
+.HS
+.HS
+bIdent	()				COSTS	1
+.HS
+{	WriteIdent	(bIdent.ident);		}
+.HS
+.HS
+bConst					COSTS	1
+.HS
+{	IF BFold (bConst) THEN
+	  WriteS	('TRUE');
+	ELSE
+	  WriteS	('FALSE');
+	END;				}
+.HS
+.HS
+.HS
+FUNCTION	AFold	 : INTEGER	/aConst/
+.HS
+/*	Faltung arithmetischer Konstanten		*/
+.HS
+.HS
+Const	()				COSTS	0
+.HS
+{	RETURN Const.value;			}
+.HS
+.HS
+\&'+'	(lo:aConst, ro:aConst)			COSTS	0
+.HS
+{	RETURN AFold (lo) + AFold (ro);	}
+.HS
+.HS
+.HS
+FUNCTION	BFold	 : BOOLEAN	/bConst/
+.HS
+/*	Faltung boolescher Konstanten		*/
+.HS
+.HS
+True	()				COSTS	0
+.HS
+{	RETURN TRUE;			}
+.HS
+.HS
+False	()				COSTS	0
+.HS
+{	RETURN FALSE;			}
+.HS
+.HS
+\&'<'	(lo: aConst, ro: aConst)			COSTS	0
+.HS
+{	RETURN AFold (lo) < AFold (ro);	}
+.)l
+.oh ''%''
+.bp
+.UH 2 "Anhang B2: Generierter Code"
+.lp
+Im folgenden ist der von ESTRA generierte Code dargestellt.
+.lp
+Die Unterschiede, der beiden Versionen, die durch den optionalen Einsatz
+des Bottom-Up Pattern-Matching entstehen, werden so dargestellt,
+da\*s der Leser diese unmittelbar vergleichen kann.
+.(l L
+.sz -2
+(* ------ simple pattern-matching ------
+   (A)
+   --------------------------------------------- *)
+   (B)
+(* --- bottom-up pattern-matching --- *)
+Beim Einsatz des Bottom-Up Pattern-Matching wird (B) generiert,
+ansonsten wird (A) erzeugt.
+.sp 8
+.)l
+.(l L
+.sz -2
+.ta 5 10 15 20 25 30 35 40 45
+DEFINITION MODULE Trans;
+.HS
+IMPORT Tree;
+    (* line 3 Trans.estra *)
+.HS
+FROM	Tree	IMPORT	tTree;
+.HS
+(* ------ simple pattern-matching ------
+   --------------------------------------------- *)
+VAR TransTabName: ARRAY [0..127] OF CHAR;
+(* --- bottom-up pattern-matching --- *)
+.HS
+PROCEDURE BeginTrans;
+PROCEDURE DoTrans (yyt: Tree.tTree);
+PROCEDURE CloseTrans;
+END Trans.
+.)l
+.bp
+.(l L
+.sz -2
+.ta 5 10 15 20 25 30 35 40 45
+IMPLEMENTATION MODULE Trans;
+.HS
+(* ------ simple pattern-matching ------
+IMPORT SYSTEM, IO, Memory, Tree;
+   --------------------------------------------- *)
+IMPORT SYSTEM, IO, Memory, SystemIO, Tree;
+(* --- bottom-up pattern-matching --- *)
+.HS
+    (* line 7 Trans.estra *)
+.HS
+FROM	StdIO	IMPORT	BeginIO, CloseIO, WriteS, WriteI, WriteNl, WriteIdent;
+FROM	Tree	IMPORT	tTree;
+.HS
+.HS
+CONST
+  yyInfinite = 2147483643;
+.HS
+  yyBitsPerBitset = 32;
+(* ------ simple pattern-matching ------
+  yyCstats = 0;
+  yyCstat = 1;
+  yyCbExpr = 5;
+  yyCindex = 3;
+  yyCaExpr = 2;
+  yyCaConst = 4;
+  yyCbConst = 6;
+  yyMaxClass = 6;
+   --------------------------------------------- *)
+  yySetSize = 22;
+  yyMaxIndex = 26;
+  yyCombSize = 117;      
+  yyStartState = 0;
+(* --- bottom-up pattern-matching --- *)
+.HS
+  yyPoolSize = 10240;
+.HS
+TYPE
+  yytBlockPtr = POINTER TO yytBlock;
+  yytBlock =
+  RECORD
+    Successor: yytBlockPtr;
+    Block: ARRAY [1..yyPoolSize] OF CHAR;
+  END;
+.HS
+(* ------ simple pattern-matching ------
+   --------------------------------------------- *)
+  yyStateType = INTEGER;
+  yySetType = ARRAY [0..yySetSize DIV yyBitsPerBitset] OF BITSET;
+  yySetsType = ARRAY [0..yyMaxIndex] OF yySetType;
+  yyCombType = ARRAY [0..yyCombSize] OF yyStateType;
+.HS
+(* --- bottom-up pattern-matching --- *)
+  yyPCode = PROCEDURE (Tree.tTree);
+  yyPAFold = PROCEDURE (Tree.tTree): INTEGER;
+  yyPBFold = PROCEDURE (Tree.tTree): BOOLEAN;
+.HS
+  yyInfoPtr  = POINTER TO yyInfoType;
+  yyInfoType =
+    RECORD
+(* ------ simple pattern-matching ------
+      yyClasses: ARRAY [0..yyMaxClass DIV yyBitsPerBitset] OF BITSET;
+   --------------------------------------------- *)
+(* --- bottom-up pattern-matching --- *)
+      Code: RECORD Cost: INTEGER; Proc: yyPCode; END;
+      AFold: RECORD Cost: INTEGER; Proc: yyPAFold; END;
+      BFold: RECORD Cost: INTEGER; Proc: yyPBFold; END;
+    END;
+.HS
+VAR
+  yySets: yySetsType;
+  yyComb: yyCombType;
+  yyInfo: yyInfoType;
+  yyMatch: ARRAY [0..22] OF BOOLEAN;
+  yyBlockList: yytBlockPtr;
+  yyPoolFreePtr, yyPoolEndPtr: SYSTEM.ADDRESS;
+.HS
+(* ------ simple pattern-matching ------
+PROCEDURE yyClass (yyt: Tree.tTree;Bit, Set: INTEGER): BOOLEAN;
+VAR info: yyInfoPtr;
+BEGIN
+  info := yyt^.yyEstraInfo;
+  RETURN Bit IN info^.yyClasses [Set];
+END yyClass;
+.HS
+   --------------------------------------------- *)
+(* --- bottom-up pattern-matching --- *)
+PROCEDURE yyAlloc (): SYSTEM.ADDRESS;
+VAR BlockPtr: yytBlockPtr;
+BEGIN
+  IF LONGINT (yyPoolEndPtr - yyPoolFreePtr) < SYSTEM.TSIZE (yyInfoType) THEN
+    BlockPtr  := yyBlockList;
+    yyBlockList  := Memory.Alloc (SYSTEM.TSIZE (yytBlock));
+    yyBlockList^.Successor := BlockPtr;
+    yyPoolFreePtr := SYSTEM.ADR (yyBlockList^.Block);
+    yyPoolEndPtr  := yyPoolFreePtr + yyPoolSize;
+  END;
+  INC (yyPoolFreePtr, SYSTEM.ADDRESS (SYSTEM.TSIZE (yyInfoType)));
+  RETURN yyPoolFreePtr - SYSTEM.ADDRESS (SYSTEM.TSIZE (yyInfoType));
+END yyAlloc;
+.HS
+PROCEDURE yyReleaseHeap;
+VAR BlockPtr: yytBlockPtr;
+BEGIN
+  WHILE yyBlockList # NIL DO
+    BlockPtr:= yyBlockList;
+    yyBlockList:= yyBlockList^.Successor;
+    Memory.Free (SYSTEM.TSIZE (yytBlock), BlockPtr);
+  END;
+END yyReleaseHeap;
+.HS
+PROCEDURE Code (yyt: Tree.tTree);
+VAR InfoPtr: yyInfoPtr;
+BEGIN
+  InfoPtr := yyInfoPtr (yyt^.yyEstraInfo);
+  InfoPtr^.Code.Proc (yyt);
+END Code;
+.HS
+PROCEDURE AFold (yyt: Tree.tTree): INTEGER;
+VAR InfoPtr: yyInfoPtr;
+BEGIN
+  InfoPtr := yyInfoPtr (yyt^.yyEstraInfo);
+  RETURN InfoPtr^.AFold.Proc (yyt);
+END AFold;
+.HS
+PROCEDURE BFold (yyt: Tree.tTree): BOOLEAN;
+VAR InfoPtr: yyInfoPtr;
+BEGIN
+  InfoPtr := yyInfoPtr (yyt^.yyEstraInfo);
+  RETURN InfoPtr^.BFold.Proc (yyt);
+END BFold;
+.HS
+PROCEDURE yyECode (yyt: Tree.tTree);
+BEGIN
+  IO.WriteS (IO.StdError, 'Function Code is not defined for this tree');
+  IO.WriteNl (IO.StdError); IO.CloseIO; HALT;
+END yyECode;
+.HS
+PROCEDURE yyEAFold (yyt: Tree.tTree): INTEGER;
+BEGIN
+  IO.WriteS (IO.StdError, 'Function AFold is not defined for this tree');
+  IO.WriteNl (IO.StdError); IO.CloseIO; HALT;
+END yyEAFold;
+.HS
+PROCEDURE yyEBFold (yyt: Tree.tTree): BOOLEAN;
+BEGIN
+  IO.WriteS (IO.StdError, 'Function BFold is not defined for this tree');
+  IO.WriteNl (IO.StdError); IO.CloseIO; HALT;
+END yyEBFold;
+.HS
+PROCEDURE yyF1Code (yyt: Tree.tTree);
+.HS
+BEGIN    (* line 72 Trans.estra *)
+	Code	(yyt^.Stats.stat);
+	WriteS	(';'); WriteNl;
+	Code	(yyt^.Stats.stats);			
+END yyF1Code;
+.HS
+PROCEDURE yyF2Code (yyt: Tree.tTree);
+.HS
+BEGIN
+END yyF2Code;
+.HS
+PROCEDURE yyF3Code (yyt: Tree.tTree);
+.HS
+BEGIN    (* line 90 Trans.estra *)
+	Code	(yyt^.If.then);				
+END yyF3Code;
+.HS
+PROCEDURE yyF4Code (yyt: Tree.tTree);
+.HS
+BEGIN    (* line 99 Trans.estra *)
+	Code	(yyt^.If.else);				
+END yyF4Code;
+.HS
+PROCEDURE yyF5Code (yyt: Tree.tTree);
+.HS
+BEGIN
+END yyF5Code;
+.HS
+PROCEDURE yyF6Code (yyt: Tree.tTree);
+.HS
+BEGIN    (* line 113 Trans.estra *)
+	WriteS	('IF ');
+	Code	(yyt^.If.bExpr);
+	WriteS	(' THEN'); WriteNl;
+	Code	(yyt^.If.then);
+	WriteS	(' END;');			
+END yyF6Code;
+.HS
+PROCEDURE yyF7Code (yyt: Tree.tTree);
+.HS
+BEGIN    (* line 124 Trans.estra *)
+	WriteS	('IF NOT (');
+	Code	(yyt^.If.bExpr);
+	WriteS	(') THEN'); WriteNl;
+	Code	(yyt^.If.else);
+	WriteS	(' END;');			
+END yyF7Code;
+.HS
+PROCEDURE yyF8Code (yyt: Tree.tTree);
+.HS
+BEGIN    (* line 135 Trans.estra *)
+	WriteS	('IF ');
+	Code	(yyt^.If.bExpr);
+	WriteS	(' THEN'); WriteNl;
+	Code	(yyt^.If.then);
+	WriteS	(' ELSE'); WriteNl;
+	Code	(yyt^.If.else);
+	WriteS	(' END;');			
+END yyF8Code;
+.HS
+PROCEDURE yyF9Code (yyt: Tree.tTree);
+.HS
+BEGIN    (* line 148 Trans.estra *)
+	Code	(yyt^.Assign.index);
+	WriteS	(' := ');
+	Code	(yyt^.Assign.aExpr);			
+END yyF9Code;
+.HS
+PROCEDURE yyF10Code (yyt: Tree.tTree);
+.HS
+BEGIN    (* line 157 Trans.estra *)
+	WriteS	('( ');
+	Code	(yyt^.Plus.lo);
+	WriteS	(' + ');
+	Code	(yyt^.Plus.ro);
+	WriteS	(' )');				
+END yyF10Code;
+.HS
+PROCEDURE yyF11Code (yyt: Tree.tTree);
+.HS
+BEGIN    (* line 168 Trans.estra *)
+	WriteI	(yyt^.Const.value);			
+END yyF11Code;
+.HS
+PROCEDURE yyF12Code (yyt: Tree.tTree);
+.HS
+BEGIN    (* line 175 Trans.estra *)
+	WriteS	('( ');
+	Code	(yyt^.Plus.lo);
+	WriteS	(' + ');
+	Code	(yyt^.Plus.ro);
+	WriteS	(' )');				
+END yyF12Code;
+.HS
+PROCEDURE yyF13Code (yyt: Tree.tTree);
+.HS
+BEGIN    (* line 186 Trans.estra *)
+	WriteIdent	(yyt^.aIdent.ident);		
+END yyF13Code;
+.HS
+PROCEDURE yyF14Code (yyt: Tree.tTree);
+.HS
+BEGIN    (* line 193 Trans.estra *)
+	WriteS	('TRUE');			
+END yyF14Code;
+.HS
+PROCEDURE yyF15Code (yyt: Tree.tTree);
+.HS
+BEGIN    (* line 200 Trans.estra *)
+	WriteS	('FALSE');			
+END yyF15Code;
+.HS
+PROCEDURE yyF16Code (yyt: Tree.tTree);
+.HS
+BEGIN    (* line 207 Trans.estra *)
+	WriteS	('( ');
+	Code	(yyt^.Less.lo);
+	WriteS	(' < ');
+	Code	(yyt^.Less.ro);
+	WriteS	(')');				
+END yyF16Code;
+.HS
+PROCEDURE yyF17Code (yyt: Tree.tTree);
+.HS
+BEGIN    (* line 218 Trans.estra *)
+	WriteIdent	(yyt^.bIdent.ident);		
+END yyF17Code;
+.HS
+PROCEDURE yyF18AFold (yyt: Tree.tTree): INTEGER;
+.HS
+BEGIN    (* line 229 Trans.estra *)
+	RETURN yyt^.Const.value;			
+END yyF18AFold;
+.HS
+PROCEDURE yyF19AFold (yyt: Tree.tTree): INTEGER;
+.HS
+BEGIN    (* line 236 Trans.estra *)
+	RETURN AFold (yyt^.Plus.lo) + AFold (yyt^.Plus.ro);		
+END yyF19AFold;
+.HS
+PROCEDURE yyF20BFold (yyt: Tree.tTree): BOOLEAN;
+.HS
+BEGIN    (* line 247 Trans.estra *)
+	RETURN TRUE;				
+END yyF20BFold;
+.HS
+PROCEDURE yyF21BFold (yyt: Tree.tTree): BOOLEAN;
+.HS
+BEGIN    (* line 254 Trans.estra *)
+	RETURN FALSE;				
+END yyF21BFold;
+.HS
+PROCEDURE yyF22BFold (yyt: Tree.tTree): BOOLEAN;
+.HS
+BEGIN    (* line 261 Trans.estra *)
+	RETURN AFold (yyt^.Less.lo) < AFold (yyt^.Less.ro);		
+END yyF22BFold;
+.HS
+PROCEDURE CostCode (yyt: Tree.tTree): INTEGER;
+VAR
+  InfoPtr: yyInfoPtr;
+BEGIN
+  InfoPtr := yyt^.yyEstraInfo;
+  RETURN InfoPtr^.Code.Cost;
+END CostCode;
+.HS
+PROCEDURE CostAFold (yyt: Tree.tTree): INTEGER;
+VAR
+  InfoPtr: yyInfoPtr;
+BEGIN
+  InfoPtr := yyt^.yyEstraInfo;
+  RETURN InfoPtr^.AFold.Cost;
+END CostAFold;
+.HS
+PROCEDURE CostBFold (yyt: Tree.tTree): INTEGER;
+VAR
+  InfoPtr: yyInfoPtr;
+BEGIN
+  InfoPtr := yyt^.yyEstraInfo;
+  RETURN InfoPtr^.BFold.Cost;
+END CostBFold;
+.HS
+(* ------ simple pattern-matching ------
+PROCEDURE yyTraverse (yyt: Tree.tTree);
+   --------------------------------------------- *)
+PROCEDURE yyTraverse (yyt: Tree.tTree): yyStateType;
+(* --- bottom-up pattern-matching --- *)
+VAR
+  state: yyStateType;
+  match: POINTER TO yySetType;
+  cost: INTEGER;
+  info: yyInfoPtr;
+  success: BOOLEAN;
+.HS
+BEGIN
+  info := yyAlloc ();
+  info^ := yyInfo;
+  yyt^.yyEstraInfo := info;
+.HS
+.HS
+  CASE yyt^.Kind OF
+.HS
+  | Tree.Stats:
+(* ------ simple pattern-matching ------
+      yyTraverse (yyt^.Stats.stat);
+      yyTraverse (yyt^.Stats.stats);
+      INCL (info^.yyClasses [yyCstats DIV yyBitsPerBitset], yyCstats MOD yyBitsPerBitset); 
+   --------------------------------------------- *)
+      state := 0;
+      state := yyComb [state + yyTraverse (yyt^.Stats.stat)];
+      state := yyComb [state + yyTraverse (yyt^.Stats.stats)];
+(* --- bottom-up pattern-matching --- *)
+.HS
+.HS
+      cost := 1
+      + CostCode (yyt^.Stats.stat)
+      + CostCode (yyt^.Stats.stats);
+      IF cost < info^.Code.Cost THEN
+        info^.Code.Cost := cost;
+        info^.Code.Proc := yyF1Code;
+      END;
+.HS
+  | Tree.Stats0:
+(* ------ simple pattern-matching ------
+      INCL (info^.yyClasses [yyCstats DIV yyBitsPerBitset], yyCstats MOD yyBitsPerBitset); 
+   --------------------------------------------- *)
+      state := 1;
+(* --- bottom-up pattern-matching --- *)
+.HS
+.HS
+      cost := 0;
+      IF cost < info^.Code.Cost THEN
+        info^.Code.Cost := cost;
+        info^.Code.Proc := yyF2Code;
+      END;
+.HS
+  | Tree.If:
+(* ------ simple pattern-matching ------
+      yyTraverse (yyt^.If.bExpr);
+      yyTraverse (yyt^.If.then);
+      yyTraverse (yyt^.If.else);
+      INCL (info^.yyClasses [yyCstat DIV yyBitsPerBitset], yyCstat MOD yyBitsPerBitset); 
+.HS
+      yyMatch [3] := yyClass (yyt^.If.bExpr, yyCbConst MOD yyBitsPerBitset, yyCbConst DIV yyBitsPerBitset)
+      & (          (* line 86 Trans.estra *)
+	BFold (yyt^.If.bExpr) = TRUE 	);
+      yyMatch [4] := yyClass (yyt^.If.bExpr, yyCbConst MOD yyBitsPerBitset, yyCbConst DIV yyBitsPerBitset)
+      & (          (* line 95 Trans.estra *)
+	BFold (yyt^.If.bExpr) = FALSE 	);
+      yyMatch [5] := (yyt^.If.then^.Kind = Tree.Stats0)
+       & (yyt^.If.else^.Kind = Tree.Stats0);
+      yyMatch [6] := (yyt^.If.else^.Kind = Tree.Stats0);
+      yyMatch [7] := (yyt^.If.then^.Kind = Tree.Stats0);
+   --------------------------------------------- *)
+      state := 1;
+      state := yyComb [state + yyTraverse (yyt^.If.bExpr)];
+      state := yyComb [state + yyTraverse (yyt^.If.then)];
+      state := yyComb [state + yyTraverse (yyt^.If.else)];
+      match := SYSTEM.ADR (yySets [state]);
+.HS
+      yyMatch [3] := (3 IN match^[0]) & (          (* line 86 Trans.estra *)
+	BFold (yyt^.If.bExpr) = TRUE 	);
+      yyMatch [4] := (4 IN match^[0]) & (          (* line 95 Trans.estra *)
+	BFold (yyt^.If.bExpr) = FALSE 	);
+      yyMatch [5] := (5 IN match^[0]);
+      yyMatch [6] := (6 IN match^[0]);
+      yyMatch [7] := (7 IN match^[0]);
+(* --- bottom-up pattern-matching --- *)
+.HS
+      IF yyMatch [3] THEN
+        cost := 0
+        + CostBFold (yyt^.If.bExpr)
+        + CostCode (yyt^.If.then);
+        IF cost < info^.Code.Cost THEN
+          info^.Code.Cost := cost;
+          info^.Code.Proc := yyF3Code;
+        END;
+      END;
+.HS
+      IF yyMatch [4] THEN
+        cost := 0
+        + CostBFold (yyt^.If.bExpr)
+        + CostCode (yyt^.If.else);
+        IF cost < info^.Code.Cost THEN
+          info^.Code.Cost := cost;
+          info^.Code.Proc := yyF4Code;
+        END;
+      END;
+.HS
+      IF yyMatch [5] THEN
+        cost := 0;
+        IF cost < info^.Code.Cost THEN
+          info^.Code.Cost := cost;
+          info^.Code.Proc := yyF5Code;
+        END;
+      END;
+.HS
+      IF yyMatch [6] THEN
+        cost := 3
+        + CostCode (yyt^.If.bExpr)
+        + CostCode (yyt^.If.then);
+        IF cost < info^.Code.Cost THEN
+          info^.Code.Cost := cost;
+          info^.Code.Proc := yyF6Code;
+        END;
+      END;
+.HS
+      IF yyMatch [7] THEN
+        cost := 4
+        + CostCode (yyt^.If.bExpr)
+        + CostCode (yyt^.If.else);
+        IF cost < info^.Code.Cost THEN
+          info^.Code.Cost := cost;
+          info^.Code.Proc := yyF7Code;
+        END;
+      END;
+.HS
+      cost := 4
+      + CostCode (yyt^.If.bExpr)
+      + CostCode (yyt^.If.then)
+      + CostCode (yyt^.If.else);
+      IF cost < info^.Code.Cost THEN
+        info^.Code.Cost := cost;
+        info^.Code.Proc := yyF8Code;
+      END;
+.HS
+  | Tree.Assign:
+(* ------ simple pattern-matching ------
+      yyTraverse (yyt^.Assign.index);
+      yyTraverse (yyt^.Assign.aExpr);
+      INCL (info^.yyClasses [yyCstat DIV yyBitsPerBitset], yyCstat MOD yyBitsPerBitset); 
+   --------------------------------------------- *)
+      state := 19;
+      state := yyComb [state + yyTraverse (yyt^.Assign.index)];
+      state := yyComb [state + yyTraverse (yyt^.Assign.aExpr)];
+(* --- bottom-up pattern-matching --- *)
+.HS
+.HS
+      cost := 1
+      + CostCode (yyt^.Assign.index)
+      + CostCode (yyt^.Assign.aExpr);
+      IF cost < info^.Code.Cost THEN
+        info^.Code.Cost := cost;
+        info^.Code.Proc := yyF9Code;
+      END;
+.HS
+  | Tree.Plus:
+(* ------ simple pattern-matching ------
+      yyTraverse (yyt^.Plus.lo);
+      yyTraverse (yyt^.Plus.ro);
+      INCL (info^.yyClasses [yyCaExpr DIV yyBitsPerBitset], yyCaExpr MOD yyBitsPerBitset); 
+      IF yyClass (yyt^.Plus.lo, yyCaConst MOD yyBitsPerBitset, yyCaConst DIV yyBitsPerBitset) 
+       & yyClass (yyt^.Plus.ro, yyCaConst MOD yyBitsPerBitset, yyCaConst DIV yyBitsPerBitset) THEN
+        INCL (info^.yyClasses [yyCaConst DIV yyBitsPerBitset], yyCaConst MOD yyBitsPerBitset);
+      END;
+.HS
+      yyMatch [12] := yyClass (yyt^.Plus.lo, yyCaConst MOD yyBitsPerBitset, yyCaConst DIV yyBitsPerBitset)
+       & yyClass (yyt^.Plus.ro, yyCaConst MOD yyBitsPerBitset, yyCaConst DIV yyBitsPerBitset);
+      yyMatch [19] := yyClass (yyt^.Plus.lo, yyCaConst MOD yyBitsPerBitset, yyCaConst DIV yyBitsPerBitset)
+       & yyClass (yyt^.Plus.ro, yyCaConst MOD yyBitsPerBitset, yyCaConst DIV yyBitsPerBitset);
+   --------------------------------------------- *)
+      state := 50;
+      state := yyComb [state + yyTraverse (yyt^.Plus.lo)];
+      state := yyComb [state + yyTraverse (yyt^.Plus.ro)];
+      match := SYSTEM.ADR (yySets [state]);
+.HS
+      yyMatch [12] := (12 IN match^[0]);
+      yyMatch [19] := (19 IN match^[0]);
+(* --- bottom-up pattern-matching --- *)
+.HS
+      cost := 1
+      + CostCode (yyt^.Plus.lo)
+      + CostCode (yyt^.Plus.ro);
+      IF cost < info^.Code.Cost THEN
+        info^.Code.Cost := cost;
+        info^.Code.Proc := yyF10Code;
+      END;
+.HS
+      IF yyMatch [12] THEN
+        cost := 1
+        + CostCode (yyt^.Plus.lo)
+        + CostCode (yyt^.Plus.ro);
+        IF cost < info^.Code.Cost THEN
+          info^.Code.Cost := cost;
+          info^.Code.Proc := yyF12Code;
+        END;
+      END;
+.HS
+      IF yyMatch [19] THEN
+        cost := 1
+        + CostAFold (yyt^.Plus.lo)
+        + CostAFold (yyt^.Plus.ro);
+        IF cost < info^.AFold.Cost THEN
+          info^.AFold.Cost := cost;
+          info^.AFold.Proc := yyF19AFold;
+        END;
+      END;
+.HS
+  | Tree.aIdent:
+(* ------ simple pattern-matching ------
+      INCL (info^.yyClasses [yyCindex DIV yyBitsPerBitset], yyCindex MOD yyBitsPerBitset); 
+      INCL (info^.yyClasses [yyCaExpr DIV yyBitsPerBitset], yyCaExpr MOD yyBitsPerBitset); 
+   --------------------------------------------- *)
+      state := 17;
+(* --- bottom-up pattern-matching --- *)
+.HS
+.HS
+      cost := 1;
+      IF cost < info^.Code.Cost THEN
+        info^.Code.Cost := cost;
+        info^.Code.Proc := yyF13Code;
+      END;
+.HS
+  | Tree.Const:
+(* ------ simple pattern-matching ------
+      INCL (info^.yyClasses [yyCaConst DIV yyBitsPerBitset], yyCaConst MOD yyBitsPerBitset); 
+      INCL (info^.yyClasses [yyCaExpr DIV yyBitsPerBitset], yyCaExpr MOD yyBitsPerBitset); 
+   --------------------------------------------- *)
+      state := 16;
+(* --- bottom-up pattern-matching --- *)
+.HS
+.HS
+      cost := 1;
+      IF cost < info^.Code.Cost THEN
+        info^.Code.Cost := cost;
+        info^.Code.Proc := yyF11Code;
+      END;
+.HS
+      cost := 1;
+      IF cost < info^.AFold.Cost THEN
+        info^.AFold.Cost := cost;
+        info^.AFold.Proc := yyF18AFold;
+      END;
+.HS
+  | Tree.Less:
+(* ------ simple pattern-matching ------
+      yyTraverse (yyt^.Less.lo);
+      yyTraverse (yyt^.Less.ro);
+      INCL (info^.yyClasses [yyCbExpr DIV yyBitsPerBitset], yyCbExpr MOD yyBitsPerBitset); 
+      IF yyClass (yyt^.Less.lo, yyCbConst MOD yyBitsPerBitset, yyCbConst DIV yyBitsPerBitset) 
+       & yyClass (yyt^.Less.ro, yyCbConst MOD yyBitsPerBitset, yyCbConst DIV yyBitsPerBitset) THEN
+        INCL (info^.yyClasses [yyCbConst DIV yyBitsPerBitset], yyCbConst MOD yyBitsPerBitset);
+      END;
+.HS
+      yyMatch [22] := yyClass (yyt^.Less.lo, yyCaConst MOD yyBitsPerBitset, yyCaConst DIV yyBitsPerBitset)
+       & yyClass (yyt^.Less.ro, yyCaConst MOD yyBitsPerBitset, yyCaConst DIV yyBitsPerBitset);
+   --------------------------------------------- *)
+      state := 73;
+      state := yyComb [state + yyTraverse (yyt^.Less.lo)];
+      state := yyComb [state + yyTraverse (yyt^.Less.ro)];
+      match := SYSTEM.ADR (yySets [state]);
+.HS
+      yyMatch [22] := (22 IN match^[0]);
+(* --- bottom-up pattern-matching --- *)
+.HS
+      cost := 1
+      + CostCode (yyt^.Less.lo)
+      + CostCode (yyt^.Less.ro);
+      IF cost < info^.Code.Cost THEN
+        info^.Code.Cost := cost;
+        info^.Code.Proc := yyF16Code;
+      END;
+.HS
+      IF yyMatch [22] THEN
+        cost := 0
+        + CostAFold (yyt^.Less.lo)
+        + CostAFold (yyt^.Less.ro);
+        IF cost < info^.BFold.Cost THEN
+          info^.BFold.Cost := cost;
+          info^.BFold.Proc := yyF22BFold;
+        END;
+      END;
+.HS
+  | Tree.bIdent:
+(* ------ simple pattern-matching ------
+      INCL (info^.yyClasses [yyCbExpr DIV yyBitsPerBitset], yyCbExpr MOD yyBitsPerBitset); 
+   --------------------------------------------- *)
+      state := 23;
+(* --- bottom-up pattern-matching --- *)
+.HS
+.HS
+      cost := 1;
+      IF cost < info^.Code.Cost THEN
+        info^.Code.Cost := cost;
+        info^.Code.Proc := yyF17Code;
+      END;
+.HS
+  | Tree.True:
+(* ------ simple pattern-matching ------
+      INCL (info^.yyClasses [yyCbConst DIV yyBitsPerBitset], yyCbConst MOD yyBitsPerBitset); 
+      INCL (info^.yyClasses [yyCbExpr DIV yyBitsPerBitset], yyCbExpr MOD yyBitsPerBitset); 
+   --------------------------------------------- *)
+      state := 18;
+(* --- bottom-up pattern-matching --- *)
+.HS
+.HS
+      cost := 1;
+      IF cost < info^.Code.Cost THEN
+        info^.Code.Cost := cost;
+        info^.Code.Proc := yyF14Code;
+      END;
+.HS
+      cost := 0;
+      IF cost < info^.BFold.Cost THEN
+        info^.BFold.Cost := cost;
+        info^.BFold.Proc := yyF20BFold;
+      END;
+.HS
+  | Tree.False:
+(* ------ simple pattern-matching ------
+      INCL (info^.yyClasses [yyCbConst DIV yyBitsPerBitset], yyCbConst MOD yyBitsPerBitset); 
+      INCL (info^.yyClasses [yyCbExpr DIV yyBitsPerBitset], yyCbExpr MOD yyBitsPerBitset); 
+   --------------------------------------------- *)
+      state := 19;
+(* --- bottom-up pattern-matching --- *)
+.HS
+.HS
+      cost := 1;
+      IF cost < info^.Code.Cost THEN
+        info^.Code.Cost := cost;
+        info^.Code.Proc := yyF15Code;
+      END;
+.HS
+      cost := 0;
+      IF cost < info^.BFold.Cost THEN
+        info^.BFold.Cost := cost;
+        info^.BFold.Proc := yyF21BFold;
+      END;
+.HS
+  END;
+(* ------ simple pattern-matching ------
+   --------------------------------------------- *)
+  RETURN state;
+(* --- bottom-up pattern-matching --- *)
+END yyTraverse;
+.HS
+(* ------ simple pattern-matching ------
+PROCEDURE BeginTrans;
+BEGIN
+   --------------------------------------------- *)
+PROCEDURE yyErrorCheck (i: INTEGER; s1, s2: ARRAY OF CHAR);
+BEGIN
+  IF i < 0 THEN
+    IO.WriteS (IO.StdError, s1);
+    IO.WriteS (IO.StdError, s2);
+    IO.WriteNl (IO.StdError); IO.CloseIO; HALT;
+  END;
+END yyErrorCheck;
+.HS
+PROCEDURE BeginTrans;
+VAR yyf: SystemIO.tFile; yyi: INTEGER;
+BEGIN
+  yyf := SystemIO.OpenInput (TransTabName);
+  yyErrorCheck (yyf, 'cannot open ', TransTabName);
+  yyi := SystemIO.Read (yyf, SYSTEM.ADR (yySets), SYSTEM.TSIZE (yySetsType));
+  yyErrorCheck (yyi, 'cannot read ', TransTabName);
+  yyi := SystemIO.Read (yyf, SYSTEM.ADR (yyComb), SYSTEM.TSIZE (yyCombType));
+  yyErrorCheck (yyi, 'cannot read ', TransTabName);
+  SystemIO.Close (yyf);
+(* --- bottom-up pattern-matching --- *)
+    (* line 12 Trans.estra *)
+.HS
+BeginIO;
+.HS
+END BeginTrans;
+.HS
+PROCEDURE DoTrans (yyt: Tree.tTree);
+VAR state: yyStateType;
+BEGIN
+(* ------ simple pattern-matching ------
+  yyTraverse (yyt);
+   --------------------------------------------- *)
+  state := yyTraverse (yyt);
+(* --- bottom-up pattern-matching --- *)
+  Code (yyt);
+  yyReleaseHeap;
+END DoTrans;
+.HS
+PROCEDURE CloseTrans;
+BEGIN
+    (* line 16 Trans.estra *)
+.HS
+CloseIO;
+.HS
+END CloseTrans;
+.HS
+BEGIN
+  TransTabName := 'Trans.tab';
+  WITH yyInfo DO
+(* ------ simple pattern-matching ------
+    yyClasses [0] := {};
+   --------------------------------------------- *)
+(* --- bottom-up pattern-matching --- *)
+    Code.Cost := yyInfinite;
+    Code.Proc := yyECode;
+    AFold.Cost := yyInfinite;
+    AFold.Proc := yyEAFold;
+    BFold.Cost := yyInfinite;
+    BFold.Proc := yyEBFold;
+  END;
+  yyBlockList:= NIL;
+  yyPoolFreePtr:= NIL;
+  yyPoolEndPtr:= NIL;
+END Trans.
+.)l
+.oh ''%''
+.bp
+.UH 2 "Anhang B3: Bottom-Up Pattern-Matching Automat"
+.lp
+.b "Relevante Muster:"
+.TS
+rl.
+.sz -2
+p\*<0\*> =	Stats (:, :)
+p\*<0\*> =	Stats (:, :)
+p\*<1\*> =	Stats0 ()
+p\*<2\*> =	If (bConst, :, :)
+p\*<3\*> =	If (:, :, Stats0 ())
+p\*<4\*> =	If (:, Stats0 (), :)
+p\*<5\*> =	If (:, :, :)
+p\*<6\*> =	':=' (:, :)
+p\*<7\*> =	'+' (:, :)
+p\*<8\*> =	aConst
+p\*<9\*> =	index
+p\*<10\*> =	'<' (:, :)
+p\*<11\*> =	bIdent ()
+p\*<12\*> =	bConst
+p\*<13\*> =	Const ()
+p\*<14\*> =	'+' (aConst, aConst)
+p\*<15\*> =	True ()
+p\*<16\*> =	False ()
+p\*<17\*> =	'<' (aConst, aConst)
+p\*<18\*> =	:
+.TE
+.bp
+.b "Zust\*ande:"
+.TS
+rl.
+.sz -2
+q\*<0\*> =	{ p\*<0\*>, p\*<18\*> }
+q\*<1\*> =	{ p\*<1\*>, p\*<18\*> }
+q\*<2\*> =	{ p\*<2\*>, p\*<3\*>, p\*<4\*>, p\*<5\*>, p\*<18\*> }
+q\*<3\*> =	{ p\*<2\*>, p\*<3\*>, p\*<5\*>, p\*<18\*> }
+q\*<4\*> =	{ p\*<2\*>, p\*<4\*>, p\*<5\*>, p\*<18\*> }
+q\*<5\*> =	{ p\*<2\*>, p\*<5\*>, p\*<18\*> }
+q\*<6\*> =	{ p\*<3\*>, p\*<4\*>, p\*<5\*>, p\*<18\*> }
+q\*<7\*> =	{ p\*<3\*>, p\*<5\*>, p\*<18\*> }
+q\*<8\*> =	{ p\*<4\*>, p\*<5\*>, p\*<18\*> }
+q\*<9\*> =	{ p\*<5\*>, p\*<18\*> }
+q\*<10\*> =	{ p\*<6\*>, p\*<18\*> }
+q\*<11\*> =	{ p\*<7\*>, p\*<8\*>, p\*<14\*>, p\*<18\*> }
+q\*<12\*> =	{ p\*<7\*>, p\*<8\*>, p\*<18\*> }
+q\*<13\*> =	{ p\*<7\*>, p\*<18\*> }
+q\*<14\*> =	{ p\*<8\*>, p\*<13\*>, p\*<18\*> }
+q\*<15\*> =	{ p\*<8\*>, p\*<18\*> }
+q\*<16\*> =	{ p\*<9\*>, p\*<18\*> }
+q\*<17\*> =	{ p\*<10\*>, p\*<12\*>, p\*<17\*>, p\*<18\*> }
+q\*<18\*> =	{ p\*<10\*>, p\*<12\*>, p\*<18\*> }
+q\*<19\*> =	{ p\*<10\*>, p\*<18\*> }
+q\*<20\*> =	{ p\*<11\*>, p\*<18\*> }
+q\*<21\*> =	{ p\*<12\*>, p\*<15\*>, p\*<18\*> }
+q\*<22\*> =	{ p\*<12\*>, p\*<16\*>, p\*<18\*> }
+q\*<23\*> =	{ p\*<12\*>, p\*<18\*> }
+q\*<24\*> =	{ p\*<18\*> }
+.TE
+.bp
+.b "Zustands\*ubergangsfunktionen:"
+.TS
+llllll.
+.sz -2
+Stats	[q\*<2\*> - q\*<10\*>, q\*<24\*>]	[q\*<0\*>, q\*<1\*>, q\*<24\*>]		\(eq	q\*<0\*>
+.HS
+Stats0				\(eq	q\*<1\*>
+.HS
+If	[q\*<17\*>, q\*<18\*>, q\*<21\*>, q\*<22\*>, q\*<23\*>]	[q\*<0\*>, q\*<24\*>]	[q\*<0\*>, q\*<24\*>]	\(eq	q\*<5\*>
+If	[q\*<17\*>, q\*<18\*>, q\*<21\*>, q\*<22\*>, q\*<23\*>]	[q\*<0\*>, q\*<24\*>]	[q\*<1\*>]	\(eq	q\*<3\*>
+If	[q\*<17\*>, q\*<18\*>, q\*<21\*>, q\*<22\*>, q\*<23\*>]	[q\*<1\*>]	[q\*<0\*>, q\*<24\*>]	\(eq	q\*<4\*>
+If	[q\*<17\*>, q\*<18\*>, q\*<21\*>, q\*<22\*>, q\*<23\*>]	[q\*<1\*>]	[q\*<1\*>]	\(eq	q\*<2\*>
+If	[q\*<19\*>, q\*<20\*>, q\*<24\*>]	[q\*<0\*>, q\*<24\*>]	[q\*<0\*>, q\*<24\*>]	\(eq	q\*<9\*>
+If	[q\*<19\*>, q\*<20\*>, q\*<24\*>]	[q\*<0\*>, q\*<24\*>]	[q\*<1\*>]	\(eq	q\*<7\*>
+If	[q\*<19\*>, q\*<20\*>, q\*<24\*>]	[q\*<1\*>]	[q\*<0\*>, q\*<24\*>]	\(eq	q\*<8\*>
+If	[q\*<19\*>, q\*<20\*>, q\*<24\*>]	[q\*<1\*>]	[q\*<1\*>]	\(eq	q\*<6\*>
+.HS
+\&':='	[q\*<16\*>, q\*<24\*>]	[q\*<11\*> - q\*<16\*>, q\*<24\*>]		\(eq	q\*<10\*>
+.HS
+\&'+'	[q\*<11\*>, q\*<12\*>, q\*<14\*>, q\*<15\*>]	[q\*<11\*>, q\*<12\*>, q\*<14\*>, q\*<15\*>]		\(eq	q\*<11\*>
+\&'+'	[q\*<11\*>, q\*<12\*>, q\*<14\*>, q\*<15\*>]	[q\*<13\*>, q\*<16\*>, q\*<24\*>]		\(eq	q\*<13\*>
+\&'+'	[q\*<13\*>, q\*<16\*>, q\*<24\*>]	[q\*<11\*> - q\*<16\*>, q\*<24\*>]		\(eq	q\*<13\*>
+.HS
+aIdent				\(eq	q\*<16\*>
+.HS
+Const				\(eq	q\*<14\*>
+.HS
+\&'<'	[q\*<11\*>, q\*<12\*>, q\*<14\*>, q\*<15\*>]	[q\*<11\*>, q\*<12\*>, q\*<14\*>, q\*<15\*>]		\(eq	q\*<17\*>
+\&'<'	[q\*<11\*>, q\*<12\*>, q\*<14\*>, q\*<15\*>]	[q\*<13\*>, q\*<16\*>, q\*<24\*>]		\(eq	q\*<19\*>
+\&'<'	[q\*<13\*>, q\*<16\*>, q\*<24\*>]	[q\*<11\*> - q\*<16\*>, q\*<24\*>]		\(eq	q\*<19\*>
+.HS
+bIdent				\(eq	q\*<20\*>
+.HS
+True				\(eq	q\*<21\*>
+.HS
+False				\(eq	q\*<22\*>
+.TE
+.BP
+.lp
+.fi
+.sp
+.b
+.sz 12
+.(x
+
+\fBLiteraturhinweise\fP
+.)x
+.de []
+.b
+Literaturhinweise
+.lp
+..
+.[]
+.[-
+.ds [F AGT87
+.ds [A Alfred V. Aho
+.as [A \*(c]Mahadevan Ganapathi
+.as [A \*(m]Steven W. K. Tjiang
+.ds [T Code Generation Using Tree Matching and Dynamic Programming
+.ds [I AT&T Bell Laboratories
+.ds [D 1987
+.][
+.[-
+.ds [F BMW87
+.ds [A J\*urgen B\*orstler
+.as [A \*(c]Ulrich M\*oncke
+.as [A \*(m]Reinhard Wilhelm
+.ds [T Table Compression for Tree Automata
+.ds [D 1987
+.ds [V 12
+.ds [J Aachener Informatik-Berichte
+.][
+.[-
+.ds [F Emm88
+.ds [A Helmut Emmelmann
+.ds [T Automatische Erzeugung effizienter Codegeneratoren
+.ds [I Diplomarbeit, GMD Forschungsstelle an der Universit\*at Karlsruhe
+.ds [D Sep. 1988
+.][
+.[-
+.ds [F Gro89
+.ds [A Josef Grosch
+.ds [T Ast - A generator for Abstract Syntax Trees
+.ds [I GMD Forschungsstelle an der Universit\*at Karlsruhe
+.ds [V 14
+.ds [D Feb. 1989
+.][
+.[-
+.ds [F HoO82
+.ds [A Christoph M. Hoffmann
+.as [A \*(n]Michael J. O'Donnell
+.ds [T Pattern Matching in Trees
+.ds [J J. ACM
+.ds [V 29
+.ds [N 1
+.nr [P 1
+.ds [P 68-95
+.ds [D Jan. 1982
+.][
+.[-
+.ds [F KeR83
+.ds [A Brian W. Kernighan
+.as [A \*(n]Dennis M. Ritchie
+.ds [T Programmieren in C
+.ds [I Hanser M\*unchen
+.ds [D 1983
+.][
+.[-
+.ds [F Knu68
+.ds [A D. E. Knuth
+.ds [T Semantics of Context-Free Languages
+.nr [P 1
+.ds [P 127-146
+.ds [J Mathematical Systems Theory
+.ds [V 2
+.ds [D June 1968
+.ds [N 2
+.][
+.[-
+.ds [F MWW84
+.ds [A Ulrich M\*onke
+.as [A \*(c]Beatrix Weisgerber
+.as [A \*(m]Reinhard Wilhelm
+.ds [T How to Implement a System for Manipulation of Attributed Trees
+.ds [B Informatik Fachberichte
+.ds [V 77
+.ds [E U. Ammann
+.nr [E 1
+.ds [S Programmiersprachen und Programmentwicklung
+.ds [I Springer Verlag
+.ds [D Mar. 1984
+.][
+.[-
+.ds [F Wir85
+.ds [A Niklaus Wirth
+.ds [T Programmieren in Modula-2
+.ds [I Springer Verlag
+.ds [D 1985
+.][
+.he '\s-2\fRInhaltsverzeichnis\fP\s+2''%'
+.bp 2
+.lp
+.xp

@@ -1,0 +1,23 @@
+MODULE btoh;
+
+(* convert binary files into ascii using hexadecimal representation *)
+
+FROM StdIO IMPORT ReadC, EndOfFile, WriteN, WriteNl, CloseIO;
+
+VAR count: INTEGER;
+
+BEGIN
+   count := 0;
+   WHILE NOT EndOfFile () DO
+      WriteN (ORD (ReadC ()), 2, 16);
+      INC (count);
+      IF count = 40 THEN
+	 WriteNl;
+	 count := 0;
+      END;
+   END;
+   IF count # 0 THEN
+      WriteNl;
+   END;
+   CloseIO;
+END btoh.

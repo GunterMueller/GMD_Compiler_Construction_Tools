@@ -1,0 +1,103 @@
+.TH AST 1 "" "GMD-Forschungsstelle-Karlsruhe"
+.SH NAME
+ast - generator for abstract structure/syntax trees
+.SH SYNOPSIS
+ast [-options] [-ldir] [file]
+.SH DESCRIPTION
+.I Ast
+generates a program module to handle arbitrary attributed trees and graphs.
+A typical application is the abstract syntax tree in a compiler.
+The input
+.I file
+contains a specification which describes the structure of all
+possible trees or nodes respectively and the attributes of the nodes.
+.I Ast
+generates type declarations to implement the tree and several procedures for
+tree manipulation including ASCII and binary readers and writers (see options below).
+If
+.I file
+is omitted the specification is read from standard input.
+.SH OPTIONS
+.ta 2.5i
+.IP a
+generate all except -ch (default)
+.IP n
+generate node constructors	procedures n<node> (node)
+.IP m
+generate node constructors	procedures m<node> (make)
+.IP f
+generate node/tree destroyer	procedure ReleaseTREE (free)
+.IP F
+generate general destroyer	procedure ReleaseTREEModule (FREE)
+.IP o
+generate ASCII node writer	procedure WriteTREENode (output)
+.IP r
+generate ASCII graph reader	procedure ReadTREE
+.IP w
+generate ASCII graph writer	procedure WriteTREE
+.IP g
+generate binary graph reader	procedure GetTREE
+.IP p
+generate binary graph writer	procedure PutTREE
+.IP R
+generate list reverser	procedure ReverseTREE
+.IP t
+generate top down traversal	procedure TraverseTREETD
+.br
+(reverse depth first)
+.IP b
+generate bottom up traversal	procedure TraverseTREEBU
+.br
+(depth first)
+.IP y
+generate graph copy	procedure CopyTREE
+.IP =
+generate tree equality test	procedure IsEqualTREE
+.IP k
+generate graph checker	procedure CheckTREE
+.IP q
+generate graph browser	procedure QueryTREE
+.IP d
+generate definition module
+.IP i
+generate implementation module
+.IP s
+generate import statements
+.IP 4
+generate tree/graph description in file VIEW.TS
+.IP 6
+generate # line directives
+.IP 7
+touch output files only if necessary
+.IP 8
+report storage consumption
+.IP c
+generate C code (default is Modula-2)
+.IP h
+print help information
+.IP l\fRdir
+.I dir
+is the directory where ast finds its table files
+.SH FILES
+.nf
+.ta 2i
+if output is in C:
+.sp 0.5
+<module>.h	specification of the generated graph module
+<module>.c	body of the generated graph module
+yy<module>.w	macro file defining type specific operations
+.sp 0.5
+if output is in Modula-2:
+.sp 0.5
+<module>.md	definition module of the generated graph module
+<module>.mi	implementation module of the generated graph module
+<module>.imp	import statements
+.fi
+.SH SEE\ ALSO
+.sp 0.5
+J. Grosch: "Ast - A Generator for Abstract Syntax Trees",
+GMD Forschungsstelle an der Universitaet Karlsruhe,
+Compiler Generation Report No. 15
+.sp 0.5
+J. Grosch: "Tool Support for Data Structures",
+Structured Programming, 12, 31-38 (1991)

@@ -1,0 +1,23 @@
+Cocktail:
+		   The Compiler Construction Tool Box
+		   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+	(c)1992, German National Research Centre for Computer Science.
+
+http://compilers.iecc.com/comparch/article/92-09-049
+
+File Changes:
+
+->	Changed installation paths in top level makefile.
+->	Changed the cmd-line for the install prog in EVERY (*used*) subdir Makefile.
+
+To Build:
+
+->	change paths in top-level Makefile to reflect your system.
+->	type 'make install'.
+->  go and have a nice cup of tea...
+
+To Test:
+
+->	Hmm... See README file in top level directory for an overview of what
+    these progs do.

@@ -1,0 +1,49 @@
+# Modula-2 library
+LIB	= $(HOME)/reuse/src
+
+# options for modula compiler
+MFLAGS	= -nobounds -norange -M$(LIB)
+
+# option to name linked program
+OUT	= ; mv a.out
+
+MD	= m2c $(MFLAGS)		# command to compile definition module
+MI	= m2c $(MFLAGS)		# command to compile implementation module
+MP	= m2c $(MFLAGS)		# command to compile program module
+ML	= m2c $(MFLAGS) -e	# command to link program
+
+ED	= .def	# extension for definition module
+EI	= .mod	# extension for implementation module
+EP	= .mod	# extension for program module
+ES	= .sym	# extension for symbol file (compiled definition)
+EO	= .o	# extension for object file (compiled implementation)
+
+SD	= .def	# compiler suffix for definition module
+SI	= .mod	# compiler suffix for implementation module
+SP	= .mod	# compiler suffix for program module
+
+all	:
+
+# HEAD
+
+Scanner$(ES)	: Scanner$(ED)	; $(MD) Scanner$(SD)
+
+Scanner$(EO)	: Scanner$(EI)	; $(MI) Scanner$(SI)
+Scanner$(EO)	: Scanner$(ES)
+Scanner$(EO)	: Source$(ES)
+
+all	: ScannerDrv
+ScannerDrv$(EO)	: ScannerDrv$(EP)	; $(MP) ScannerDrv$(SP)
+ScannerDrv$(EO)	: Scanner$(ES)
+
+Source$(ES)	: Source$(ED)	; $(MD) Source$(SD)
+
+Source$(EO)	: Source$(EI)	; $(MI) Source$(SI)
+Source$(EO)	: Source$(ES)
+
+ScannerDrv	: ScannerDrv$(EO) Scanner$(EO) Source$(EO)	; $(ML) ScannerDrv $(OUT) ScannerDrv
+
+# TAIL
+
+# CLEAN	:	; rm -f core *.[dimor] ERRORS LISTING
+CLEAN	:	; rm -f core *.sym *.o

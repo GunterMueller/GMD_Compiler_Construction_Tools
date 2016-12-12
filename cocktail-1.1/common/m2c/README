@@ -1,0 +1,17 @@
+Common - Module Library
+=======================
+
+The library MLIB=reuse must have been compiled before the compilation of common.
+Common has been compiled successfully on several configurations:
+
+configuration | computer | processor | operating-system | compiler
+--------------------------------------------------------------------
+CC            | SUN 3    | MC 68020  | SunOS 4.1        | cc
+CC	      | SUN 4    | SPARC     | SunOS 4.1  	| cc
+CC	      | VAX 2000 |	     | ULTRIX V2.0	| cc
+CC	      | VAX 8500 |	     | ULTRIX V2.0-1	| cc
+CC	      | DEC 3100 | MIPS      | ULTRIX V2.0-7	| cc
+
+To generate common use:
+
+   make OPT=...

@@ -1,0 +1,17 @@
+A Simple Test of Rex
+====================
+
+Currently (Sept. 1988) Rex has been tested successfully for its 2 target
+languages using 2 different Modula-2 compilers:
+
+test | language | compiler
+----------------------------------
+C    | C        | cc
+MC   | Modula   | MOCKA (mc)
+M2C  | Modula   | SUN Modula (m2c)
+
+To run a test use:
+
+   make <test> MLIB=...
+
+where MLIB (=reuse) is the directory containing the Modula library.

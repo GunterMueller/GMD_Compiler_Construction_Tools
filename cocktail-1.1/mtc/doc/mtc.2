@@ -1,0 +1,130 @@
+
+
+
+MTC(1)                   USER COMMANDS                     MTC(1)
+
+
+
+NAME
+     mtc - Modula-2 to C Translator
+
+SYNOPSIS
+     mtc [ options ] [ file ]
+
+DESCRIPTION
+     Mtc translates Modula-2 programs into readable C code.   Mtc
+     implements  the  language  Modula-2 as defined in N. Wirth's
+     report (3rd edition) with  a  few  minor  restrictions  (see
+     below)  and  most  language extensions implemented by MOCKA,
+     the Modula-2 Compiler Karlsruhe. It produces K&R (not  ANSI)
+     C code with a few very common extensions like passing struc-
+     tures as value parameters.
+     A definition or foreign module module.md is translated  into
+     a  C  header  file  module.h.  An  implementation or program
+     module module.mi is  translated  into  the  corresponding  C
+     source  file  module.c.   Separate compilation is handled by
+     reprocessing all transitively  imported  definition  modules
+     when  translating a compilation unit. If file is omitted mtc
+     reads from standard input.
+     Mtc is intended as a tool for translating finished  programs
+     from  Modula-2  to  C and not as a tool for program develop-
+     ment.  Therefore, the translator does not check the semantic
+     correctness of the Modula-2 programs.
+     For each  foreign  module  an  empty  implementation  module
+     corresponding  to  it has to be translated to C, because the
+     initialization routine produced for the dummy implementation
+     module  is  used  within  the modules resp. C programs which
+     import the foreign module.
+     If the library function alloca is available and the  C  pro-
+     grams  are  compiled  with  the  flag -DStackAlloc, then the
+     memory space for open array value parameters will  be  allo-
+     cated  in  the  stack  frame of the corresponding procedure.
+     This temporary space will be freed  automatically  when  the
+     procedure  returns.  Otherwise, malloc and free will be used
+     to allocate and deallocate memory space for open array value
+     parameters.
+
+OPTIONS
+     -w          Suppress warning diagnostics.
+
+     -i          Generate header files for imported modules.
+
+     -c          Generate type casts to make the C programs  lint
+                 free.
+
+     -r          Generate runtime checks.
+
+     -h          Print help information.
+
+
+
+GMD-Forschungsstelle-Karlsruhe    Last change:                          1
+
+
+
+
+
+
+MTC(1)                   USER COMMANDS                     MTC(1)
+
+
+
+     -t          Print test output (time).
+
+     -m          Print test output (memory).
+
+     -ddir       Allow import from modules in library dir.
+
+     -ldir       Specify directory where mtc finds its tables.
+
+FILES
+     module.md   Source file  of  definition  or  foreign  module
+                 module.
+
+     module.mi   Source file of implementation or program  module
+                 module.
+
+     module.h    C header file produced for module.md.
+
+     module.c    C source file produced for module.mi.
+
+     SYSTEM_.h   Definition of standard constants,  types,  func-
+                 tions,  and  macros,  which are used in the gen-
+                 erated C programs.
+
+     SYSTEM_.c   Main  program  and  implementation  of  standard
+                 functions.
+
+SEE ALSO
+     Entwurf und Implementierung eines  bersetzers  von  Modula-2
+     nach C by M. Martin.
+     Programming in Modula-2 (3rd edition) by N. Wirth.
+     MOCKA User Manual by F. Engelmann.
+     The C Programming Language by B.  W.  Kernighan  and  D.  M.
+     Ritchie.
+
+DIAGNOSTICS
+     The translator reports lexical and syntactic errors,  errors
+     detected  during  the  handling of separate compilation, and
+     restrictions of the code generation.   The  translator  does
+     not check the semantic correctness of the Modula-2 programs.
+     The diagnostics produced by mtc are  intended  to  be  self-
+     explanatory.
+
+BUGS
+     Coroutines are not supported.
+     Forward references within pointer declarations  are  limited
+     to structured types.
+     Comments are not translated from Modula-2 to C.
+     In some very rare cases the translator has to evaluate  con-
+     stant expressions, because a literal translation is not pos-
+     sible. The translator will fail to do this, if  the  expres-
+     sion   or   one   of  its  operands  is  not  in  the  range
+     MIN(INTEGER)..MAX(INTEGER).
+
+
+
+GMD-Forschungsstelle-Karlsruhe    Last change:                          2
+
+
+

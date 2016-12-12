@@ -1,0 +1,1695 @@
+IMPLEMENTATION MODULE Optimize;
+
+
+
+
+
+
+
+
+
+
+
+
+
+IMPORT SYSTEM, System, IO, Tree;
+(* line 5 "opt.puma" *)
+
+
+FROM IO		IMPORT StdOutput, WriteB, WriteS, WriteI, WriteNl;
+FROM Idents	IMPORT WriteIdent;
+FROM Mod	IMPORT ImplMod;
+FROM Tree	IMPORT tTree, NoTree, mTestIsType, mNodeTypes;
+FROM Scanner	IMPORT Warning;
+FROM Positions	IMPORT tPosition;
+
+FROM Sets	IMPORT
+   tSet		, MakeSet	, ReleaseSet	, AssignEmpty	,
+   IsEmpty	, Difference	, IsSubset	, Assign	,
+   IsEqual	, IsNotEqual	, Intersection	, Union		,
+   Size		, WriteSet	;
+
+IMPORT Sets;
+
+VAR
+   gHasExit, gHasAssign, gHasTargetCode, gHasRejectOrFail: BOOLEAN;
+   gRule, nNoDecision, nNoTest	: tTree;
+
+PROCEDURE IsDisjoint (s1, s2: tSet): BOOLEAN;
+   VAR s: tSet; Result: BOOLEAN;
+   BEGIN
+      MakeSet (s, Size (s1));
+      Assign (s, s1);
+      Intersection (s, s2);
+      Result := IsEmpty (s);
+      ReleaseSet (s);
+      RETURN Result;
+   END IsDisjoint;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+PROCEDURE yyAbort (yyFunction: ARRAY OF CHAR);
+ BEGIN
+  IO.WriteS (IO.StdError, 'Error: module Optimize, routine ');
+  IO.WriteS (IO.StdError, yyFunction);
+  IO.WriteS (IO.StdError, ' failed');
+  IO.WriteNl (IO.StdError);
+  Exit;
+ END yyAbort;
+
+PROCEDURE yyIsEqual (yya, yyb: ARRAY OF SYSTEM.BYTE): BOOLEAN;
+ VAR yyi	: INTEGER;
+ BEGIN
+  FOR yyi := 0 TO INTEGER (HIGH (yya)) DO
+   IF yya [yyi] # yyb [yyi] THEN RETURN FALSE; END;
+  END;
+  RETURN TRUE;
+ END yyIsEqual;
+
+PROCEDURE Optimize (t: Tree.tTree);
+ VAR yyTempo: RECORD CASE : INTEGER OF
+ | 1: yyR1: RECORD
+  yyV1: Tree.tTree;
+  yyV2: Tree.tTree;
+  END;
+ | 2: yyR2: RECORD
+  yyV1: Tree.tTree;
+  yyV2: Tree.tTree;
+  yyV3: tSet;
+  yyV4: Tree.tTree;
+  yyV5: SHORTCARD;
+  yyV6: tSet;
+  END;
+ END; END;
+ BEGIN
+  IF (t^.Kind = Tree.Spec) THEN
+(* line 40 "opt.puma" *)
+    WITH yyTempo.yyR1 DO
+     WITH t^.Spec DO
+(* line 41 "opt.puma" *)
+      yyV1 := Tree.yyPoolFreePtr; IF SYSTEM.ADDRESS (yyV1) >= Tree.yyPoolMaxPtr THEN yyV1 := Tree.yyAlloc (); END; INC (Tree.yyPoolFreePtr, Tree.yyNodeSize [Tree.NoDecision]); yyV1^.yyHead.yyMark := 0; yyV1^.Kind := Tree.NoDecision;
+      nNoDecision := yyV1;
+(* line 42 "opt.puma" *)
+      yyV2 := Tree.yyPoolFreePtr; IF SYSTEM.ADDRESS (yyV2) >= Tree.yyPoolMaxPtr THEN yyV2 := Tree.yyAlloc (); END; INC (Tree.yyPoolFreePtr, Tree.yyNodeSize [Tree.NoTest]); yyV2^.yyHead.yyMark := 0; yyV2^.Kind := Tree.NoTest;
+      nNoTest := yyV2;
+(* line 43 "opt.puma" *)
+      Optimize (Routines);
+      RETURN;
+     END;
+    END;
+
+  END;
+  IF Tree.IsType (t, Tree.Routine) THEN
+(* line 45 "opt.puma" *)
+    WITH yyTempo.yyR2 DO
+     WITH t^.Routine DO
+(* line 46 "opt.puma" *)
+      RuleProperties (Rules);
+(* line 47 "opt.puma" *)
+      CollectTests (Rules, InForm);
+(* line 48 "opt.puma" *)
+      BuildTree (Rules, nNoDecision, yyV1);
+(* line 49 "opt.puma" *)
+      Decisions := yyV1;
+(* line 50 "opt.puma" *)
+      ElimDeadTests (Decisions, yyV2, (FALSE), yyV3);
+(* line 51 "opt.puma" *)
+      FindCases (Decisions, yyV4, yyV5, yyV6);
+(* line 52 "opt.puma" *)
+      MarkCases (Decisions, yyV5, yyV6);
+(* line 53 "opt.puma" *)
+      Optimize (Next);
+      RETURN;
+     END;
+    END;
+
+  END;
+ END Optimize;
+
+PROCEDURE RuleProperties (yyP1: Tree.tTree);
+ VAR yyTempo: RECORD CASE : INTEGER OF
+ END; END;
+ BEGIN
+
+  CASE yyP1^.Kind OF
+  | Tree.Spec:
+(* line 58 "opt.puma" *)
+     WITH yyP1^.Spec DO
+(* line 59 "opt.puma" *)
+      RuleProperties (Routines);
+      RETURN;
+     END;
+
+  | Tree.Routine
+  , Tree.Procedure
+  , Tree.Function
+  , Tree.Predicate:
+(* line 61 "opt.puma" *)
+     WITH yyP1^.Routine DO
+(* line 62 "opt.puma" *)
+      RuleProperties (Rules);
+(* line 63 "opt.puma" *)
+      RuleProperties (Next);
+      RETURN;
+     END;
+
+  | Tree.Rule:
+(* line 65 "opt.puma" *)
+     WITH yyP1^.Rule DO
+(* line 66 "opt.puma" *)
+      gHasExit := FALSE;
+(* line 67 "opt.puma" *)
+      gHasAssign := FALSE;
+(* line 68 "opt.puma" *)
+      gHasTargetCode := FALSE;
+(* line 69 "opt.puma" *)
+      gHasRejectOrFail := FALSE;
+(* line 70 "opt.puma" *)
+      RuleProperties (Statements);
+(* line 71 "opt.puma" *)
+      RuleProperties (Exprs);
+(* line 72 "opt.puma" *)
+      RuleProperties (Expr);
+(* line 73 "opt.puma" *)
+      HasExit := gHasExit;
+(* line 74 "opt.puma" *)
+      HasAssign := gHasAssign;
+(* line 75 "opt.puma" *)
+      HasTargetCode := gHasTargetCode;
+(* line 76 "opt.puma" *)
+      HasRejectOrFail := gHasRejectOrFail;
+(* line 77 "opt.puma" *)
+      RuleProperties (Next);
+      RETURN;
+     END;
+
+  | Tree.ProcCall:
+(* line 79 "opt.puma" *)
+     WITH yyP1^.ProcCall DO
+(* line 80 "opt.puma" *)
+      RuleProperties (Call);
+(* line 81 "opt.puma" *)
+      RuleProperties (Next);
+      RETURN;
+     END;
+
+  | Tree.Assignment:
+(* line 83 "opt.puma" *)
+     WITH yyP1^.Assignment DO
+(* line 84 "opt.puma" *)
+      gHasAssign := TRUE;
+(* line 85 "opt.puma" *)
+      RuleProperties (Adr);
+(* line 86 "opt.puma" *)
+      RuleProperties (Expr);
+(* line 87 "opt.puma" *)
+      RuleProperties (Next);
+      RETURN;
+     END;
+
+  | Tree.Condition:
+(* line 89 "opt.puma" *)
+     WITH yyP1^.Condition DO
+(* line 90 "opt.puma" *)
+      gHasExit := TRUE;
+(* line 91 "opt.puma" *)
+      RuleProperties (Next);
+      RETURN;
+     END;
+
+  | Tree.Reject:
+(* line 93 "opt.puma" *)
+     WITH yyP1^.Reject DO
+(* line 94 "opt.puma" *)
+      gHasExit := TRUE;
+(* line 95 "opt.puma" *)
+      gHasRejectOrFail := TRUE;
+(* line 96 "opt.puma" *)
+      RuleProperties (Next);
+      RETURN;
+     END;
+
+  | Tree.Fail:
+(* line 98 "opt.puma" *)
+     WITH yyP1^.Fail DO
+(* line 99 "opt.puma" *)
+      gHasRejectOrFail := TRUE;
+(* line 100 "opt.puma" *)
+      RuleProperties (Next);
+      RETURN;
+     END;
+
+  | Tree.TargetStmt:
+(* line 102 "opt.puma" *)
+     WITH yyP1^.TargetStmt DO
+(* line 103 "opt.puma" *)
+      gHasTargetCode := TRUE;
+(* line 104 "opt.puma" *)
+      RuleProperties (Next);
+      RETURN;
+     END;
+
+  | Tree.Statement
+  , Tree.Nl
+  , Tree.WriteStr:
+(* line 106 "opt.puma" *)
+     WITH yyP1^.Statement DO
+(* line 107 "opt.puma" *)
+      RuleProperties (Next);
+      RETURN;
+     END;
+
+  | Tree.OneExpr
+  , Tree.NamedExpr:
+(* line 109 "opt.puma" *)
+     WITH yyP1^.OneExpr DO
+(* line 110 "opt.puma" *)
+      RuleProperties (Expr);
+(* line 111 "opt.puma" *)
+      RuleProperties (Next);
+      RETURN;
+     END;
+
+  | Tree.Expr
+  , Tree.Compose
+  , Tree.VarUse
+  , Tree.AttrDesc
+  , Tree.Nil
+  , Tree.Call
+  , Tree.Binary
+  , Tree.PreOperator
+  , Tree.PostOperator
+  , Tree.Index
+  , Tree.Parents
+  , Tree.TargetExpr
+  , Tree.StringExpr:
+(* line 113 "opt.puma" *)
+     WITH yyP1^.Expr DO
+(* line 114 "opt.puma" *)
+      gHasExit := gHasExit OR NeedsMatch (yyP1);
+      RETURN;
+     END;
+
+  ELSE END;
+
+ END RuleProperties;
+
+PROCEDURE NeedsMatch (yyP2: Tree.tTree): BOOLEAN;
+ VAR yyTempo: RECORD CASE : INTEGER OF
+ END; END;
+ BEGIN
+  IF (yyP2^.Kind = Tree.TestValue) THEN
+(* line 119 "opt.puma" *)
+   LOOP
+     WITH yyP2^.TestValue DO
+(* line 119 "opt.puma" *)
+      IF NOT (NeedsMatch (Expr) OR NeedsMatch (Next)) THEN EXIT; END;
+      RETURN TRUE;
+     END;
+   END;
+
+  END;
+
+  CASE yyP2^.Kind OF
+  | Tree.OneTest
+  , Tree.TestKind
+  , Tree.TestIsType
+  , Tree.TestNil
+  , Tree.TestNonlin
+  , Tree.TestValue:
+(* line 121 "opt.puma" *)
+   LOOP
+     WITH yyP2^.OneTest DO
+(* line 121 "opt.puma" *)
+      IF NOT (NeedsMatch (Next)) THEN EXIT; END;
+      RETURN TRUE;
+     END;
+   END;
+
+  | Tree.OneExpr
+  , Tree.NamedExpr:
+(* line 123 "opt.puma" *)
+   LOOP
+     WITH yyP2^.OneExpr DO
+(* line 123 "opt.puma" *)
+      IF NOT (NeedsMatch (Expr) OR NeedsMatch (Next)) THEN EXIT; END;
+      RETURN TRUE;
+     END;
+   END;
+
+  | Tree.Compose:
+(* line 125 "opt.puma" *)
+   LOOP
+     WITH yyP2^.Compose DO
+(* line 125 "opt.puma" *)
+      IF NOT (NeedsMatch (Exprs)) THEN EXIT; END;
+      RETURN TRUE;
+     END;
+   END;
+
+  | Tree.Call:
+(* line 127 "opt.puma" *)
+   LOOP
+     WITH yyP2^.Call DO
+(* line 128 "opt.puma" *)
+      IF NOT (NeedsMatch (Expr) OR NeedsMatch (Exprs) OR (Object # NoTree) AND NeedsMatch2 (Patterns, Object ^ . Routine . OutForm)) THEN EXIT; END;
+      RETURN TRUE;
+     END;
+   END;
+
+  | Tree.Binary:
+(* line 130 "opt.puma" *)
+   LOOP
+     WITH yyP2^.Binary DO
+(* line 130 "opt.puma" *)
+      IF NOT (NeedsMatch (Lop) OR NeedsMatch (Rop)) THEN EXIT; END;
+      RETURN TRUE;
+     END;
+   END;
+
+  | Tree.Parents:
+(* line 132 "opt.puma" *)
+   LOOP
+     WITH yyP2^.Parents DO
+(* line 134 "opt.puma" *)
+      IF NOT (NeedsMatch (Expr)) THEN EXIT; END;
+      RETURN TRUE;
+     END;
+   END;
+
+  | Tree.PreOperator:
+(* line 132 "opt.puma" *)
+   LOOP
+     WITH yyP2^.PreOperator DO
+(* line 134 "opt.puma" *)
+      IF NOT (NeedsMatch (Expr)) THEN EXIT; END;
+      RETURN TRUE;
+     END;
+   END;
+
+  | Tree.PostOperator:
+(* line 132 "opt.puma" *)
+   LOOP
+     WITH yyP2^.PostOperator DO
+(* line 134 "opt.puma" *)
+      IF NOT (NeedsMatch (Expr)) THEN EXIT; END;
+      RETURN TRUE;
+     END;
+   END;
+
+  | Tree.Index:
+(* line 136 "opt.puma" *)
+   LOOP
+     WITH yyP2^.Index DO
+(* line 136 "opt.puma" *)
+      IF NOT (NeedsMatch (Expr) OR NeedsMatch (Exprs)) THEN EXIT; END;
+      RETURN TRUE;
+     END;
+   END;
+
+  ELSE END;
+
+  RETURN FALSE;
+ END NeedsMatch;
+
+PROCEDURE NeedsMatch2 (yyP4: Tree.tTree; yyP3: Tree.tTree): BOOLEAN;
+ VAR yyTempo: RECORD CASE : INTEGER OF
+ END; END;
+ BEGIN
+  IF (yyP4^.Kind = Tree.OnePattern) THEN
+(* line 141 "opt.puma" *)
+   LOOP
+     WITH yyP4^.OnePattern DO
+(* line 142 "opt.puma" *)
+      IF NOT (NeedsMatch2 (Pattern, yyP3) OR NeedsMatch2 (Next, yyP3 ^ . Formal . Next)) THEN EXIT; END;
+      RETURN TRUE;
+     END;
+   END;
+
+  END;
+  IF (yyP4^.Kind = Tree.Decompose) THEN
+(* line 145 "opt.puma" *)
+   LOOP
+     WITH yyP4^.Decompose DO
+     WITH yyP3^.Formal DO
+(* line 147 "opt.puma" *)
+      IF NOT ((yyP3^.Formal.TypeDesc ^ . Kind = Tree . UserType) OR IsNotEqual (Object ^ . Class . TypeDesc ^ . NodeTypes . Types, yyP3^.Formal.TypeDesc ^ . NodeTypes . Types) OR NeedsMatch2 (Patterns, Object ^ . Class . Formals)) THEN EXIT; END;
+      RETURN TRUE;
+     END;
+     END;
+   END;
+
+  END;
+  IF (yyP4^.Kind = Tree.VarDef) THEN
+(* line 150 "opt.puma" *)
+   LOOP
+     WITH yyP4^.VarDef DO
+(* line 150 "opt.puma" *)
+      IF NOT (Object # NoTree) THEN EXIT; END;
+      RETURN TRUE;
+     END;
+   END;
+
+  END;
+  IF (yyP4^.Kind = Tree.NilTest) THEN
+(* line 151 "opt.puma" *)
+      RETURN TRUE;
+
+  END;
+  IF (yyP4^.Kind = Tree.Value) THEN
+(* line 152 "opt.puma" *)
+      RETURN TRUE;
+
+  END;
+  RETURN FALSE;
+ END NeedsMatch2;
+
+PROCEDURE NeedsTempo (yyP5: Tree.tTree; VAR yyP6: Tree.tTree): BOOLEAN;
+ VAR yyTempo: RECORD CASE : INTEGER OF
+ | 1: yyR1: RECORD
+  yyV1: Tree.tTree;
+  END;
+ END; END;
+ BEGIN
+  IF (yyP5^.Kind = Tree.Decision) THEN
+(* line 156 "opt.puma" *)
+    WITH yyTempo.yyR1 DO
+   LOOP
+     WITH yyP5^.Decision DO
+(* line 156 "opt.puma" *)
+      IF NOT (NeedsTempo (yyP5^.Decision.Then, yyV1)) THEN EXIT; END;
+      yyP6 := yyV1;
+      RETURN TRUE;
+     END;
+   END;
+    END;
+
+  END;
+  IF (yyP5^.Kind = Tree.Decided) THEN
+  IF (yyP5^.Decided.Rule^.Rule.HasTempos =  (TRUE)) THEN
+(* line 157 "opt.puma" *)
+      yyP6 := yyP5^.Decided.Rule;
+      RETURN TRUE;
+
+  END;
+  END;
+  RETURN FALSE;
+ END NeedsTempo;
+
+PROCEDURE NeedsNoFinale (yyP7: Tree.tTree): BOOLEAN;
+ VAR yyTempo: RECORD CASE : INTEGER OF
+ END; END;
+ BEGIN
+  IF (yyP7^.Kind = Tree.Decision) THEN
+(* line 161 "opt.puma" *)
+   LOOP
+     WITH yyP7^.Decision DO
+(* line 161 "opt.puma" *)
+      IF NOT (NeedsNoFinale (yyP7^.Decision.Else)) THEN EXIT; END;
+      RETURN TRUE;
+     END;
+   END;
+
+  END;
+  IF (yyP7^.Kind = Tree.Decided) THEN
+  IF (yyP7^.Decided.Rule^.Rule.HasExit =  (FALSE)) THEN
+(* line 162 "opt.puma" *)
+      RETURN TRUE;
+
+  END;
+(* line 163 "opt.puma" *)
+   LOOP
+     WITH yyP7^.Decided DO
+(* line 163 "opt.puma" *)
+      IF NOT (NeedsNoFinale (yyP7^.Decided.Else)) THEN EXIT; END;
+      RETURN TRUE;
+     END;
+   END;
+
+  END;
+  RETURN FALSE;
+ END NeedsNoFinale;
+
+PROCEDURE GetRule (yyP8: Tree.tTree; VAR yyP9: Tree.tTree);
+ VAR yyTempo: RECORD CASE : INTEGER OF
+ | 1: yyR1: RECORD
+  yyV1: Tree.tTree;
+  END;
+ END; END;
+ BEGIN
+  IF (yyP8^.Kind = Tree.Decision) THEN
+(* line 167 "opt.puma" *)
+    WITH yyTempo.yyR1 DO
+     WITH yyP8^.Decision DO
+(* line 167 "opt.puma" *)
+      GetRule (yyP8^.Decision.Then, yyV1);
+      yyP9 := yyV1;
+      RETURN;
+     END;
+    END;
+
+  END;
+  IF (yyP8^.Kind = Tree.Decided) THEN
+(* line 168 "opt.puma" *)
+      yyP9 := yyP8^.Decided.Rule;
+      RETURN;
+
+  END;
+ END GetRule;
+
+PROCEDURE CollectTests (yyP11: Tree.tTree; yyP10: Tree.tTree);
+ VAR yyTempo: RECORD CASE : INTEGER OF
+ | 1: yyR1: RECORD
+  yyV1: Tree.tTree;
+  END;
+ END; END;
+ BEGIN
+  IF (yyP11^.Kind = Tree.Rule) THEN
+(* line 172 "opt.puma" *)
+    WITH yyTempo.yyR1 DO
+     WITH yyP11^.Rule DO
+(* line 173 "opt.puma" *)
+      CollectTests2 (Patterns, yyP10, nNoTest, yyV1);
+(* line 174 "opt.puma" *)
+      Tests := yyV1;
+(* line 175 "opt.puma" *)
+      CollectTests (Next, yyP10);
+      RETURN;
+     END;
+    END;
+
+  END;
+ END CollectTests;
+
+PROCEDURE CollectTests2 (yyP14: Tree.tTree; yyP13: Tree.tTree; yyP12: Tree.tTree; VAR yyP15: Tree.tTree);
+ VAR yyTempo: RECORD CASE : INTEGER OF
+ | 1: yyR1: RECORD
+  yyV1: Tree.tTree;
+  yyV2: Tree.tTree;
+  END;
+ | 2: yyR2: RECORD
+  yyV1: Tree.tTree;
+  END;
+ | 3: yyR3: RECORD
+  yyV1: Tree.tTree;
+  END;
+ | 4: yyR4: RECORD
+  yyV1: Tree.tTree;
+  END;
+ END; END;
+ BEGIN
+  IF (yyP14^.Kind = Tree.OnePattern) THEN
+  IF (yyP13^.Kind = Tree.Formal) THEN
+(* line 180 "opt.puma" *)
+    WITH yyTempo.yyR1 DO
+     WITH yyP14^.OnePattern DO
+     WITH yyP13^.Formal DO
+(* line 182 "opt.puma" *)
+      CollectTests2 (yyP14^.OnePattern.Next, yyP13^.Formal.Next, yyP12, yyV1);
+(* line 183 "opt.puma" *)
+      CollectTests2 (yyP14^.OnePattern.Pattern, yyP13, yyV1, yyV2);
+      yyP15 := yyV2;
+      RETURN;
+     END;
+     END;
+    END;
+
+  END;
+  END;
+  IF (yyP14^.Kind = Tree.Decompose) THEN
+  IF (yyP13^.Kind = Tree.Formal) THEN
+(* line 185 "opt.puma" *)
+    WITH yyTempo.yyR2 DO
+   LOOP
+     WITH yyP14^.Decompose DO
+     WITH yyP13^.Formal DO
+(* line 187 "opt.puma" *)
+      IF NOT ((yyP13^.Formal.TypeDesc ^ . Kind # Tree . UserType) AND IsEqual (Object ^ . Class . TypeDesc ^ . NodeTypes . Types, yyP13^.Formal.TypeDesc ^ . NodeTypes . Types)) THEN EXIT; END;
+(* line 189 "opt.puma" *)
+      CollectTests2 (Patterns, Object ^ . Class . Formals, yyP12, yyV1);
+      yyP15 := yyV1;
+      RETURN;
+     END;
+     END;
+   END;
+    END;
+
+(* line 191 "opt.puma" *)
+    WITH yyTempo.yyR3 DO
+   LOOP
+     WITH yyP14^.Decompose DO
+     WITH yyP13^.Formal DO
+(* line 193 "opt.puma" *)
+      IF NOT (yyP14^.Decompose.Object ^ . Class . Extensions ^ . Kind = Tree . NoClass) THEN EXIT; END;
+(* line 194 "opt.puma" *)
+      CollectTests2 (yyP14^.Decompose.Patterns, yyP14^.Decompose.Object ^ . Class . Formals, yyP12, yyV1);
+      yyP15 := Tree.yyPoolFreePtr; IF SYSTEM.ADDRESS (yyP15) >= Tree.yyPoolMaxPtr THEN yyP15 := Tree.yyAlloc (); END; INC (Tree.yyPoolFreePtr, Tree.yyNodeSize [Tree.TestKind]); yyP15^.yyHead.yyMark := 0; yyP15^.Kind := Tree.TestKind;
+      WITH yyP15^.TestKind DO
+      Next := yyV1;
+      Path := yyP14^.Decompose.Path;
+      TypeDesc := yyP14^.Decompose.Object ^ . Class . TypeDesc;
+      Name := yyP14^.Decompose.Object ^ . Class . Name;
+      END;
+      RETURN;
+     END;
+     END;
+   END;
+    END;
+
+  END;
+(* line 196 "opt.puma" *)
+    WITH yyTempo.yyR4 DO
+     WITH yyP14^.Decompose DO
+(* line 198 "opt.puma" *)
+      CollectTests2 (yyP14^.Decompose.Patterns, yyP14^.Decompose.Object ^ . Class . Formals, yyP12, yyV1);
+      yyP15 := Tree.yyPoolFreePtr; IF SYSTEM.ADDRESS (yyP15) >= Tree.yyPoolMaxPtr THEN yyP15 := Tree.yyAlloc (); END; INC (Tree.yyPoolFreePtr, Tree.yyNodeSize [Tree.TestIsType]); yyP15^.yyHead.yyMark := 0; yyP15^.Kind := Tree.TestIsType;
+      WITH yyP15^.TestIsType DO
+      Next := yyV1;
+      Path := yyP14^.Decompose.Path;
+      TypeDesc := yyP14^.Decompose.Object ^ . Class . TypeDesc;
+      Name := yyP14^.Decompose.Object ^ . Class . Name;
+      END;
+      RETURN;
+     END;
+    END;
+
+  END;
+  IF (yyP14^.Kind = Tree.VarDef) THEN
+(* line 200 "opt.puma" *)
+   LOOP
+     WITH yyP14^.VarDef DO
+(* line 202 "opt.puma" *)
+      IF NOT (Object # NoTree) THEN EXIT; END;
+      yyP15 := Tree.yyPoolFreePtr; IF SYSTEM.ADDRESS (yyP15) >= Tree.yyPoolMaxPtr THEN yyP15 := Tree.yyAlloc (); END; INC (Tree.yyPoolFreePtr, Tree.yyNodeSize [Tree.TestNonlin]); yyP15^.yyHead.yyMark := 0; yyP15^.Kind := Tree.TestNonlin;
+      WITH yyP15^.TestNonlin DO
+      Next := yyP12;
+      Path := Object ^ . Formal . Path;
+      Path2 := yyP14^.VarDef.Path;
+      TypeDesc := Object ^ . Formal . TypeDesc;
+      END;
+      RETURN;
+     END;
+   END;
+
+  END;
+  IF (yyP14^.Kind = Tree.NilTest) THEN
+(* line 204 "opt.puma" *)
+      yyP15 := Tree.yyPoolFreePtr; IF SYSTEM.ADDRESS (yyP15) >= Tree.yyPoolMaxPtr THEN yyP15 := Tree.yyAlloc (); END; INC (Tree.yyPoolFreePtr, Tree.yyNodeSize [Tree.TestNil]); yyP15^.yyHead.yyMark := 0; yyP15^.Kind := Tree.TestNil;
+      WITH yyP15^.TestNil DO
+      Next := yyP12;
+      Path := yyP14^.NilTest.Path;
+      END;
+      RETURN;
+
+  END;
+  IF (yyP14^.Kind = Tree.Value) THEN
+  IF (yyP13^.Kind = Tree.Formal) THEN
+(* line 207 "opt.puma" *)
+      yyP15 := Tree.yyPoolFreePtr; IF SYSTEM.ADDRESS (yyP15) >= Tree.yyPoolMaxPtr THEN yyP15 := Tree.yyAlloc (); END; INC (Tree.yyPoolFreePtr, Tree.yyNodeSize [Tree.TestValue]); yyP15^.yyHead.yyMark := 0; yyP15^.Kind := Tree.TestValue;
+      WITH yyP15^.TestValue DO
+      Next := yyP12;
+      Path := yyP14^.Value.Path;
+      Expr := yyP14^.Value.Expr;
+      TypeDesc := yyP13 ^ . Formal . TypeDesc;
+      END;
+      RETURN;
+
+  END;
+  END;
+(* line 210 "opt.puma" *)
+      yyP15 := yyP12;
+      RETURN;
+
+ END CollectTests2;
+
+PROCEDURE IsSamePath (yyP17: Tree.tTree; yyP16: Tree.tTree): BOOLEAN;
+ VAR yyTempo: RECORD CASE : INTEGER OF
+ END; END;
+ BEGIN
+  IF (yyP17^.Kind = Tree.Var) THEN
+  IF (yyP16^.Kind = Tree.Var) THEN
+  IF (yyP17^.Var.Name =  yyP16^.Var.Name) THEN
+(* line 215 "opt.puma" *)
+      RETURN TRUE;
+
+  END;
+  END;
+  END;
+  IF (yyP17^.Kind = Tree.ConsType) THEN
+  IF (yyP16^.Kind = Tree.ConsType) THEN
+  IF (yyP17^.ConsType.Name =  yyP16^.ConsType.Name) THEN
+(* line 216 "opt.puma" *)
+   LOOP
+     WITH yyP17^.ConsType DO
+     WITH yyP16^.ConsType DO
+(* line 217 "opt.puma" *)
+      IF NOT (IsSamePath (yyP17^.ConsType.Next, yyP16^.ConsType.Next)) THEN EXIT; END;
+      RETURN TRUE;
+     END;
+     END;
+   END;
+
+  END;
+  END;
+  END;
+  IF (yyP17^.Kind = Tree.Field) THEN
+  IF (yyP16^.Kind = Tree.Field) THEN
+  IF (yyP17^.Field.Name =  yyP16^.Field.Name) THEN
+(* line 216 "opt.puma" *)
+   LOOP
+     WITH yyP17^.Field DO
+     WITH yyP16^.Field DO
+(* line 217 "opt.puma" *)
+      IF NOT (IsSamePath (yyP17^.Field.Next, yyP16^.Field.Next)) THEN EXIT; END;
+      RETURN TRUE;
+     END;
+     END;
+   END;
+
+  END;
+  END;
+  END;
+  RETURN FALSE;
+ END IsSamePath;
+
+PROCEDURE IsSameType (yyP19: Tree.tTree; yyP18: Tree.tTree): BOOLEAN;
+ VAR yyTempo: RECORD CASE : INTEGER OF
+ END; END;
+ BEGIN
+  IF (yyP19^.Kind = Tree.NodeTypes) THEN
+  IF (yyP18^.Kind = Tree.NodeTypes) THEN
+  IF (yyP19^.NodeTypes.TreeName^.TreeName.Name =  yyP18^.NodeTypes.TreeName^.TreeName.Name) THEN
+  IF (Sets.IsEqual (yyP19^.NodeTypes.Types,  yyP18^.NodeTypes.Types)) THEN
+(* line 221 "opt.puma" *)
+      RETURN TRUE;
+
+  END;
+  END;
+  END;
+  END;
+  IF (yyP19^.Kind = Tree.UserType) THEN
+  IF (yyP18^.Kind = Tree.UserType) THEN
+  IF (yyP19^.UserType.Type =  yyP18^.UserType.Type) THEN
+(* line 222 "opt.puma" *)
+      RETURN TRUE;
+
+  END;
+  END;
+  END;
+  RETURN FALSE;
+ END IsSameType;
+
+PROCEDURE IsSameTest (yyP21: Tree.tTree; yyP20: Tree.tTree): BOOLEAN;
+ VAR yyTempo: RECORD CASE : INTEGER OF
+ END; END;
+ BEGIN
+  IF (yyP21^.Kind = Tree.TestKind) THEN
+  IF (yyP20^.Kind = Tree.TestKind) THEN
+(* line 226 "opt.puma" *)
+   LOOP
+     WITH yyP21^.TestKind DO
+     WITH yyP20^.TestKind DO
+(* line 228 "opt.puma" *)
+      IF NOT (IsSamePath (yyP21^.TestKind.Path, yyP20^.TestKind.Path)) THEN EXIT; END;
+(* line 229 "opt.puma" *)
+      IF NOT (IsSameType (yyP21^.TestKind.TypeDesc, yyP20^.TestKind.TypeDesc)) THEN EXIT; END;
+      RETURN TRUE;
+     END;
+     END;
+   END;
+
+  END;
+  END;
+  IF (yyP21^.Kind = Tree.TestIsType) THEN
+  IF (yyP20^.Kind = Tree.TestIsType) THEN
+(* line 226 "opt.puma" *)
+   LOOP
+     WITH yyP21^.TestIsType DO
+     WITH yyP20^.TestIsType DO
+(* line 228 "opt.puma" *)
+      IF NOT (IsSamePath (yyP21^.TestIsType.Path, yyP20^.TestIsType.Path)) THEN EXIT; END;
+(* line 229 "opt.puma" *)
+      IF NOT (IsSameType (yyP21^.TestIsType.TypeDesc, yyP20^.TestIsType.TypeDesc)) THEN EXIT; END;
+      RETURN TRUE;
+     END;
+     END;
+   END;
+
+  END;
+  END;
+  IF (yyP21^.Kind = Tree.TestNil) THEN
+  IF (yyP20^.Kind = Tree.TestNil) THEN
+(* line 231 "opt.puma" *)
+   LOOP
+     WITH yyP21^.TestNil DO
+     WITH yyP20^.TestNil DO
+(* line 232 "opt.puma" *)
+      IF NOT (IsSamePath (yyP21^.TestNil.Path, yyP20^.TestNil.Path)) THEN EXIT; END;
+      RETURN TRUE;
+     END;
+     END;
+   END;
+
+  END;
+  END;
+  IF (yyP21^.Kind = Tree.TestNonlin) THEN
+  IF (yyP20^.Kind = Tree.TestNonlin) THEN
+(* line 234 "opt.puma" *)
+   LOOP
+     WITH yyP21^.TestNonlin DO
+     WITH yyP20^.TestNonlin DO
+(* line 235 "opt.puma" *)
+      IF NOT (IsSamePath (yyP21^.TestNonlin.Path, yyP20^.TestNonlin.Path)) THEN EXIT; END;
+(* line 236 "opt.puma" *)
+      IF NOT (IsSamePath (yyP21^.TestNonlin.Path2, yyP20^.TestNonlin.Path2)) THEN EXIT; END;
+      RETURN TRUE;
+     END;
+     END;
+   END;
+
+  END;
+  END;
+  RETURN FALSE;
+ END IsSameTest;
+
+PROCEDURE BuildTree (yyP23: Tree.tTree; yyP22: Tree.tTree; VAR yyP24: Tree.tTree);
+ VAR yyTempo: RECORD CASE : INTEGER OF
+ | 1: yyR1: RECORD
+  yyV1: Tree.tTree;
+  yyV2: Tree.tTree;
+  END;
+ END; END;
+ BEGIN
+  IF (yyP23^.Kind = Tree.Rule) THEN
+(* line 241 "opt.puma" *)
+    WITH yyTempo.yyR1 DO
+     WITH yyP23^.Rule DO
+(* line 242 "opt.puma" *)
+      gRule := yyP23;
+(* line 243 "opt.puma" *)
+      BuildTree2 (Tests, yyP22, yyV1);
+(* line 244 "opt.puma" *)
+      UpdateChange (yyV1, gRule);
+(* line 245 "opt.puma" *)
+      BuildTree (Next, yyV1, yyV2);
+      yyP24 := yyV2;
+      RETURN;
+     END;
+    END;
+
+  END;
+  IF (yyP23^.Kind = Tree.NoRule) THEN
+(* line 247 "opt.puma" *)
+      yyP24 := yyP22;
+      RETURN;
+
+  END;
+ END BuildTree;
+
+PROCEDURE BuildTree2 (t: Tree.tTree; d: Tree.tTree; VAR yyP25: Tree.tTree);
+ VAR yyTempo: RECORD CASE : INTEGER OF
+ | 1: yyR1: RECORD
+  yyV1: Tree.tTree;
+  END;
+ | 2: yyR2: RECORD
+  yyV1: Tree.tTree;
+  END;
+ | 3: yyR3: RECORD
+  yyV1: Tree.tTree;
+  END;
+ | 4: yyR4: RECORD
+  yyV1: Tree.tTree;
+  END;
+ | 6: yyR6: RECORD
+  yyV1: Tree.tTree;
+  END;
+ | 7: yyR7: RECORD
+  yyV1: Tree.tTree;
+  END;
+ END; END;
+ BEGIN
+  IF Tree.IsType (t, Tree.OneTest) THEN
+  IF (d^.Kind = Tree.NoDecision) THEN
+(* line 252 "opt.puma" *)
+    WITH yyTempo.yyR1 DO
+     WITH t^.OneTest DO
+     WITH d^.NoDecision DO
+(* line 253 "opt.puma" *)
+      BuildTree2 (t^.OneTest.Next, d, yyV1);
+(* line 254 "opt.puma" *)
+      UpdateChange (yyV1, gRule);
+      yyP25 := Tree.yyPoolFreePtr; IF SYSTEM.ADDRESS (yyP25) >= Tree.yyPoolMaxPtr THEN yyP25 := Tree.yyAlloc (); END; INC (Tree.yyPoolFreePtr, Tree.yyNodeSize [Tree.Decision]); yyP25^.yyHead.yyMark := 0; yyP25^.Kind := Tree.Decision;
+      WITH yyP25^.Decision DO
+      Then := yyV1;
+      Else := d;
+      OneTest := t;
+      Cases := 0;
+      IsUnchanged := TRUE;
+      END;
+      RETURN;
+     END;
+     END;
+    END;
+
+  END;
+  IF (d^.Kind = Tree.Decision) THEN
+    WITH yyTempo.yyR2 DO
+  IF (d^.Decision.IsUnchanged =  (TRUE)) THEN
+(* line 256 "opt.puma" *)
+   LOOP
+     WITH t^.OneTest DO
+     WITH d^.Decision DO
+(* line 257 "opt.puma" *)
+      IF NOT (IsSameTest (t, d^.Decision.OneTest)) THEN EXIT; END;
+(* line 258 "opt.puma" *)
+      IF NOT (NOT HasInterference (t, d^.Decision.Else)) THEN EXIT; END;
+(* line 259 "opt.puma" *)
+      BuildTree2 (t^.OneTest.Next, d^.Decision.Then, yyV1);
+(* line 260 "opt.puma" *)
+      d^.Decision.Then := yyV1;
+(* line 261 "opt.puma" *)
+      UpdateChange (yyV1, gRule);
+      yyP25 := d;
+      RETURN;
+     END;
+     END;
+   END;
+
+  END;
+    END;
+(* line 263 "opt.puma" *)
+    WITH yyTempo.yyR3 DO
+     WITH t^.OneTest DO
+     WITH d^.Decision DO
+(* line 264 "opt.puma" *)
+      BuildTree2 (t, d^.Decision.Else, yyV1);
+(* line 265 "opt.puma" *)
+      d^.Decision.Else := yyV1;
+(* line 266 "opt.puma" *)
+      UpdateChange (yyV1, gRule);
+      yyP25 := d;
+      RETURN;
+     END;
+     END;
+    END;
+
+  END;
+  IF (d^.Kind = Tree.Decided) THEN
+(* line 268 "opt.puma" *)
+    WITH yyTempo.yyR4 DO
+     WITH t^.OneTest DO
+     WITH d^.Decided DO
+(* line 269 "opt.puma" *)
+      BuildTree2 (t, d^.Decided.Else, yyV1);
+(* line 270 "opt.puma" *)
+      d^.Decided.Else := yyV1;
+(* line 271 "opt.puma" *)
+      UpdateChange (yyV1, gRule);
+      yyP25 := d;
+      RETURN;
+     END;
+     END;
+    END;
+
+  END;
+  END;
+  IF (t^.Kind = Tree.NoTest) THEN
+  IF (d^.Kind = Tree.NoDecision) THEN
+(* line 273 "opt.puma" *)
+      yyP25 := Tree.yyPoolFreePtr; IF SYSTEM.ADDRESS (yyP25) >= Tree.yyPoolMaxPtr THEN yyP25 := Tree.yyAlloc (); END; INC (Tree.yyPoolFreePtr, Tree.yyNodeSize [Tree.Decided]); yyP25^.yyHead.yyMark := 0; yyP25^.Kind := Tree.Decided;
+      WITH yyP25^.Decided DO
+      Else := d;
+      Rule := gRule;
+      END;
+      RETURN;
+
+  END;
+  IF (d^.Kind = Tree.Decision) THEN
+(* line 275 "opt.puma" *)
+    WITH yyTempo.yyR6 DO
+     WITH t^.NoTest DO
+     WITH d^.Decision DO
+(* line 276 "opt.puma" *)
+      BuildTree2 (t, d^.Decision.Else, yyV1);
+(* line 277 "opt.puma" *)
+      d^.Decision.Else := yyV1;
+      yyP25 := d;
+      RETURN;
+     END;
+     END;
+    END;
+
+  END;
+  IF (d^.Kind = Tree.Decided) THEN
+(* line 279 "opt.puma" *)
+    WITH yyTempo.yyR7 DO
+     WITH t^.NoTest DO
+     WITH d^.Decided DO
+(* line 280 "opt.puma" *)
+      BuildTree2 (t, d^.Decided.Else, yyV1);
+(* line 281 "opt.puma" *)
+      d^.Decided.Else := yyV1;
+      yyP25 := d;
+      RETURN;
+     END;
+     END;
+    END;
+
+  END;
+  END;
+ END BuildTree2;
+
+PROCEDURE HasInterference (yyP27: Tree.tTree; yyP26: Tree.tTree): BOOLEAN;
+ VAR yyTempo: RECORD CASE : INTEGER OF
+ END; END;
+ BEGIN
+  IF (yyP26^.Kind = Tree.Decided) THEN
+(* line 286 "opt.puma" *)
+      RETURN TRUE;
+
+  END;
+  IF (yyP27^.Kind = Tree.TestKind) THEN
+  IF (yyP26^.Kind = Tree.Decision) THEN
+  IF (yyP26^.Decision.OneTest^.Kind = Tree.TestKind) THEN
+(* line 287 "opt.puma" *)
+   LOOP
+     WITH yyP27^.TestKind DO
+     WITH yyP26^.Decision DO
+(* line 295 "opt.puma" *)
+      IF NOT (IsSamePath (yyP27^.TestKind.Path, yyP26^.Decision.OneTest^.TestKind.Path)) THEN EXIT; END;
+(* line 296 "opt.puma" *)
+      IF NOT (NOT IsDisjoint (yyP27^.TestKind.TypeDesc^.NodeTypes.Types, yyP26^.Decision.OneTest^.TestKind.TypeDesc^.NodeTypes.Types)) THEN EXIT; END;
+      RETURN TRUE;
+     END;
+     END;
+   END;
+
+  END;
+  IF (yyP26^.Decision.OneTest^.Kind = Tree.TestIsType) THEN
+(* line 287 "opt.puma" *)
+   LOOP
+     WITH yyP27^.TestKind DO
+     WITH yyP26^.Decision DO
+(* line 295 "opt.puma" *)
+      IF NOT (IsSamePath (yyP27^.TestKind.Path, yyP26^.Decision.OneTest^.TestIsType.Path)) THEN EXIT; END;
+(* line 296 "opt.puma" *)
+      IF NOT (NOT IsDisjoint (yyP27^.TestKind.TypeDesc^.NodeTypes.Types, yyP26^.Decision.OneTest^.TestIsType.TypeDesc^.NodeTypes.Types)) THEN EXIT; END;
+      RETURN TRUE;
+     END;
+     END;
+   END;
+
+  END;
+  END;
+  END;
+  IF (yyP27^.Kind = Tree.TestIsType) THEN
+  IF (yyP26^.Kind = Tree.Decision) THEN
+  IF (yyP26^.Decision.OneTest^.Kind = Tree.TestKind) THEN
+(* line 287 "opt.puma" *)
+   LOOP
+     WITH yyP27^.TestIsType DO
+     WITH yyP26^.Decision DO
+(* line 295 "opt.puma" *)
+      IF NOT (IsSamePath (yyP27^.TestIsType.Path, yyP26^.Decision.OneTest^.TestKind.Path)) THEN EXIT; END;
+(* line 296 "opt.puma" *)
+      IF NOT (NOT IsDisjoint (yyP27^.TestIsType.TypeDesc^.NodeTypes.Types, yyP26^.Decision.OneTest^.TestKind.TypeDesc^.NodeTypes.Types)) THEN EXIT; END;
+      RETURN TRUE;
+     END;
+     END;
+   END;
+
+  END;
+  IF (yyP26^.Decision.OneTest^.Kind = Tree.TestIsType) THEN
+(* line 287 "opt.puma" *)
+   LOOP
+     WITH yyP27^.TestIsType DO
+     WITH yyP26^.Decision DO
+(* line 295 "opt.puma" *)
+      IF NOT (IsSamePath (yyP27^.TestIsType.Path, yyP26^.Decision.OneTest^.TestIsType.Path)) THEN EXIT; END;
+(* line 296 "opt.puma" *)
+      IF NOT (NOT IsDisjoint (yyP27^.TestIsType.TypeDesc^.NodeTypes.Types, yyP26^.Decision.OneTest^.TestIsType.TypeDesc^.NodeTypes.Types)) THEN EXIT; END;
+      RETURN TRUE;
+     END;
+     END;
+   END;
+
+  END;
+  END;
+  END;
+  IF (yyP26^.Kind = Tree.Decision) THEN
+(* line 298 "opt.puma" *)
+   LOOP
+     WITH yyP26^.Decision DO
+(* line 298 "opt.puma" *)
+      IF NOT (HasInterference (yyP27, yyP26^.Decision.Else)) THEN EXIT; END;
+      RETURN TRUE;
+     END;
+   END;
+
+  END;
+  RETURN FALSE;
+ END HasInterference;
+
+PROCEDURE UpdateChange (yyP29: Tree.tTree; yyP28: Tree.tTree);
+ VAR yyTempo: RECORD CASE : INTEGER OF
+ END; END;
+ BEGIN
+  IF (yyP29^.Kind = Tree.Decision) THEN
+  IF (yyP29^.Decision.OneTest^.Kind = Tree.TestKind) THEN
+  IF (yyP28^.Rule.HasExit =  (TRUE)) THEN
+  IF (yyP28^.Rule.HasAssign =  (TRUE)) THEN
+(* line 302 "opt.puma" *)
+   LOOP
+     WITH yyP29^.Decision DO
+     WITH yyP28^.Rule DO
+(* line 306 "opt.puma" *)
+      IF NOT (IsChanged (yyP29^.Decision.OneTest^.TestKind.Path, yyP28^.Rule.Statements)) THEN EXIT; END;
+(* line 307 "opt.puma" *)
+      yyP29^.Decision.IsUnchanged := FALSE;
+      RETURN;
+     END;
+     END;
+   END;
+
+  END;
+  END;
+  END;
+  IF (yyP29^.Decision.OneTest^.Kind = Tree.TestIsType) THEN
+  IF (yyP28^.Rule.HasExit =  (TRUE)) THEN
+  IF (yyP28^.Rule.HasAssign =  (TRUE)) THEN
+(* line 302 "opt.puma" *)
+   LOOP
+     WITH yyP29^.Decision DO
+     WITH yyP28^.Rule DO
+(* line 306 "opt.puma" *)
+      IF NOT (IsChanged (yyP29^.Decision.OneTest^.TestIsType.Path, yyP28^.Rule.Statements)) THEN EXIT; END;
+(* line 307 "opt.puma" *)
+      yyP29^.Decision.IsUnchanged := FALSE;
+      RETURN;
+     END;
+     END;
+   END;
+
+  END;
+  END;
+  END;
+  END;
+ END UpdateChange;
+
+PROCEDURE IsChanged (yyP31: Tree.tTree; yyP30: Tree.tTree): BOOLEAN;
+ VAR yyTempo: RECORD CASE : INTEGER OF
+ END; END;
+ BEGIN
+  IF (yyP30^.Kind = Tree.Assignment) THEN
+(* line 312 "opt.puma" *)
+   LOOP
+     WITH yyP30^.Assignment DO
+(* line 312 "opt.puma" *)
+      IF NOT (yyP30^.Assignment.Object # NIL) THEN EXIT; END;
+(* line 312 "opt.puma" *)
+      IF NOT (IsSamePath (yyP31, yyP30^.Assignment.Object ^ . Formal . Path)) THEN EXIT; END;
+      RETURN TRUE;
+     END;
+   END;
+
+  END;
+  IF Tree.IsType (yyP30, Tree.Statement) THEN
+(* line 313 "opt.puma" *)
+   LOOP
+     WITH yyP30^.Statement DO
+(* line 313 "opt.puma" *)
+      IF NOT (IsChanged (yyP31, yyP30^.Statement.Next)) THEN EXIT; END;
+      RETURN TRUE;
+     END;
+   END;
+
+  END;
+  RETURN FALSE;
+ END IsChanged;
+
+PROCEDURE FindCases (yyP32: Tree.tTree; VAR yyP35: Tree.tTree; VAR yyP34: SHORTCARD; VAR yyP33: tSet);
+ VAR yyTempo: RECORD CASE : INTEGER OF
+ | 1: yyR1: RECORD
+  yyV1: Tree.tTree;
+  yyV2: SHORTCARD;
+  yyV3: tSet;
+  yyV4: Tree.tTree;
+  yyV5: SHORTCARD;
+  yyV6: tSet;
+  k: SHORTCARD;
+  s: tSet;
+  END;
+ | 2: yyR2: RECORD
+  yyV1: Tree.tTree;
+  yyV2: SHORTCARD;
+  yyV3: tSet;
+  yyV4: Tree.tTree;
+  yyV5: SHORTCARD;
+  yyV6: tSet;
+  k: SHORTCARD;
+  s: tSet;
+  END;
+ | 3: yyR3: RECORD
+  yyV1: Tree.tTree;
+  yyV2: SHORTCARD;
+  yyV3: tSet;
+  yyV4: Tree.tTree;
+  yyV5: SHORTCARD;
+  yyV6: tSet;
+  END;
+ | 4: yyR4: RECORD
+  yyV1: Tree.tTree;
+  yyV2: SHORTCARD;
+  yyV3: tSet;
+  END;
+ END; END;
+ BEGIN
+  IF (yyP32^.Kind = Tree.Decision) THEN
+  IF (yyP32^.Decision.OneTest^.Kind = Tree.TestKind) THEN
+(* line 317 "opt.puma" *)
+    WITH yyTempo.yyR1 DO
+     WITH yyP32^.Decision DO
+(* line 321 "opt.puma" *)
+      FindCases (yyP32^.Decision.Then, yyV1, yyV2, yyV3);
+(* line 322 "opt.puma" *)
+      MarkCases (yyP32^.Decision.Then, yyV2, yyV3);
+(* line 323 "opt.puma" *)
+      FindCases (yyP32^.Decision.Else, yyV4, yyV5, yyV6);
+(* line 324 "opt.puma" *)
+      ;
+(* line 325 "opt.puma" *)
+      
+   IF yyV5 = 0 THEN
+      k := 1;
+      MakeSet (s, yyP32^.Decision.OneTest^.TestKind.TypeDesc^.NodeTypes.TreeName^.TreeName.ClassCount);
+      Assign (s, yyP32^.Decision.OneTest^.TestKind.TypeDesc^.NodeTypes.Types);
+   ELSIF IsSamePath (yyP32^.Decision.OneTest^.TestKind.Path, yyV4) AND IsDisjoint (yyV6, yyP32^.Decision.OneTest^.TestKind.TypeDesc^.NodeTypes.Types) THEN
+      k := yyV5 + 1;
+      s := yyV6;
+      Union (s, yyP32^.Decision.OneTest^.TestKind.TypeDesc^.NodeTypes.Types);
+   ELSE
+      MarkCases (yyP32^.Decision.Else, yyV5, yyV6);
+      k := 1;
+      MakeSet (s, yyP32^.Decision.OneTest^.TestKind.TypeDesc^.NodeTypes.TreeName^.TreeName.ClassCount);
+      Assign (s, yyP32^.Decision.OneTest^.TestKind.TypeDesc^.NodeTypes.Types);
+   END;
+;
+      yyP35 := yyP32^.Decision.OneTest^.TestKind.Path;
+      yyP34 := k;
+      yyP33 := s;
+      RETURN;
+     END;
+    END;
+
+  END;
+  IF (yyP32^.Decision.OneTest^.Kind = Tree.TestIsType) THEN
+(* line 317 "opt.puma" *)
+    WITH yyTempo.yyR2 DO
+     WITH yyP32^.Decision DO
+(* line 321 "opt.puma" *)
+      FindCases (yyP32^.Decision.Then, yyV1, yyV2, yyV3);
+(* line 322 "opt.puma" *)
+      MarkCases (yyP32^.Decision.Then, yyV2, yyV3);
+(* line 323 "opt.puma" *)
+      FindCases (yyP32^.Decision.Else, yyV4, yyV5, yyV6);
+(* line 324 "opt.puma" *)
+      ;
+(* line 325 "opt.puma" *)
+      
+   IF yyV5 = 0 THEN
+      k := 1;
+      MakeSet (s, yyP32^.Decision.OneTest^.TestIsType.TypeDesc^.NodeTypes.TreeName^.TreeName.ClassCount);
+      Assign (s, yyP32^.Decision.OneTest^.TestIsType.TypeDesc^.NodeTypes.Types);
+   ELSIF IsSamePath (yyP32^.Decision.OneTest^.TestIsType.Path, yyV4) AND IsDisjoint (yyV6, yyP32^.Decision.OneTest^.TestIsType.TypeDesc^.NodeTypes.Types) THEN
+      k := yyV5 + 1;
+      s := yyV6;
+      Union (s, yyP32^.Decision.OneTest^.TestIsType.TypeDesc^.NodeTypes.Types);
+   ELSE
+      MarkCases (yyP32^.Decision.Else, yyV5, yyV6);
+      k := 1;
+      MakeSet (s, yyP32^.Decision.OneTest^.TestIsType.TypeDesc^.NodeTypes.TreeName^.TreeName.ClassCount);
+      Assign (s, yyP32^.Decision.OneTest^.TestIsType.TypeDesc^.NodeTypes.Types);
+   END;
+;
+      yyP35 := yyP32^.Decision.OneTest^.TestIsType.Path;
+      yyP34 := k;
+      yyP33 := s;
+      RETURN;
+     END;
+    END;
+
+  END;
+(* line 342 "opt.puma" *)
+    WITH yyTempo.yyR3 DO
+     WITH yyP32^.Decision DO
+(* line 343 "opt.puma" *)
+      FindCases (yyP32^.Decision.Then, yyV1, yyV2, yyV3);
+(* line 344 "opt.puma" *)
+      MarkCases (yyP32^.Decision.Then, yyV2, yyV3);
+(* line 345 "opt.puma" *)
+      FindCases (yyP32^.Decision.Else, yyV4, yyV5, yyV6);
+(* line 346 "opt.puma" *)
+      MarkCases (yyP32^.Decision.Else, yyV5, yyV6);
+      yyP35 := NIL;
+      yyP34 := 0;
+      
+      RETURN;
+     END;
+    END;
+
+  END;
+  IF (yyP32^.Kind = Tree.Decided) THEN
+(* line 348 "opt.puma" *)
+    WITH yyTempo.yyR4 DO
+     WITH yyP32^.Decided DO
+(* line 349 "opt.puma" *)
+      FindCases (yyP32^.Decided.Else, yyV1, yyV2, yyV3);
+(* line 350 "opt.puma" *)
+      MarkCases (yyP32^.Decided.Else, yyV2, yyV3);
+      yyP35 := NIL;
+      yyP34 := 0;
+      
+      RETURN;
+     END;
+    END;
+
+  END;
+  IF (yyP32^.Kind = Tree.NoDecision) THEN
+(* line 352 "opt.puma" *)
+      yyP35 := NIL;
+      yyP34 := 0;
+      
+      RETURN;
+
+  END;
+ END FindCases;
+
+PROCEDURE MarkCases (yyP38: Tree.tTree; yyP37: SHORTCARD; yyP36: tSet);
+ VAR yyTempo: RECORD CASE : INTEGER OF
+ END; END;
+ BEGIN
+  IF (yyP38^.Kind = Tree.Decision) THEN
+(* line 356 "opt.puma" *)
+   LOOP
+     WITH yyP38^.Decision DO
+(* line 356 "opt.puma" *)
+      IF NOT (yyP37 >= 7) THEN EXIT; END;
+(* line 356 "opt.puma" *)
+      yyP38^.Decision.Cases := yyP37;
+(* line 356 "opt.puma" *)
+      ReleaseSet (yyP36);
+      RETURN;
+     END;
+   END;
+
+  END;
+ END MarkCases;
+
+PROCEDURE ElimDeadTests (yyP42: Tree.tTree; yyP41: Tree.tTree; yyP40: BOOLEAN; yyP39: tSet);
+ VAR yyTempo: RECORD CASE : INTEGER OF
+ | 1: yyR1: RECORD
+  s: tSet;
+  yyV1: Tree.tTree;
+  yyV2: tSet;
+  END;
+ | 2: yyR2: RECORD
+  s: tSet;
+  yyV1: Tree.tTree;
+  yyV2: tSet;
+  END;
+ | 3: yyR3: RECORD
+  types: tSet;
+  s2: tSet;
+  yyV1: Tree.tTree;
+  yyV2: tSet;
+  END;
+ | 4: yyR4: RECORD
+  types: tSet;
+  s2: tSet;
+  yyV1: Tree.tTree;
+  yyV2: tSet;
+  END;
+ | 5: yyR5: RECORD
+  yyV1: Tree.tTree;
+  yyV2: tSet;
+  yyV3: Tree.tTree;
+  yyV4: tSet;
+  END;
+ | 6: yyR6: RECORD
+  yyV1: Tree.tTree;
+  yyV2: tSet;
+  END;
+ END; END;
+ BEGIN
+  IF (yyP42^.Kind = Tree.Decision) THEN
+  IF (yyP42^.Decision.OneTest^.Kind = Tree.TestKind) THEN
+    WITH yyTempo.yyR1 DO
+  IF (yyP40 =  (FALSE)) THEN
+(* line 360 "opt.puma" *)
+     WITH yyP42^.Decision DO
+(* line 365 "opt.puma" *)
+      ;
+(* line 366 "opt.puma" *)
+        MakeSet (s, yyP42^.Decision.OneTest^.TestKind.TypeDesc^.NodeTypes.TreeName^.TreeName.ClassCount); IF IsDeadEnd (yyP42^.Decision.Then) THEN Assign (s, yyP42^.Decision.OneTest^.TestKind.TypeDesc^.NodeTypes.Types); END; ;
+(* line 367 "opt.puma" *)
+      ElimDeadTests (yyP42^.Decision.Else, yyP42^.Decision.OneTest^.TestKind.Path, (TRUE), s);
+(* line 368 "opt.puma" *)
+      ElimDeadTests (yyP42^.Decision.Then, yyV1, (FALSE), yyV2);
+      RETURN;
+     END;
+
+  END;
+    END;
+(* line 370 "opt.puma" *)
+    WITH yyTempo.yyR3 DO
+     WITH yyP42^.Decision DO
+(* line 375 "opt.puma" *)
+      ;
+(* line 376 "opt.puma" *)
+      
+   s2 := yyP39;
+   IF IsSamePath (yyP42^.Decision.OneTest^.TestKind.Path, yyP41) THEN
+      IF NOT IsDisjoint (yyP42^.Decision.OneTest^.TestKind.TypeDesc^.NodeTypes.Types, yyP39) THEN
+	 types := yyP42^.Decision.OneTest^.TestKind.TypeDesc^.NodeTypes.Types;
+	 yyP42^.Decision.OneTest := mTestIsType (yyP42^.Decision.OneTest^.TestKind.Next, yyP42^.Decision.OneTest^.TestKind.Path, mNodeTypes (yyP42^.Decision.OneTest^.TestKind.TypeDesc^.NodeTypes.TreeName, types), yyP42^.Decision.OneTest^.TestKind.Name);
+	 MakeSet (yyP42^.Decision.OneTest^.TestKind.TypeDesc^.NodeTypes.Types, yyP42^.Decision.OneTest^.TestKind.TypeDesc^.NodeTypes.TreeName^.TreeName.ClassCount);
+	 Assign (yyP42^.Decision.OneTest^.TestKind.TypeDesc^.NodeTypes.Types, types);
+	 Difference (yyP42^.Decision.OneTest^.TestKind.TypeDesc^.NodeTypes.Types, yyP39);
+      END;
+   ELSE
+      AssignEmpty (s2);
+   END;
+   IF IsDeadEnd (yyP42^.Decision.Then) THEN Union (s2, yyP42^.Decision.OneTest^.TestKind.TypeDesc^.NodeTypes.Types); END;
+;
+(* line 391 "opt.puma" *)
+      ElimDeadTests (yyP42^.Decision.Else, yyP42^.Decision.OneTest^.TestKind.Path, (TRUE), s2);
+(* line 392 "opt.puma" *)
+      ElimDeadTests (yyP42^.Decision.Then, yyV1, (FALSE), yyV2);
+      RETURN;
+     END;
+    END;
+
+  END;
+  IF (yyP42^.Decision.OneTest^.Kind = Tree.TestIsType) THEN
+    WITH yyTempo.yyR2 DO
+  IF (yyP40 =  (FALSE)) THEN
+(* line 360 "opt.puma" *)
+     WITH yyP42^.Decision DO
+(* line 365 "opt.puma" *)
+      ;
+(* line 366 "opt.puma" *)
+        MakeSet (s, yyP42^.Decision.OneTest^.TestIsType.TypeDesc^.NodeTypes.TreeName^.TreeName.ClassCount); IF IsDeadEnd (yyP42^.Decision.Then) THEN Assign (s, yyP42^.Decision.OneTest^.TestIsType.TypeDesc^.NodeTypes.Types); END; ;
+(* line 367 "opt.puma" *)
+      ElimDeadTests (yyP42^.Decision.Else, yyP42^.Decision.OneTest^.TestIsType.Path, (TRUE), s);
+(* line 368 "opt.puma" *)
+      ElimDeadTests (yyP42^.Decision.Then, yyV1, (FALSE), yyV2);
+      RETURN;
+     END;
+
+  END;
+    END;
+(* line 370 "opt.puma" *)
+    WITH yyTempo.yyR4 DO
+     WITH yyP42^.Decision DO
+(* line 375 "opt.puma" *)
+      ;
+(* line 376 "opt.puma" *)
+      
+   s2 := yyP39;
+   IF IsSamePath (yyP42^.Decision.OneTest^.TestIsType.Path, yyP41) THEN
+      IF NOT IsDisjoint (yyP42^.Decision.OneTest^.TestIsType.TypeDesc^.NodeTypes.Types, yyP39) THEN
+	 types := yyP42^.Decision.OneTest^.TestIsType.TypeDesc^.NodeTypes.Types;
+	 yyP42^.Decision.OneTest := mTestIsType (yyP42^.Decision.OneTest^.TestIsType.Next, yyP42^.Decision.OneTest^.TestIsType.Path, mNodeTypes (yyP42^.Decision.OneTest^.TestIsType.TypeDesc^.NodeTypes.TreeName, types), yyP42^.Decision.OneTest^.TestIsType.Name);
+	 MakeSet (yyP42^.Decision.OneTest^.TestIsType.TypeDesc^.NodeTypes.Types, yyP42^.Decision.OneTest^.TestIsType.TypeDesc^.NodeTypes.TreeName^.TreeName.ClassCount);
+	 Assign (yyP42^.Decision.OneTest^.TestIsType.TypeDesc^.NodeTypes.Types, types);
+	 Difference (yyP42^.Decision.OneTest^.TestIsType.TypeDesc^.NodeTypes.Types, yyP39);
+      END;
+   ELSE
+      AssignEmpty (s2);
+   END;
+   IF IsDeadEnd (yyP42^.Decision.Then) THEN Union (s2, yyP42^.Decision.OneTest^.TestIsType.TypeDesc^.NodeTypes.Types); END;
+;
+(* line 391 "opt.puma" *)
+      ElimDeadTests (yyP42^.Decision.Else, yyP42^.Decision.OneTest^.TestIsType.Path, (TRUE), s2);
+(* line 392 "opt.puma" *)
+      ElimDeadTests (yyP42^.Decision.Then, yyV1, (FALSE), yyV2);
+      RETURN;
+     END;
+    END;
+
+  END;
+(* line 394 "opt.puma" *)
+    WITH yyTempo.yyR5 DO
+     WITH yyP42^.Decision DO
+(* line 395 "opt.puma" *)
+        IF yyP40 THEN ReleaseSet (yyP39); END; ;
+(* line 396 "opt.puma" *)
+      ElimDeadTests (yyP42^.Decision.Else, yyV1, (FALSE), yyV2);
+(* line 397 "opt.puma" *)
+      ElimDeadTests (yyP42^.Decision.Then, yyV3, (FALSE), yyV4);
+      RETURN;
+     END;
+    END;
+
+  END;
+  IF (yyP42^.Kind = Tree.Decided) THEN
+(* line 399 "opt.puma" *)
+    WITH yyTempo.yyR6 DO
+     WITH yyP42^.Decided DO
+(* line 400 "opt.puma" *)
+        IF yyP40 THEN ReleaseSet (yyP39); END; ;
+(* line 401 "opt.puma" *)
+        IF NOT yyP42^.Decided.Rule^.Rule.HasExit THEN ReportWarning (yyP42^.Decided.Else); END; ;
+(* line 402 "opt.puma" *)
+      ElimDeadTests (yyP42^.Decided.Else, yyV1, (FALSE), yyV2);
+      RETURN;
+     END;
+    END;
+
+  END;
+  IF (yyP42^.Kind = Tree.NoDecision) THEN
+  IF (yyP40 =  (TRUE)) THEN
+(* line 404 "opt.puma" *)
+     WITH yyP42^.NoDecision DO
+(* line 405 "opt.puma" *)
+      ReleaseSet (yyP39);
+      RETURN;
+     END;
+
+  END;
+  END;
+ END ElimDeadTests;
+
+PROCEDURE IsDeadEnd (yyP43: Tree.tTree): BOOLEAN;
+ VAR yyTempo: RECORD CASE : INTEGER OF
+ END; END;
+ BEGIN
+  IF (yyP43^.Kind = Tree.Decided) THEN
+(* line 410 "opt.puma" *)
+   LOOP
+     WITH yyP43^.Decided DO
+(* line 410 "opt.puma" *)
+      IF NOT (NOT yyP43^.Decided.Rule^.Rule.HasExit OR IsDeadEnd (yyP43^.Decided.Else)) THEN EXIT; END;
+      RETURN TRUE;
+     END;
+   END;
+
+  END;
+  RETURN FALSE;
+ END IsDeadEnd;
+
+PROCEDURE ReportWarning (yyP44: Tree.tTree);
+ VAR yyTempo: RECORD CASE : INTEGER OF
+ END; END;
+ BEGIN
+  IF (yyP44^.Kind = Tree.Decided) THEN
+(* line 414 "opt.puma" *)
+     WITH yyP44^.Decided DO
+(* line 415 "opt.puma" *)
+      Warning ("unreachable code", yyP44^.Decided.Rule^.Rule.Line);
+(* line 416 "opt.puma" *)
+      ReportWarning (yyP44^.Decided.Else);
+      RETURN;
+     END;
+
+  END;
+  IF (yyP44^.Kind = Tree.Decision) THEN
+(* line 418 "opt.puma" *)
+     WITH yyP44^.Decision DO
+(* line 419 "opt.puma" *)
+      ReportWarning (yyP44^.Decision.Then);
+(* line 420 "opt.puma" *)
+      ReportWarning (yyP44^.Decision.Else);
+      RETURN;
+     END;
+
+  END;
+ END ReportWarning;
+
+PROCEDURE BeginOptimize;
+ BEGIN
+ END BeginOptimize;
+
+PROCEDURE CloseOptimize;
+ BEGIN
+ END CloseOptimize;
+
+PROCEDURE yyExit;
+ BEGIN
+  IO.CloseIO; System.Exit (1);
+ END yyExit;
+
+BEGIN
+ yyf	:= IO.StdOutput;
+ Exit	:= yyExit;
+ BeginOptimize;
+END Optimize.

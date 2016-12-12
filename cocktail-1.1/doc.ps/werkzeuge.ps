@@ -1,0 +1,6104 @@
+%!PS-Adobe-1.0
+%%Creator: mars:grosch (Josef Grosch %Dec95%)
+%%Title: stdin (ditroff)
+%%CreationDate: Mon Sep 21 15:30:18 1992
+%%EndComments
+% lib/psdit.pro -- prolog for psdit (ditroff) files
+% Copyright (c) 1984, 1985 Adobe Systems Incorporated. All Rights Reserved.
+% last edit: shore Sat Nov 23 20:28:03 1985
+% RCSID: $Header: psdit.pro,v 2.1 85/11/24 12:19:43 shore Rel $
+
+/$DITroff 140 dict def $DITroff begin
+/fontnum 1 def /fontsize 10 def /fontheight 10 def /fontslant 0 def
+/xi {0 72 11 mul 1.8 28.3465 mul add translate
+  72 resolution div dup neg scale 0 0 moveto
+  /fontnum 1 def /fontsize 10 def /fontheight 10 def /fontslant 0 def F
+  /pagesave save def}def
+/xiL {72 8.25 mul 72 11 mul 1.8 28.3465 mul add translate -90 rotate
+  72 resolution div dup neg scale 0 0 moveto
+  /fontnum 1 def /fontsize 10 def /fontheight 10 def /fontslant 0 def F
+  /pagesave save def}def
+/PB{save /psv exch def currentpoint translate 
+  resolution 72 div dup neg scale 0 0 moveto}def
+/PE{psv restore}def
+/arctoobig 90 def /arctoosmall .05 def
+/m1 matrix def /m2 matrix def /m3 matrix def /oldmat matrix def
+/tan{dup sin exch cos div}def
+/point{resolution 72 div mul}def
+/dround	{transform round exch round exch itransform}def
+/xT{/devname exch def}def
+/xr{/mh exch def /my exch def /resolution exch def}def
+/xp{}def
+/xs{docsave restore end}def
+/xt{}def
+/xf{/fontname exch def /slotno exch def fontnames slotno get fontname eq not
+ {fonts slotno fontname findfont put fontnames slotno fontname put}if}def
+/xH{/fontheight exch def F}def
+/xS{/fontslant exch def F}def
+/s{/fontsize exch def /fontheight fontsize def F}def
+/f{/fontnum exch def F}def
+/F{fontheight 0 le {/fontheight fontsize def}if
+   fonts fontnum get fontsize point 0 0 fontheight point neg 0 0 m1 astore
+   fontslant 0 ne{1 0 fontslant tan 1 0 0 m2 astore m3 concatmatrix}if
+   makefont setfont .04 fontsize point mul 0 dround pop setlinewidth}def
+/X{exch currentpoint exch pop moveto show}def
+/N{3 1 roll moveto show}def
+/Y{exch currentpoint pop exch moveto show}def
+/S{show}def
+/ditpush{}def/ditpop{}def
+/AX{3 -1 roll currentpoint exch pop moveto 0 exch ashow}def
+/AN{4 2 roll moveto 0 exch ashow}def
+/AY{3 -1 roll currentpoint pop exch moveto 0 exch ashow}def
+/AS{0 exch ashow}def
+/MX{currentpoint exch pop moveto}def
+/MY{currentpoint pop exch moveto}def
+/MXY{moveto}def
+/cb{pop}def	% action on unknown char -- nothing for now
+/n{}def/w{}def
+/p{pop showpage pagesave restore /pagesave save def}def
+% Manual Feed Definitions
+/SetStTime{statusdict /manualfeedtimeout 120 put} def
+/SetStatus{statusdict /manualfeed true put
+   statusdict /product get (LaserWriter) eq 
+   {version (23.0) eq  % Don't redefine the show page if printer is not "Classic LW"
+     {/p {
+	 {statusdict /printerstatus get exec 16#22000000 and 0 eq{exit}if}loop
+	 pop showpage pagesave restore /pagesave save def}def}if }if}def
+/abspoint{currentpoint exch pop add exch currentpoint pop add exch}def
+/distance{dup mul exch dup mul add sqrt}def
+/dstroke{currentpoint stroke moveto}def
+/Dl{2 copy gsave rlineto stroke grestore rmoveto}def
+/arcellipse{/diamv exch def /diamh exch def oldmat currentmatrix pop
+ currentpoint translate 1 diamv diamh div scale /rad diamh 2 div def
+ currentpoint exch rad add exch rad -180 180 arc oldmat setmatrix}def
+/Dc{dup arcellipse dstroke}def
+/De{arcellipse dstroke}def
+/Da{/endv exch def /endh exch def /centerv exch def /centerh exch def
+ /cradius centerv centerv mul centerh centerh mul add sqrt def
+ /eradius endv endv mul endh endh mul add sqrt def
+ /endang endv endh atan def
+ /startang centerv neg centerh neg atan def
+ /sweep startang endang sub dup 0 lt{360 add}if def
+ sweep arctoobig gt
+ {/midang startang sweep 2 div sub def /midrad cradius eradius add 2 div def
+  /midh midang cos midrad mul def /midv midang sin midrad mul def
+  midh neg midv neg endh endv centerh centerv midh midv Da
+  currentpoint moveto Da}
+ {sweep arctoosmall ge
+  {/controldelt 1 sweep 2 div cos sub 3 sweep 2 div sin mul div 4 mul def
+  centerv neg controldelt mul centerh controldelt mul
+  endv neg controldelt mul centerh add endh add
+  endh controldelt mul centerv add endv add
+  centerh endh add centerv endv add rcurveto dstroke}
+ {centerh endh add centerv endv add rlineto dstroke}ifelse}ifelse}def
+
+/Barray 200 array def % 200 values in a wiggle
+/D~{mark}def
+/D~~{counttomark Barray exch 0 exch getinterval astore /Bcontrol exch def pop
+ /Blen Bcontrol length def Blen 4 ge Blen 2 mod 0 eq and
+ {Bcontrol 0 get Bcontrol 1 get abspoint /Ycont exch def /Xcont exch def
+  Bcontrol 0 2 copy get 2 mul put Bcontrol 1 2 copy get 2 mul put
+  Bcontrol Blen 2 sub 2 copy get 2 mul put
+  Bcontrol Blen 1 sub 2 copy get 2 mul put
+  /Ybi /Xbi currentpoint 3 1 roll def def 0 2 Blen 4 sub
+  {/i exch def
+   Bcontrol i get 3 div Bcontrol i 1 add get 3 div
+   Bcontrol i get 3 mul Bcontrol i 2 add get add 6 div
+   Bcontrol i 1 add get 3 mul Bcontrol i 3 add get add 6 div
+   /Xbi Xcont Bcontrol i 2 add get 2 div add def
+   /Ybi Ycont Bcontrol i 3 add get 2 div add def
+   /Xcont Xcont Bcontrol i 2 add get add def
+   /Ycont Ycont Bcontrol i 3 add get add def
+   Xbi currentpoint pop sub Ybi currentpoint exch pop sub rcurveto
+  }for dstroke}if}def
+end
+/ditstart{$DITroff begin
+ /nfonts 60 def			% NFONTS makedev/ditroff dependent!
+ /fonts[nfonts{0}repeat]def
+ /fontnames[nfonts{()}repeat]def
+/docsave save def
+}def
+
+% character outcalls
+/oc {/pswid exch def /cc exch def /name exch def
+   /ditwid pswid fontsize mul resolution mul 72000 div def
+   /ditsiz fontsize resolution mul 72 div def
+   ocprocs name known{ocprocs name get exec}{name cb}
+   ifelse}def
+/fractm [.65 0 0 .6 0 0] def
+/fraction
+ {/fden exch def /fnum exch def gsave /cf currentfont def
+  cf fractm makefont setfont 0 .3 dm 2 copy neg rmoveto
+  fnum show rmoveto currentfont cf setfont(\244)show setfont fden show 
+  grestore ditwid 0 rmoveto} def
+/oce {grestore ditwid 0 rmoveto}def
+/dm {ditsiz mul}def
+/ocprocs 50 dict def ocprocs begin
+(14){(1)(4)fraction}def
+(12){(1)(2)fraction}def
+(34){(3)(4)fraction}def
+(13){(1)(3)fraction}def
+(23){(2)(3)fraction}def
+(18){(1)(8)fraction}def
+(38){(3)(8)fraction}def
+(58){(5)(8)fraction}def
+(78){(7)(8)fraction}def
+(sr){gsave 0 .06 dm rmoveto(\326)show oce}def
+(is){gsave 0 .15 dm rmoveto(\362)show oce}def
+(->){gsave 0 .02 dm rmoveto(\256)show oce}def
+(<-){gsave 0 .02 dm rmoveto(\254)show oce}def
+(==){gsave 0 .05 dm rmoveto(\272)show oce}def
+end
+
+% an attempt at a PostScript FONT to implement ditroff special chars
+% this will enable us to 
+%	cache the little buggers
+%	generate faster, more compact PS out of psdit
+%	confuse everyone (including myself)!
+50 dict dup begin
+/FontType 3 def
+/FontName /DIThacks def
+/FontMatrix [.001 0 0 .001 0 0] def
+/FontBBox [-260 -260 900 900] def% a lie but ...
+/Encoding 256 array def
+0 1 255{Encoding exch /.notdef put}for
+Encoding
+ dup 8#040/space put %space
+ dup 8#110/rc put %right ceil
+ dup 8#111/lt put %left  top curl
+ dup 8#112/bv put %bold vert
+ dup 8#113/lk put %left  mid curl
+ dup 8#114/lb put %left  bot curl
+ dup 8#115/rt put %right top curl
+ dup 8#116/rk put %right mid curl
+ dup 8#117/rb put %right bot curl
+ dup 8#120/rf put %right floor
+ dup 8#121/lf put %left  floor
+ dup 8#122/lc put %left  ceil
+ dup 8#140/sq put %square
+ dup 8#141/bx put %box
+ dup 8#142/ci put %circle
+ dup 8#143/br put %box rule
+ dup 8#144/rn put %root extender
+ dup 8#145/vr put %vertical rule
+ dup 8#146/ob put %outline bullet
+ dup 8#147/bu put %bullet
+ dup 8#150/ru put %rule
+ dup 8#151/ul put %underline
+ pop
+/DITfd 100 dict def
+/BuildChar{0 begin
+ /cc exch def /fd exch def
+ /charname fd /Encoding get cc get def
+ /charwid fd /Metrics get charname get def
+ /charproc fd /CharProcs get charname get def
+ charwid 0 fd /FontBBox get aload pop setcachedevice
+ 2 setlinejoin 40 setlinewidth
+ newpath 0 0 moveto gsave charproc grestore
+ end}def
+/BuildChar load 0 DITfd put
+%/UniqueID 5 def
+/CharProcs 50 dict def
+CharProcs begin
+/space{}def
+/.notdef{}def
+/ru{500 0 rls}def
+/rn{0 840 moveto 500 0 rls}def
+/vr{0 800 moveto 0 -770 rls}def
+/bv{0 800 moveto 0 -1000 rls}def
+/br{0 750 moveto 0 -1000 rls}def
+/ul{0 -140 moveto 500 0 rls}def
+/ob{200 250 rmoveto currentpoint newpath 200 0 360 arc closepath stroke}def
+/bu{200 250 rmoveto currentpoint newpath 200 0 360 arc closepath fill}def
+/sq{80 0 rmoveto currentpoint dround newpath moveto
+    640 0 rlineto 0 640 rlineto -640 0 rlineto closepath stroke}def
+/bx{80 0 rmoveto currentpoint dround newpath moveto
+    640 0 rlineto 0 640 rlineto -640 0 rlineto closepath fill}def
+/ci{500 360 rmoveto currentpoint newpath 333 0 360 arc
+    50 setlinewidth stroke}def
+
+/lt{0 -200 moveto 0 550 rlineto currx 800 2cx s4 add exch s4 a4p stroke}def
+/lb{0 800 moveto 0 -550 rlineto currx -200 2cx s4 add exch s4 a4p stroke}def
+/rt{0 -200 moveto 0 550 rlineto currx 800 2cx s4 sub exch s4 a4p stroke}def
+/rb{0 800 moveto 0 -500 rlineto currx -200 2cx s4 sub exch s4 a4p stroke}def
+/lk{0 800 moveto 0 300 -300 300 s4 arcto pop pop 1000 sub
+    0 300 4 2 roll s4 a4p 0 -200 lineto stroke}def
+/rk{0 800 moveto 0 300 s2 300 s4 arcto pop pop 1000 sub
+    0 300 4 2 roll s4 a4p 0 -200 lineto stroke}def
+/lf{0 800 moveto 0 -1000 rlineto s4 0 rls}def
+/rf{0 800 moveto 0 -1000 rlineto s4 neg 0 rls}def
+/lc{0 -200 moveto 0 1000 rlineto s4 0 rls}def
+/rc{0 -200 moveto 0 1000 rlineto s4 neg 0 rls}def
+end
+
+/Metrics 50 dict def Metrics begin
+/.notdef 0 def
+/space 500 def
+/ru 500 def
+/br 0 def
+/lt 416 def
+/lb 416 def
+/rt 416 def
+/rb 416 def
+/lk 416 def
+/rk 416 def
+/rc 416 def
+/lc 416 def
+/rf 416 def
+/lf 416 def
+/bv 416 def
+/ob 350 def
+/bu 350 def
+/ci 750 def
+/bx 750 def
+/sq 750 def
+/rn 500 def
+/ul 500 def
+/vr 0 def
+end
+
+DITfd begin
+/s2 500 def /s4 250 def /s3 333 def
+/a4p{arcto pop pop pop pop}def
+/2cx{2 copy exch}def
+/rls{rlineto stroke}def
+/currx{currentpoint pop}def
+/dround{transform round exch round exch itransform} def
+end
+end
+/DIThacks exch definefont pop
+
+% angeh\angt von Martin Leiser fuer Umlaute. 19.12.1988
+
+/reencsmalldict 12 dict def
+/ReEncodeSmall
+{ reencsmalldict begin
+  /newcodesandnames exch def
+  /newfontname exch def
+  /basefontname exch def
+  /basefontdict basefontname findfont def
+  /newfont basefontdict maxlength dict def
+  basefontdict
+   { exch dup /FID ne
+    { dup /Encoding eq
+     { exch dup length array copy newfont 3 1 roll put }
+     { exch newfont 3 1 roll put }
+     ifelse
+    }
+    { pop pop }
+    ifelse
+   } forall
+  newfont /FontName newfontname put
+  newcodesandnames aload pop
+  newcodesandnames length 2 idiv
+   { newfont /Encoding get 3 1 roll put }
+   repeat
+  newfontname newfont definefont pop
+  end
+} def
+/germvec [
+8#321 /Adieresis
+8#322 /Edieresis
+8#323 /Idieresis
+8#324 /Odieresis
+8#325 /Udieresis
+8#326 /Ydieresis
+8#327 /adieresis
+8#330 /edieresis
+8#331 /idieresis
+8#332 /odieresis
+8#333 /udieresis
+8#334 /ydieresis
+] def
+/Times-Roman /Times-Roman-Germ germvec ReEncodeSmall
+/Times-Italic /Times-Italic-Germ germvec ReEncodeSmall
+/Times-Bold /Times-Bold-Germ germvec ReEncodeSmall
+/Times-BoldItalic /Times-BoldItalic-Germ germvec ReEncodeSmall
+/Helvetica /Helvetica-Germ germvec ReEncodeSmall
+/Helvetica-Bold /Helvetica-Bold-Germ germvec ReEncodeSmall
+/Helvetica-Oblique /Helvetica-Oblique-Germ germvec ReEncodeSmall
+/Helvetica-BoldOblique /Helvetica-BoldOblique-Germ germvec ReEncodeSmall
+/Courier /Courier-Germ germvec ReEncodeSmall
+/Courier-Bold /Courier-Bold-Germ germvec ReEncodeSmall
+/Courier-Oblique /Courier-Oblique-Germ germvec ReEncodeSmall
+/Courier-BoldOblique /Courier-BoldOblique-Germ germvec ReEncodeSmall
+ditstart
+(psc)xT
+576 1 1 xr
+1(Times-Roman-Germ)xf 1 f
+2(Times-Italic-Germ)xf 2 f
+3(Times-Bold-Germ)xf 3 f
+4(Times-BoldItalic-Germ)xf 4 f
+5(Helvetica-Germ)xf 5 f
+6(Helvetica-Bold-Germ)xf 6 f
+7(Courier-Germ)xf 7 f
+8(Courier-Bold-Germ)xf 8 f
+9(Symbol)xf 9 f
+10(DIThacks)xf 10 f
+10 s
+1 f
+xi
+%%EndProlog
+4(Courier-Germ)xf 4 f
+
+%%Page: 1 1
+4(Courier-Germ)xf 4 f
+10 s 0 xH 0 xS 4 f
+12 s
+3 f
+1 f
+10 f
+566 1114(h)N
+603(hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh)X
+1 f
+2606 1438(Werkzeuge)N
+3069(f\333r)X
+3205(den)X
+2606 1546(\325bersetzerbau)N
+2606 1762(J.)N
+2691(Grosch)X
+2606 1870(H.)N
+2723(Emmelmann)X
+10 f
+566 2086(h)N
+603(hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh)X
+566 5028(h)N
+603(hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh)X
+5 f
+2606 5136(GESELLSCHAFT)N
+3390(F\325R)X
+3614(MATHEMATIK)X
+2606 5244(UND)N
+2840(DATENVERARBEITUNG)X
+3949(MBH)X
+2606 5460(FORSCHUNGSSTELLE)N
+3672(F\325R)X
+2606 5568(PROGRAMMSTRUKTUREN)N
+2606 5676(AN)N
+2766(DER)X
+2995(UNIVERSIT\321T)X
+3657(KARLSRUHE)X
+1 f
+10 f
+566 5784(h)N
+603(hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh)X
+
+2 p
+%%Page: 2 2
+4(Courier-Germ)xf 4 f
+12 s 0 xH 0 xS 4 f
+3 f
+1 f
+20 s
+2209 1392(Project)N
+3 f
+1704 1752(C)N
+1819(om)X
+2033(piler)X
+2394(G)X
+2519(eneration)X
+1 f
+12 s
+10 f
+736 2040(h)N
+777(hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh)X
+3 f
+16 s
+1492 2292(W)N
+(erkzeuge)S
+2143(f\333r)X
+2346(den)X
+2577(\325bersetzerbau)X
+1 f
+2103 2724(Josef)N
+2399(Grosch)X
+1900 2868(Helm)N
+2185(ut)X
+2317(Em)X
+2495(m)X
+2595(elm)X
+2788(ann)X
+14 s
+2156 3282(Feb.)N
+2380(7,)X
+2492(1990)X
+12 s
+10 f
+736 3516(h)N
+777(hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh)X
+1 f
+2163 3840(Report)N
+2449(No.)X
+2614(21)X
+1960 4164(Copyright)N
+9 f
+2374(\323)X
+1 f
+2474(1990)X
+2690(GMD)X
+1323 4488(Gesellschaft)N
+1823(f\333r)X
+1959(Mathematik)X
+2449(und)X
+2617(Datenverarbeitung)X
+3358(mbH)X
+1555 4596(Forschungsstelle)N
+2225(an)X
+2340(der)X
+2487(Universit\327t)X
+2939(Karlsruhe)X
+1966 4704(Vincenz-Prie\373nitz-Str.)N
+2859(1)X
+2088 4812(D-7500)N
+2405(Karlsruhe)X
+
+1 p
+%%Page: 1 3
+4(Courier-Germ)xf 4 f
+12 s 0 xH 0 xS 4 f
+3 f
+4259 561(1)N
+1728 780(Werkzeuge)N
+2217(f\333r)X
+2369(den)X
+2542(\325bersetzerbau)X
+1 f
+1926 996(J.)N
+2011(Grosch,)X
+2336(H.)X
+2453(Emmelmann)X
+1431 1104(GMD)N
+1678(Forschungsstelle)X
+2348(an)X
+2463(der)X
+2610(Universit\327t)X
+3062(Karlsruhe)X
+1391 1212(Vincenz-Prie\373nitz-Str.)N
+2284(1,)X
+2380(D-7500)X
+2697(Karlsruhe,)X
+3124(Germany)X
+3 f
+566 1524(\325bersicht)N
+1 f
+766 1665(Mit)N
+957 0.1576(\325bersetzerbau-Werkzeugen)AX
+2084(lassen)X
+2371(sich)X
+2577(\325bersetzer)X
+3045(f\333r)X
+3208(Programmiersprachen)X
+4109(weit-)X
+566 1773(gehend)N
+879(automatisch)X
+1380(generieren.)X
+1846(Wir)X
+2031(stellen)X
+2318(einen)X
+2562(Werkzeugkasten)X
+3239(vor,)X
+3426(welcher)X
+3766(die)X
+3918(Konstruk-)X
+566 1881(tion)N
+747(nahezu)X
+1050(aller)X
+1252(Phasen)X
+1554(eines)X
+1782(\325bersetzers)X
+2266(unterst\333tzt.)X
+2727(Die)X
+2896(Entwurfsziele)X
+3461(f\333r)X
+3603(diesen)X
+3879(Werkzeug-)X
+566 1989(kasten)N
+846(waren)X
+1115(praktische)X
+1545(Brauchbarkeit,)X
+2149(deutlich)X
+2494(reduzierter)X
+2946(Erstellungsaufwand)X
+3744(f\333r)X
+3890(\325bersetzer)X
+566 2097(und)N
+763(hohe)X
+1003(Qualit\327t)X
+1367(der)X
+1543(generierten)X
+2030(\325bersetzer.)X
+2524(Besonders)X
+2977(hinsichtlich)X
+3480(Ef\256zienz)X
+3880(sollten)X
+4189(die)X
+566 2205(Werkzeuge)N
+1050(konkurrenzf\327hig)X
+1731(zur)X
+1899(Programmierung)X
+2596(von)X
+2785(Hand)X
+3038(sein.)X
+3285(Zur)X
+3468(Zeit)X
+3668(k\332nnen)X
+3995(mit)X
+4168(den)X
+566 2313(Werkzeugen)N
+1082(\325bersetzermodule)X
+1817(in)X
+1920(den)X
+2087(Zielsprachen)X
+2613(C)X
+2705(und)X
+2877(Modula-2)X
+3284(erzeugt)X
+3596(werden.)X
+3931(Erste)X
+4157(rea-)X
+566 2421(listische)N
+930(Anwendungen)X
+1538(demonstrieren)X
+2137(die)X
+2303(ausgezeichnete)X
+2934(Leistungsf\327higkeit)X
+3698(der)X
+3868(Werkzeuge)X
+566 2529(und)N
+736(zeigen,)X
+1038(da\373)X
+1203(die)X
+1347(Werkzeuge)X
+1812(die)X
+1956(Konstruktion)X
+2489(von)X
+2659(\325bersetzern)X
+3149(mit)X
+3303(Produktionsqualit\327t)X
+4082(erlau-)X
+566 2637(ben.)N
+3 f
+566 2841(1.)N
+686(Aufbau)X
+1018(eines)X
+1245(\325bersetzers)X
+1 f
+766 2982(Ein)N
+937(wichtiges)X
+1343(Hilfsmittel)X
+1798(zur)X
+1958(Programmierung)X
+2647(eines)X
+2882(Computers)X
+3341(ist)X
+3469(ein)X
+3624(\325bersetzer)X
+4077(\(com-)X
+566 3090(piler\).)N
+903(Ein)X
+1117(\325bersetzer)X
+1614(ist)X
+1785(ein)X
+1983(Programm,)X
+2493(welches)X
+2882(ein)X
+3079(in)X
+3233(einer)X
+3505(Programmiersprache)X
+566 3198(geschriebenes)N
+1149(Programm)X
+1598(in)X
+1716(eine)X
+1920(Maschinensprache)X
+2679(\333bersetzt.)X
+3094(Die)X
+3276(Hardware)X
+3698(versteht)X
+4045(genau-)X
+566 3306(genommen)N
+1037(nur)X
+1208(aus)X
+1379(Nullen)X
+1684(und)X
+1871(Einsen)X
+2176 0.2083(zusammengesetzte)AX
+2942(Maschinensprach-Programme.)X
+4163(Um)X
+566 3414(einem)N
+837(Computer)X
+1257(auch)X
+1473(eine)X
+1668(f\333r)X
+1814(den)X
+1987(menschlichen)X
+2551(Programmierer)X
+3168(besser)X
+3442(geeignete)X
+3846(h\332here)X
+4142(Pro-)X
+566 3522(grammiersprache)N
+1259(verst\327ndlich)X
+1754(zu)X
+1869(machen,)X
+2217(ist)X
+2332(eine)X
+2517(\325bersetzung)X
+3027(n\332tig.)X
+766 3663(Die)N
+938(Konstruktion)X
+1478(eines)X
+1708(\325bersetzers)X
+2194(ist)X
+2317(eine)X
+2510(anspruchsvolle)X
+3119(und)X
+3295(aufwendige)X
+3776(Aufgabe.)X
+4163(Der)X
+566 3771(Bedarf)N
+856(an)X
+975(\325bersetzern)X
+1468(ist)X
+1587(relativ)X
+1862(gro\373,)X
+2090(da)X
+2209(f\333r)X
+2349(jede)X
+2538(Programmiersprache)X
+3368(und)X
+3540(jeden)X
+3777(Computer)X
+4189(ein)X
+566 3879(eigener)N
+878(\325bersetzer)X
+1323(notwendig)X
+1757(ist.)X
+1924(Es)X
+2048(lohnt)X
+2274(sich)X
+2457(daher,)X
+2723(nach)X
+2933(Methoden)X
+3351(zu)X
+3470(suchen)X
+3765(die)X
+3911(Erstellung)X
+566 3987(von)N
+754(Compilern)X
+1210(zu)X
+1344(vereinfachen.)X
+1933(Doch)X
+2184(bevor)X
+2446(wir)X
+2617(zu)X
+2751(unserem)X
+3120(eigentlichen)X
+3635(Thema)X
+3946(kommen,)X
+566 4095(n\327mlich)N
+939(der)X
+1124(automatischen)X
+1743(Generierung)X
+2286(von)X
+2492(\325bersetzern)X
+3018(mit)X
+3208 0.1510(\325bersetzerbau-Werkzeugen,)AX
+566 4203(m\332chten)N
+931(wir)X
+1092(kurz)X
+1296(den)X
+1468(Aufbau)X
+1789(und)X
+1966(die)X
+2117(prinzipielle)X
+2589(Funktionsweise)X
+3224(eines)X
+3454(\325bersetzers)X
+3940(erl\327utern.)X
+566 4311(Die)N
+729(rechte)X
+989(Spalte)X
+1254(in)X
+1353(Abb.)X
+1566(1)X
+1638(zeigt)X
+1850(die)X
+1992(Phasen)X
+2288(bzw.)X
+2496(Module)X
+2819(eines)X
+3041(\325bersetzers.)X
+766 4452(Die)N
+940(lexikalische)X
+1436(Analyse)X
+1786(liest)X
+1981(das)X
+2143(Quellprogramm)X
+2792(zeichenweise.)X
+3364(Sie)X
+3521(fa\373t)X
+3705(die)X
+3857(Zeichenfol-)X
+566 4560(gen)N
+746(f\333r)X
+899(Bezeichner,)X
+1398(Zahlen)X
+1707(und)X
+1892(Schl\333sselw\332rter)X
+2547(zu)X
+2679(Grundsymbolen)X
+3339(zusammen)X
+3791(und)X
+3975(\333berliest)X
+566 4668(Zwischenr\327ume)N
+1205(und)X
+1373(Kommentare.)X
+766 4809(Die)N
+930(syntaktische)X
+1431(Analyse)X
+1771(hat)X
+1914(als)X
+2046(Eingabe)X
+2387(eine)X
+2572(Folge)X
+2815(von)X
+2983(Grundsymbolen.)X
+3650(Sie)X
+3797(\333berpr\333ft)X
+4179(das)X
+566 4917(Quellprogramm)N
+1212(auf)X
+1366(syntaktische)X
+1873(Fehler)X
+2150(und)X
+2325(rekonstruiert)X
+2848(die)X
+2996(Struktur)X
+3341(des)X
+3499(Programms,)X
+3996(d.)X
+4098(h.)X
+4200(sie)X
+566 5025(erkennt)N
+881(den)X
+1046(Aufbau)X
+1360(der)X
+1508(Ausdr\333cke)X
+1949(und)X
+2118(Anweisungen)X
+2671(sowie)X
+2920(deren)X
+3159(Zusammenhang.)X
+3823(Diese)X
+4067(Struk-)X
+566 5133(tur)N
+697(wird)X
+897(oft)X
+1028(in)X
+1127(Form)X
+1359(eines)X
+1581(Syntaxbaums)X
+2123(gespeichert.)X
+766 5274(Die)N
+931(semantische)X
+1428(Analyse)X
+1769(\333berpr\333ft)X
+2153(die)X
+2297(Kontextbedingungen)X
+3129(bzw.)X
+3338(die)X
+3481(Regeln)X
+3779(der)X
+3927(statischen)X
+566 5382(Semantik)N
+970(und)X
+1154(berechnet)X
+1568(f\333r)X
+1719(die)X
+1876(Codegenerierung)X
+2578(n\332tige)X
+2858(Eigenschaften.)X
+3467(Ein)X
+3640(Beispiel)X
+3995(f\333r)X
+4146(eine)X
+566 5490(Kontextbedingung)N
+1315(ist)X
+1439(die)X
+1590(Vorschrift,)X
+2042(da\373)X
+2214(alle)X
+2387(Variablen)X
+2799(deklariert)X
+3201(sein)X
+3388(m\333ssen.)X
+3756(Zur)X
+3927(statischen)X
+566 5598(Semantik)N
+957(z\327hlen)X
+1236(die)X
+1381(Analyse)X
+1723(der)X
+1873 0.1645(G\333ltigkeitsbereiche,)AX
+2679(die)X
+2824(Namensanalyse,)X
+3478(d.)X
+3600(h.)X
+3698(die)X
+3842(Feststellung)X
+566 5706(der)N
+713(zu)X
+828(einem)X
+1088(Bezeichner)X
+1546(geh\332renden)X
+2019(Deklaration,)X
+2522(und)X
+2690(die)X
+2832(Typ\333berpr\333fung.)X
+766 5847(Zur)N
+940(Vereinfachung)X
+1547(der)X
+1705(gesamten)X
+2104(\325bersetzungsaufgabe)X
+2966(wird)X
+3176(diese)X
+3408(h\327u\256g)X
+3682(in)X
+3791(zwei)X
+4007(Schritte)X
+566 5955(unterteilt.)N
+979(Der)X
+1163(Syntaxbaum)X
+1684(wird)X
+1900(zun\327chst)X
+2277(von)X
+2461(einer)X
+2693(Transformationsphase)X
+3587(in)X
+3701(eine)X
+3901(Zwischen-)X
+566 6063(sprache)N
+924(umgewandelt.)X
+1531(Diese)X
+1814(Zwischensprache)X
+2545(ist)X
+2699(meist)X
+2971 0.1944(maschinenorientiert)AX
+3800(jedoch)X
+4120(noch)X
+566 6171(maschinenunabh\327ngig.)N
+1476(Das)X
+1650(niedrige)X
+1991(Niveau)X
+2294(der)X
+2442(Zwischensprache)X
+3134(erleichtert)X
+3550(dem)X
+3740(Codegenerator)X
+
+2 p
+%%Page: 2 4
+4(Courier-Germ)xf 4 f
+12 s 0 xH 0 xS 4 f
+3 f
+4259 561(2)N
+1 f
+566 780(die)N
+708(Erzeugung)X
+1149(der)X
+1296(Maschinensprache.)X
+766 921(Zu)N
+906(den)X
+1077(Aufgaben)X
+1488(des)X
+1648(Codegenerators)X
+2284(z\327hlen)X
+2568(die)X
+2718(Befehlsauswahl,)X
+3383(d.)X
+3487(h.)X
+3591(die)X
+3741(Abbildung)X
+4184(der)X
+566 1029(Zwischensprachanweisungen)N
+1722(auf)X
+1874(Maschinenbefehle,)X
+2633(sowie)X
+2886(die)X
+3033(Speicher-)X
+3431(und)X
+3603(Registerzuteilung.)X
+566 1137(Die)N
+729(Ausgabe)X
+1089(ist)X
+1204(schlie\373lich)X
+1646(ein)X
+1788(bin\327r-codiertes)X
+2390(Maschinenprogramm.)X
+766 1278(Der)N
+960(folgende)X
+1347(Abschnitt)X
+1771(beschreibt)X
+2217(die)X
+2384(Vorteile,)X
+2773(die)X
+2940(Entwurfsziele)X
+3524(und)X
+3717(den)X
+3905(Inhalt)X
+4179(des)X
+566 1386(Werkzeugkastens.)N
+1330(Abschnitt)X
+1741(3)X
+1826(stellt)X
+2051(die)X
+2206(gemeinsamen)X
+2773(Eigenschaften)X
+3356(der)X
+3516(Werkzeuge)X
+3992(dar.)X
+4200(Im)X
+566 1494(Abschnitt)N
+964(4)X
+1036(wird)X
+1236(das)X
+1388(von)X
+1556(uns)X
+1713(bevorzugte)X
+2165(\325bersetzermodell)X
+2874(beschrieben.)X
+3406(Der)X
+3574(Abschnitt)X
+3972(5)X
+4044(enth\327lt)X
+566 1602(eine)N
+765(kurze)X
+1017(Darstellung)X
+1504(der)X
+1665(einzelnen)X
+2073(Werkzeuge.)X
+2598(Abschnitt)X
+3009(6)X
+3094(berichtet)X
+3469(von)X
+3650(den)X
+3826(Erfahrungen)X
+566 1710(des)N
+739(Einsatzes)X
+1148(der)X
+1316(Werkzeuge)X
+1800(in)X
+1920(zwei)X
+2147(realistischen)X
+2674(Anwendungen.)X
+3327(Abschnitt)X
+3746(7)X
+3839(enth\327lt)X
+4146(eine)X
+566 1818(Zusammenfassung)N
+1311(und)X
+1479(beschreibt)X
+1899(weiterf\333hrende)X
+2506(Arbeiten.)X
+3 f
+566 2022(2.)N
+686(Werkzeugkasten)X
+1 f
+766 2163(Die)N
+941(Erstellung)X
+1373(eines)X
+1607(\325bersetzers)X
+2097(von)X
+2277(Hand)X
+2521(ist)X
+2648(eine)X
+2845(sehr)X
+3041(anspruchsvolle)X
+3678(und)X
+3858(aufwendige)X
+566 2271(Aufgabe.)N
+973(Durch)X
+1241(den)X
+1408(Einsatz)X
+1720(von)X
+1892 0.1576(\325bersetzerbau-Werkzeugen)AX
+2995(l\327\373t)X
+3168(sich)X
+3350(dieser)X
+3607(Aufwand)X
+3991(reduzie-)X
+566 2379(ren.)N
+771(Im)X
+912(folgenden)X
+1331(stellen)X
+1617(wir)X
+1779(einen)X
+2022(Werkzeugkasten)X
+2698(zur)X
+2854(\325bersetzer-Generierung)X
+3817(vor,)X
+4002(welcher)X
+566 2487(f\333r)N
+707(nahezu)X
+1009(jede)X
+1198(\325bersetzerphase)X
+1862(Werkzeuge)X
+2329(enth\327lt.)X
+2668(Diese)X
+2915(sind)X
+3103(f\333r)X
+3243(den)X
+3410(Einsatz)X
+3722(in)X
+3825(realistischen)X
+566 2595(\325bersetzerprojekten)N
+1371(konzipiert.)X
+766 2736(Im)N
+915(allgemeinen)X
+1429(akzeptieren)X
+1916(die)X
+2076(Werkzeuge)X
+2557(als)X
+2706(Eingabe)X
+3064(eine)X
+3266(Spezi\256kation,)X
+3839(die)X
+3998(in)X
+4114(einer)X
+566 2844(werkzeug-spezi\256schen)N
+1547(Sprache)X
+1962(geschrieben)X
+2527(ist.)X
+2747(Sie)X
+2974(produzieren)X
+3538(als)X
+3749(Ausgabe)X
+4189(ein)X
+566 2952(Programm-Modul)N
+1285(in)X
+1385(einer)X
+1602(Zielsprache)X
+2076(\(C)X
+2196(oder)X
+2391(Modula-2\).)X
+2850(Deshalb)X
+3189(kann)X
+3400(ein)X
+3542(Werkzeug)X
+3962(als)X
+4093(gene-)X
+566 3060(rische)N
+831(L\332sung)X
+1154(eines)X
+1387(Teilproblems)X
+1935(in)X
+2044(einem)X
+2314(\325bersetzer)X
+2765(gesehen)X
+3109(werden,)X
+3450(wobei)X
+3719(mit)X
+3882(Hilfe)X
+4114(einer)X
+566 3168(Spezi\256kation)N
+1098(eine)X
+1283(konkrete)X
+1644(L\332sung)X
+1956(gewonnen)X
+2375(wird.)X
+766 3309(Die)N
+945(Benutzung)X
+1402(von)X
+1585(Werkzeugen)X
+2111(hat)X
+2268(gegen\333ber)X
+2708(der)X
+2870(Programmierung)X
+3561(von)X
+3744(Hand)X
+3991(mehrere)X
+566 3417(Vorteile:)N
+952(Der)X
+1139(zur)X
+1305(Konstruktion)X
+1854(eines)X
+2094(\325bersetzers)X
+2590(notwendige)X
+3081(Aufwand)X
+3480(wird)X
+3698(wesentlich)X
+4152(ver-)X
+566 3525(ringert.)N
+905(An)X
+1080(Stelle)X
+1358(eines)X
+1614(Programms)X
+2115(wird)X
+2349(eine)X
+2568(viel)X
+2771(k\333rzere)X
+3118(Spezi\256kation)X
+3684(entwickelt.)X
+4168(Die)X
+566 3633(Werkzeuge)N
+1056(k\332nnen)X
+1390(eine)X
+1602(Spezi\256kation)X
+2160(in)X
+2285(vielfacher)X
+2721(Weise)X
+3012(auf)X
+3185(Konsistenz)X
+3662(\333berpr\333fen.)X
+4158(Das)X
+566 3741(Schreiben)N
+993(automatisch)X
+1501(pr\333fbarer)X
+1901(Spezi\256kationen)X
+2542(verringert)X
+2964(die)X
+3124(Anzahl)X
+3444(m\332glicher)X
+3876(Fehler)X
+4163(und)X
+566 3849(erh\332ht)N
+836(so)X
+945(die)X
+1087(Zuverl\327ssigkeit)X
+1705(des)X
+1857(resultierenden)X
+2427(\325bersetzers.)X
+766 3990(Die)N
+929(wichtigsten)X
+1397(Entwurfsziele)X
+1956(f\333r)X
+2092(den)X
+2255(Werkzeugkasten)X
+2921(waren:)X
+566 4131(-)N
+766(praktische)X
+1186(Brauchbarkeit)X
+1756(f\333r)X
+1892(realistische)X
+2350(Programmiersprachen)X
+566 4272(-)N
+766(automatische)X
+1299(Generierung)X
+1804(von)X
+1972(\325bersetzern)X
+2461(mit)X
+2614(Produktionsqualit\327t)X
+566 4413(-)N
+766(wesentliche)X
+1245(Steigerung)X
+1686(der)X
+1833 0.1274(\325bersetzerbau-Produktivit\327t)AX
+566 4554(-)N
+766(mit)X
+919(Handprogrammierung)X
+1798(vergleichbare)X
+2347(Qualit\327t)X
+2682(der)X
+2829(erzeugten)X
+3228(\325bersetzer)X
+766 4695(Mit)N
+932(dieser)X
+1189(Zielsetzung)X
+1689(sollte)X
+1924(die)X
+2068(praktische)X
+2490 0.2083(Einsatzf\327higkeit)AX
+3143(des)X
+3297(Werkzeugkastens)X
+4002(in)X
+4103(reali-)X
+566 4803(stischen)N
+918 0.1458(\325bersetzerbauprojekten)AX
+1880(erreicht)X
+2217(werden.)X
+2566(Daher)X
+2842(wurde)X
+3123(auch)X
+3346(die)X
+3505(Konkurrenzf\327higkeit)X
+566 4911(zur)N
+725(Handprogrammierung)X
+1616(betont.)X
+1917(Wir)X
+2103(meinen,)X
+2447(da\373)X
+2621(die)X
+2774(hohe)X
+2996(Produktivit\327t)X
+3534(und)X
+3713(Zuverl\327ssigkeit)X
+566 5019(nicht)N
+784(durch)X
+1028(eine)X
+1214(geringere)X
+1603(Codequalit\327t)X
+2120(oder)X
+2315(Ef\256zienz)X
+2687(des)X
+2839(resultierenden)X
+3409(Compilers)X
+3834(erkauft)X
+4131(wer-)X
+566 5127(den)N
+729(mu\373.)X
+766 5268(Der)N
+934(Werkzeugkasten)X
+1600(enth\327lt)X
+1887(folgende)X
+2248(Werkzeuge:)X
+
+3 p
+%%Page: 3 5
+4(Courier-Germ)xf 4 f
+12 s 0 xH 0 xS 4 f
+3 f
+4259 561(3)N
+1 f
+726 780(Rex)N
+1179(Generator)X
+1588(f\333r)X
+1724(lexikalische)X
+2209(Analysatoren)X
+726 888(Lalr)N
+1179(LALR\(1\))X
+1566 0.2426(Zerteilergenerator)AX
+726 996(Ell)N
+1179(LL\(1\))X
+1433 0.2426(Zerteilergenerator)AX
+726 1104(Ast)N
+1179(Generator)X
+1588(f\333r)X
+1724(abstrakte)X
+2096(Syntaxb\327ume)X
+726 1212(Ag)N
+1179(Generator)X
+1588(f\333r)X
+1724(Attributauswerter)X
+726 1320(Estra)N
+1179(Transformation)X
+1802(abstrakter)X
+2206(Syntaxb\327ume)X
+726 1428(Beg)N
+1179(Generator)X
+1588(f\333r)X
+1724(Codegeneratoren)X
+726 1536(Reuse)N
+1179(Bibliothek)X
+1610(wiederverwendbarer)X
+2425(Module)X
+766 1710(Alle)N
+975(Werkzeuge)X
+1457(wurden)X
+1788(urspr\333nglich)X
+2317(in)X
+2435(Modula-2)X
+2857(programmiert)X
+3430(und)X
+3617(laufen)X
+3901(unter)X
+4141(dem)X
+566 1818(Betriebssystem)N
+1179(UNIX.)X
+1467(Unter)X
+1711(Verwendung)X
+2232(des)X
+2384(Modula-2)X
+2787(nach)X
+2993(C)X
+3081(\325bersetzers)X
+2 f
+3559(Mtc)X
+1 f
+3733([Mar90])X
+4077(\(siehe)X
+566 1926(Abschnitt)N
+978(6.1\),)X
+1192(konnte)X
+1492(von)X
+1674(den)X
+1851(Programmen)X
+2386(automatisch)X
+2889(eine)X
+3087(C-Version)X
+3524(erstellt)X
+3824(werden.)X
+4168(Zur)X
+566 2034(Zeit)N
+746(erzeugen)X
+1118(die)X
+1260(meisten)X
+1584(Werkzeuge)X
+2047(Module)X
+2370(in)X
+2469(den)X
+2632(Zielsprachen)X
+3154(C)X
+3242(und)X
+3410(Modula-2.)X
+3 f
+566 2238(3.)N
+686(Gemeinsame)X
+1239(Eigenschaften)X
+1 f
+766 2379(Unsere)N
+1146(Entwurfsziele)X
+1789(f\333hrten)X
+2175(zu)X
+2374(einigen)X
+2765(f\333r)X
+2984(alle)X
+3231(Werkzeuge)X
+3777(gemeinsamen)X
+566 2487(Entwurfsentscheidungen.)N
+1582(Nahezu)X
+1917(jedes)X
+2156(Werkzeug)X
+2592(ben\332tigt)X
+2948(eine)X
+3149(Programmiersprache,)X
+4015(mit)X
+4184(der)X
+566 2595(der)N
+724(Benutzer)X
+1107(gewi\373e)X
+1420(Aktionen,)X
+1837(Bedingungen)X
+2385(oder)X
+2591(Berechnungen)X
+3181(spezi\256zieren)X
+3702(kann.)X
+3947(Das)X
+4130(trifft)X
+566 2703(offensichtlich)N
+1133(f\333r)X
+1282 0.1910(Attributgrammatiken)AX
+2133(zu,)X
+2285(aber)X
+2488(auch)X
+2707(der)X
+2866 0.1449(Codegenerator-Generator)AX
+3886(mu\373)X
+4093(Attri-)X
+566 2811(bute)N
+763(und)X
+938(Bedingungen)X
+1482(auswerten.)X
+1927(Sogar)X
+2181(die)X
+2329 0.2368(Zerteilergeneratoren)AX
+3147(brauchen)X
+3530(eine)X
+3721(solche)X
+3997(Sprache)X
+566 2919(zur)N
+713(Spezi\256kation)X
+1245(semantischer)X
+1772(Aktionen.)X
+766 3060(Wir)N
+951(entschieden)X
+1441(uns)X
+1609(daf\333r)X
+1847(direkt)X
+2106(die)X
+2258(Zielsprache)X
+2742(\(n\327mlich)X
+3119(C)X
+3217(oder)X
+3422(Modula-2\))X
+3867(zu)X
+3992(verwen-)X
+566 3168(den.)N
+828(Deshalb)X
+1218(k\332nnen)X
+1576(Spezi\256kationen)X
+2250(Abschnitte)X
+2742(mit)X
+2946(Zielsprachanweisungen)X
+3929(enthalten.)X
+566 3276(Abgesehen)N
+1048(von)X
+1247(geringf\333gigen)X
+1842(Ersetzungen)X
+2372(wird)X
+2602(dieser)X
+2886(Text)X
+3117(unver\327ndert)X
+3631(in)X
+3760(die)X
+3932(erzeugten)X
+566 3384(Module)N
+908(kopiert.)X
+1272(Der)X
+1459(Nachteil)X
+1828(dieser)X
+2100(Methode)X
+2484(ist,)X
+2641(da\373)X
+2822(die)X
+2982(in)X
+3099(der)X
+3264(Zielsprache)X
+3756(geschriebenen)X
+566 3492(Teile)N
+798(nicht)X
+1024(vollst\327ndig)X
+1485(von)X
+1662(den)X
+1834(Werkzeugen)X
+2354(\333berpr\333ft)X
+2744(werden)X
+3059(k\332nnen.)X
+3398(Zum)X
+3612(Beispiel)X
+3960(kann)X
+4179(das)X
+566 3600 0.1875(Attributgrammatik-Werkzeug)AN
+1766(nicht)X
+2008(\333berpr\333fen,)X
+2503(ob)X
+2648(Attributberechnungen)X
+3541(keine)X
+3798(Seiteneffekte)X
+566 3708(haben.)N
+848(Andererseits)X
+1362(wird)X
+1566(damit)X
+1814(eine)X
+2002(sehr)X
+2189(gro\373e)X
+2435(Flexibilit\327t)X
+2886(erreicht,)X
+3232(da)X
+3350(die)X
+3495(volle)X
+3715(Ausdruckskraft)X
+566 3816(der)N
+716(Zielsprache)X
+1193(zur)X
+1343(Verf\333gung)X
+1786(steht.)X
+2019(Ebenso)X
+2329(wird)X
+2531(die)X
+2675(praktische)X
+3097(Brauchbarkeit)X
+3669(drastisch)X
+4037(erh\332ht,)X
+566 3924(da)N
+704(die)X
+869(Einbeziehung)X
+1446(anderer,)X
+1806(eventuell)X
+2207(handgeschriebener)X
+2976(Komponenten)X
+3568(leicht)X
+3830(m\332glich)X
+4192(ist.)X
+566 4032(Schlie\373lich)N
+1024(f\333hrt)X
+1235(es)X
+1339(zu)X
+1454(einfachen)X
+1853(Werkzeugen)X
+2364(und)X
+2532(einfachen)X
+2931(Spezi\256kationssprachen.)X
+766 4173(Unsere)N
+1067(Erfahrung)X
+1486(mit)X
+1644(fr\333heren)X
+1999(Werkzeugen)X
+2515(zeigte,)X
+2799(da\373)X
+2967(w\327hrend)X
+3326(der)X
+3477(Konstruktion)X
+4012(realisti-)X
+566 4281(sche)N
+784(\325bersetzer)X
+1248(eine)X
+1456(Reihe)X
+1728(kleiner)X
+2042(Sonderprobleme)X
+2724(auftritt,)X
+3057(die)X
+3221(nicht)X
+3460(mit)X
+3635(den)X
+3820(Werkzeugen)X
+566 4389(gel\332st)N
+842(werden)X
+1171(k\332nnen.)X
+1524(Deswegen)X
+1970(sind)X
+2176(Schlup\257\332cher)X
+2755(n\332tig,)X
+3022(also)X
+3222(M\332glichkeiten,)X
+3853(die)X
+4016(es)X
+4141(dem)X
+566 4497 0.2042(Werkzeugbenutzer)AN
+1348(erlauben)X
+1733(leicht)X
+2001(handgeschriebene)X
+2744(Teile)X
+2996(einzuf\333gen.)X
+3501(Diese)X
+3773(Schlup\257\332cher)X
+566 4605(tragen)N
+837(auch)X
+1049(dazu)X
+1261(bei)X
+1409(die)X
+1557(Werkzeuge)X
+2026(einfach)X
+2340(zu)X
+2461(machen,)X
+2815(da)X
+2936(man)X
+3132(nicht)X
+3355(gezwungen)X
+3823(ist,)X
+3968(f\333r)X
+4109(jedes)X
+566 4713(Problem)N
+928(sofort)X
+1188(eine)X
+1384(L\332sung)X
+1707 0.2083(bereitzustellen.)AX
+2329(Das)X
+2513(Schlup\257och)X
+3007(kann)X
+3229(benutzt)X
+3548(werden)X
+3866(solange)X
+4195(bis)X
+566 4821(eine)N
+751(wirklich)X
+1096(gute)X
+1286(L\332sung)X
+1598(gefunden)X
+1980(wird,)X
+2204(welche)X
+2501(man)X
+2691(in)X
+2790(ein)X
+2932(Werkzeug)X
+3352(einbauen)X
+3724(kann.)X
+766 4962(Die)N
+936(Werkzeuge)X
+1406(sind)X
+1596(gr\332\373tenteils)X
+2081(von)X
+2255(einander)X
+2617(unabh\327ngig.)X
+3120(Dies)X
+3326(wird)X
+3532(dadurch)X
+3872(erzielt,)X
+4168(da\373)X
+566 5070(keines)N
+846(der)X
+1002(erzeugten)X
+1410(Module)X
+1742(eine)X
+1936(festgelegte)X
+2387(Ausgabe)X
+2756(besitzt.)X
+3065(Stattdessen)X
+3531(wird)X
+3740(diese)X
+3971(Ausgabe)X
+566 5178(mittels)N
+861(Anweisungen)X
+1421(der)X
+1576(Zielsprache)X
+2058(spezi\256ziert)X
+2513(und)X
+2689(kann)X
+2907(somit)X
+3152(beliebig)X
+3494(gew\327hlt)X
+3830(werden.)X
+4168(Die)X
+566 5286(Unabh\327ngigkeit)N
+1241(der)X
+1424(Werkzeuge)X
+1923(sorgt)X
+2175(f\333r)X
+2347(gro\373e)X
+2626(Freiheiten)X
+3077(beim)X
+3330(\325bersetzerentwurf.)X
+4130(Eine)X
+566 5394(Ausnahme)N
+1006(bilden)X
+1276(die)X
+1423(Werkzeuge)X
+2 f
+1891(Ag)X
+1 f
+2027(und)X
+2 f
+2200(Estra)X
+1 f
+2408(,)X
+2461(denn)X
+2677(sie)X
+2813(basieren)X
+3163(auf)X
+3315(den)X
+3483(mit)X
+2 f
+3641(Ast)X
+1 f
+3793(spezi\256zierten)X
+566 5502(Syntaxb\327umen.)N
+1192(Deshalb)X
+1537(h\327ngen)X
+1845(diese)X
+2073(Werkzeuge)X
+2542(von)X
+2 f
+2716(Ast)X
+1 f
+2869(ab,)X
+3014(und)X
+3188(alle)X
+3358(drei)X
+3538(Werkzeuge)X
+4006(sind)X
+4195(f\333r)X
+566 5610(\325bersetzer)N
+1007(zugeschnitten,)X
+1585(die)X
+1727(einen)X
+1960 0.2404(attributierten)AX
+2483(abstrakten)X
+2903(Syntaxbaum)X
+3408(benutzen.)X
+3 f
+566 5814(4.)N
+686(\325bersetzer-Modell)X
+1 f
+766 5955(Obwohl)N
+1112(die)X
+1267(Werkzeuge)X
+1743(kein)X
+1946(bestimmtes)X
+2422(\325bersetzer-Modell)X
+3186(erzwingen,)X
+3647(m\332chten)X
+4015(wir)X
+4179(das)X
+566 6063(von)N
+740(uns)X
+903(bevorzugte)X
+1361(Modell)X
+1669(vorstellen.)X
+2103(Wir)X
+2283(meinen,)X
+2621(da\373)X
+2790(dieses)X
+3055(am)X
+3203(besten)X
+3479(von)X
+3652(den)X
+3820(Werkzeugen)X
+566 6171(unterst\333tzt)N
+1011(wird.)X
+1249(Wir)X
+1437(betrachten)X
+1877(die)X
+2033(semantische)X
+2542(Analyse)X
+2895(nach)X
+3115(wie)X
+3292(vor)X
+3458(als)X
+3602(den)X
+3778(schwierigsten)X
+
+4 p
+%%Page: 4 6
+4(Courier-Germ)xf 4 f
+12 s 0 xH 0 xS 4 f
+3 f
+4259 561(4)N
+1 f
+1152 1664(regul\327re)N
+1492(Ausdr\333cke)X
+933 1809 MXY
+0 -346 Dl
+1175 0 Dl
+0 346 Dl
+-1175 0 Dl
+2108 1636 MXY
+346 0 Dl
+2396 1651 MXY
+58 -15 Dl
+2396 1622 MXY
+58 14 Dl
+2574 1664(rex)N
+2454 1636 MXY
+346 Dc
+2799 MX
+346 0 Dl
+3087 1651 MXY
+58 -15 Dl
+3087 1622 MXY
+58 14 Dl
+3291 1610(lexikalische)N
+3364 1718(Analyse)N
+3145 1809 MXY
+0 -346 Dl
+734 0 Dl
+0 346 Dl
+-734 0 Dl
+1216 2144(konkrete)N
+1577(Syntax)X
+1279 2252(\(Grammatik\))N
+1039 2360(Abb.:)N
+1279(konkret)X
+9 f
+1597 MX
+(->)174 987 oc
+1 f
+1716(abstrakt)X
+933 2396 MXY
+0 -345 Dl
+1175 0 Dl
+0 345 Dl
+-1175 0 Dl
+2108 2224 MXY
+346 0 Dl
+2396 2238 MXY
+58 -14 Dl
+2396 2209 MXY
+58 15 Dl
+2571 2198(lalr)N
+2587 2306(ell)N
+2454 2224 MXY
+346 Dc
+2799 MX
+346 0 Dl
+3087 2238 MXY
+58 -14 Dl
+3087 2209 MXY
+58 15 Dl
+3283 2198(syntaktische)N
+3364 2306(Analyse)N
+3145 2396 MXY
+0 -345 Dl
+734 0 Dl
+0 345 Dl
+-734 0 Dl
+1211 2785(abstrakte)N
+1583(Syntax)X
+1279 2893(\(Grammatik\))N
+933 2984 MXY
+0 -346 Dl
+1175 0 Dl
+0 346 Dl
+-1175 0 Dl
+2108 2811 MXY
+346 0 Dl
+2396 2826 MXY
+58 -15 Dl
+2396 2797 MXY
+58 14 Dl
+2582 2839(ast)N
+2454 2811 MXY
+346 Dc
+2799 MX
+346 0 Dl
+3087 2826 MXY
+58 -15 Dl
+3087 2797 MXY
+58 14 Dl
+3281 2839(Syntaxbaum)N
+3145 2984 MXY
+0 -346 Dl
+734 0 Dl
+0 346 Dl
+-734 0 Dl
+1142 3427(Attribut-Grammatik)N
+933 3571 MXY
+0 -345 Dl
+1175 0 Dl
+0 345 Dl
+-1175 0 Dl
+2108 3399 MXY
+346 0 Dl
+2396 3413 MXY
+58 -14 Dl
+2396 3384 MXY
+58 15 Dl
+2590 3427(ag)N
+2454 3399 MXY
+346 Dc
+2799 MX
+346 0 Dl
+3087 3413 MXY
+58 -14 Dl
+3087 3384 MXY
+58 15 Dl
+3286 3373(semantische)N
+3364 3481(Analyse)N
+3145 3571 MXY
+0 -345 Dl
+734 0 Dl
+0 345 Dl
+-734 0 Dl
+1422 3960(Abb.:)N
+972 4068(abstrakt)N
+9 f
+1301 MX
+(->)174 987 oc
+1 f
+1420(Zwischensprache)X
+933 4159 MXY
+0 -346 Dl
+1175 0 Dl
+0 346 Dl
+-1175 0 Dl
+2108 3986 MXY
+346 0 Dl
+2396 4000 MXY
+58 -14 Dl
+2396 3972 MXY
+58 14 Dl
+2544 4014(estra)N
+2454 3986 MXY
+346 Dc
+2799 MX
+346 0 Dl
+3087 4000 MXY
+58 -14 Dl
+3087 3972 MXY
+58 14 Dl
+3222 4014(Transformation)N
+3145 4159 MXY
+0 -346 Dl
+734 0 Dl
+0 346 Dl
+-734 0 Dl
+1196 4547(Zwischensprache)N
+1279 4655(\(Grammatik\))N
+933 4746 MXY
+0 -345 Dl
+1175 0 Dl
+0 345 Dl
+-1175 0 Dl
+2108 4573 MXY
+346 0 Dl
+2396 4588 MXY
+58 -15 Dl
+2396 4559 MXY
+58 14 Dl
+2582 4601(ast)N
+2454 4573 MXY
+346 Dc
+2799 MX
+346 0 Dl
+3087 4588 MXY
+58 -15 Dl
+3087 4559 MXY
+58 14 Dl
+3187 4601(Zwischensprache)N
+3145 4746 MXY
+0 -345 Dl
+734 0 Dl
+0 345 Dl
+-734 0 Dl
+1422 5081(Abb.:)N
+1137 5189(Zwischensprache)N
+9 f
+1829 MX
+(->)174 987 oc
+1 f
+1172 5297(Maschinensprache)N
+933 5334 MXY
+0 -346 Dl
+1175 0 Dl
+0 346 Dl
+-1175 0 Dl
+2108 5161 MXY
+346 0 Dl
+2396 5175 MXY
+58 -14 Dl
+2396 5146 MXY
+58 15 Dl
+2566 5189(beg)N
+2454 5161 MXY
+346 Dc
+2799 MX
+346 0 Dl
+3087 5175 MXY
+58 -14 Dl
+3087 5146 MXY
+58 15 Dl
+3238 5189(Codegenerator)N
+3145 5334 MXY
+0 -346 Dl
+734 0 Dl
+0 346 Dl
+-734 0 Dl
+1276 1077(Spezi\256kation)N
+2437(Werkzeug)X
+3169(\325bersetzer-Modul)X
+3497 1406 MXY
+15 57 Dl
+3526 1406 MXY
+-14 57 Dl
+0 -311 Dl
+1809 MY
+0 242 Dl
+3497 1993 MXY
+15 58 Dl
+3526 1993 MXY
+-14 58 Dl
+2396 MY
+0 242 Dl
+3497 2581 MXY
+15 57 Dl
+3526 2581 MXY
+-14 57 Dl
+3526 3041 MXY
+-14 -57 Dl
+3497 3041 MXY
+15 -57 Dl
+0 242 Dl
+3497 3168 MXY
+15 58 Dl
+3526 3168 MXY
+-14 58 Dl
+3913 3764 MXY
+-34 49 Dl
+3932 3786 MXY
+-53 27 Dl
+-366 -414 367 -414 Da
+3512 4159 MXY
+0 242 Dl
+3497 4343 MXY
+15 58 Dl
+3526 4343 MXY
+-14 58 Dl
+4746 MY
+0 242 Dl
+3497 4931 MXY
+15 57 Dl
+3526 4931 MXY
+-14 57 Dl
+5334 MY
+0 311 Dl
+3497 5587 MXY
+15 58 Dl
+3526 5587 MXY
+-14 58 Dl
+1917 5807(Abb.)N
+2130(1:)X
+2229(\325bersetzer-Modell)X
+566 6011(Teil)N
+749(eines)X
+974(\325bersetzers.)X
+1479(Deshalb)X
+1821(gehen)X
+2078(wir)X
+2233(f\333r)X
+2372(die)X
+2517(semantische)X
+3015(Analyse)X
+3357(und)X
+3527(die)X
+3671(Erzeugung)X
+4114(einer)X
+566 6119(Zwischensprache)N
+1262(von)X
+1434(der)X
+1585(abstrakten)X
+2009(Syntax)X
+2304(aus.)X
+2484(Wir)X
+2662(bauen)X
+2920(den)X
+3086(abstrakten)X
+3509(Syntaxbaum)X
+4017(explizit)X
+
+5 p
+%%Page: 5 7
+4(Courier-Germ)xf 4 f
+12 s 0 xH 0 xS 4 f
+3 f
+4259 561(5)N
+1 f
+566 780(auf,)N
+749(welcher)X
+1090(w\327hrend)X
+1456(der)X
+1614(semantischen)X
+2168(Analyse)X
+2518(eventuell)X
+2907(mit)X
+3071(Attributen)X
+3502(erg\327nzt)X
+3821(wird.)X
+4056(Neben)X
+566 888(der)N
+723(abstrakten)X
+1152(Syntax,)X
+1476(welche)X
+1782(als)X
+1922(erste,)X
+2161(hohe)X
+2381(Zwischensprache)X
+3082(betrachtet)X
+3496(werden)X
+3812(kann,)X
+4056(bevor-)X
+566 996(zugen)N
+821(wir)X
+974(die)X
+1117(Verwendung)X
+1637(einer)X
+1854(zweiten,)X
+2202(niederen)X
+2558(Zwischensprache)X
+3250(als)X
+3381(Schnittstelle)X
+3882(zum)X
+4072(Code-)X
+566 1104(generator.)N
+984(Dies)X
+1190(bringt)X
+1450(Vorteile)X
+1796(in)X
+1901(der)X
+2054(Optimierung)X
+2576(und)X
+2749(der)X
+2901(mustergesteuerten)X
+3631(Codeauswahl)X
+4178(mit)X
+566 1212(sich.)N
+766 1353(Abbildung)N
+1207(1)X
+1285(zeigt)X
+1503(das)X
+1661(von)X
+1835(uns)X
+1998(bevorzugte)X
+2456(\325bersetzermodell.)X
+3194(Die)X
+3362(rechte)X
+3627(Spalte)X
+3897(enth\327lt)X
+4189(die)X
+566 1461(wichtigsten)N
+1087(Module)X
+1463(eines)X
+1738(\325bersetzers.)X
+2293(Die)X
+2508(linke)X
+2777(Spalte)X
+3094(zeigt)X
+3358(die)X
+3552(dazu)X
+3810(notwendigen)X
+566 1569(Spezi\256kationen.)N
+1258(Die)X
+1466(dazwischen)X
+1984(liegenden)X
+2428(Werkzeuge)X
+2936(werden)X
+3288(von)X
+3501(den)X
+3708(Spezi\256kationen)X
+566 1677(gesteuert)N
+955(und)X
+1140(erzeugen)X
+1529(die)X
+1688(einzelnen)X
+2099(Module.)X
+2462(Die)X
+2641(Pfeile)X
+2906(stellen)X
+3198(den)X
+3377(Daten\257u\373)X
+3796(dar,)X
+3983(teils)X
+4184(zur)X
+566 1785(Generierungszeit)N
+1248(und)X
+1416(teils)X
+1601(zur)X
+1748(\325bersetzungszeit.)X
+3 f
+566 1989(5.)N
+686(Die)X
+849(Werkzeuge)X
+1 f
+766 2130(Die)N
+935(folgenden)X
+1349(Abschnitte)X
+1795(stellen)X
+2076(kurz)X
+2276(die)X
+2423(einzelnen)X
+2822(Werkzeuge)X
+3290(des)X
+3447(Werkzeugkastens)X
+4155(vor.)X
+566 2238(Wir)N
+788(beschreiben)X
+1319(nur)X
+1518(die)X
+1707(Eigenschaften)X
+2324(der)X
+2518(Werkzeuge.)X
+3052(F\333r)X
+3256(weitere)X
+3611 0.2604(Einzelheiten,)AX
+4189(die)X
+566 2346(Spezi\256kationstechniken)N
+1593(oder)X
+1871(f\333r)X
+2089(Beispiele)X
+2554(sei)X
+2767(der)X
+2996(Leser)X
+3316(auf)X
+3545(die)X
+3769(existierenden,)X
+566 2454(werkzeug-spezi\256schen)N
+1466(Dokumente)X
+1939(verwiesen.)X
+3 f
+566 2658(5.1.)N
+758(Rex)X
+1 f
+2 f
+766 2799(Rex)N
+1 f
+959(\()X
+2 f
+991(r)X
+1 f
+1028(egular)X
+2 f
+1317(ex)X
+1 f
+1403(pression)X
+1771(tool\))X
+2001(ist)X
+2139(ein)X
+2304(Generator)X
+2736(f\333r)X
+2895(lexikalische)X
+3403(Analysatoren)X
+3963([Gro87a,)X
+566 2907(Gro88,)N
+888(Gro89a].)X
+1309(Seine)X
+1576(Spezi\256kationen)X
+2228(basieren)X
+2602(auf)X
+2777(regul\327ren)X
+3193(Ausdr\333cken)X
+3709(und)X
+3905(beliebigen)X
+566 3015(semantischen)N
+1127(Aktionen,)X
+1550(die)X
+1709(in)X
+1825(einer)X
+2059(der)X
+2223(Zielsprachen)X
+2762(C)X
+2867(oder)X
+3079(Modula-2)X
+3499(geschrieben)X
+4000(werden.)X
+566 3123(Immer)N
+852(wenn)X
+1089(in)X
+1193(der)X
+1345(Eingabe)X
+1690(des)X
+1847(erzeugten)X
+2251(lexikalischen)X
+2789(Analysators)X
+3276(eine)X
+3465(einem)X
+3729(regul\327ren)X
+4121(Aus-)X
+566 3231(druck)N
+811(entsprechende)X
+1388 0.2898(Zeichenkette)AX
+1912(erkannt)X
+2226(wurde,)X
+2515(werden)X
+2823(die)X
+2966(zugeh\332rigem)X
+3494(Aktionen)X
+3877(ausgef\333hrt.)X
+566 3339(Falls)N
+785(zur)X
+940(eindeutigen)X
+1422(Erkennung)X
+1876(der)X
+2030(Symbole)X
+2403(der)X
+2557(Kontext)X
+2898(betrachtet)X
+3310(werden)X
+3624(mu\373,)X
+3850(so)X
+3966(kann)X
+4184(der)X
+566 3447(rechte)N
+835(Kontext)X
+1178(durch)X
+1430(einen)X
+1672(zus\327tzlichen)X
+2182(regul\327ren)X
+2579(Ausdruck)X
+2985(spezi\256ziert)X
+3441(werden,)X
+3781(und)X
+3958(der)X
+4114(linke)X
+566 3555(Kontext)N
+901(wird)X
+1102(mit)X
+1256(sogenannten)X
+1762(Start-Zust\327nden)X
+2402(behandelt.)X
+2850(Falls)X
+3062(mehrere)X
+3403(regul\327re)X
+3744(Ausdr\333cke)X
+4184(auf)X
+566 3663(die)N
+717(aktuelle)X
+1056(Eingabe)X
+1405(zutreffen,)X
+1810(so)X
+1928(wird)X
+2137(der)X
+2293(Ausdruck)X
+2698(mit)X
+2859(der)X
+3014(l\327ngsten)X
+3367 0.2898(Zeichenkette)AX
+3898(bevorzugt.)X
+566 3771(Falls)N
+804(es)X
+935(immer)X
+1238(noch)X
+1476(mehrere)X
+1843(M\332glichkeiten)X
+2456(gibt,)X
+2681(so)X
+2817(wird)X
+3044(der)X
+3218(zuerst)X
+3499(in)X
+3625(der)X
+3799(Spezi\256kation)X
+566 3879(stehende)N
+927(Ausdruck)X
+1324(gew\327hlt.)X
+766 4020(Die)N
+942(erzeugten)X
+1353(lexikalischen)X
+1898(Analysatoren)X
+2447(berechnen)X
+2879(automatisch)X
+3381(Zeile)X
+3616(und)X
+3796(Spalte)X
+4073(in)X
+4184(der)X
+566 4128(Quelle)N
+878(f\333r)X
+1045(jedes)X
+1298(erkannte)X
+1685(Symbol)X
+2039(und)X
+2237(enthalten)X
+2645(einen)X
+2908(Mechanismus)X
+3496(f\333r)X
+3662(Include-Dateien.)X
+566 4236(Bezeichner)N
+1041(und)X
+1226(Schl\333sselw\332rter)X
+1880(k\332nnen)X
+2203(ef\256zient)X
+2559(in)X
+2674(Gro\373-)X
+2943(oder)X
+3154(Kleinbuchstaben)X
+3841(normalisiert)X
+566 4344(werden.)N
+909(Es)X
+1040(gibt)X
+1225(vorde\256nierte)X
+1752(Regeln)X
+2060(um)X
+2218(Leerstellen,)X
+2706(Tabulatoren)X
+3207(und)X
+3386(Zeilenwechsel)X
+3978(zu)X
+4104(\333ber-)X
+566 4452(lesen.)N
+868(Die)X
+1063(generierten)X
+1552(lexikalischen)X
+2116(Analysatoren)X
+2684(sind)X
+2899 0.2153(tabellengesteuerte,)AX
+3675(deterministische)X
+566 4560(endliche)N
+978(Automaten.)X
+1515(Die)X
+1739(Tabellen)X
+2162(werden)X
+2530(mit)X
+2743(der)X
+2950(sogenannten)X
+3515(Kammvektortechnik)X
+566 4668(komprimiert)N
+1072([ASU86].)X
+766 4809(Die)N
+957(herausragende)X
+1565(Eigenschaft)X
+2072(von)X
+2 f
+2268(Rex)X
+1 f
+2465(ist)X
+2608(seine)X
+2857(Geschwindigkeit.)X
+3608(Die)X
+3798(lexikalischen)X
+566 4917(Analysatoren)N
+1105(verarbeiten)X
+1565(nahezu)X
+1864(200.000)X
+2202(Zeilen)X
+2474(pro)X
+2627(Minute)X
+2930(ohne)X
+3142(Hashing)X
+3487(von)X
+3656(Bezeichnern)X
+4163(und)X
+566 5025(150.000)N
+910(Zeilen)X
+1189(pro)X
+1349(Minute)X
+1659(mit)X
+1820(Hashing.)X
+2195(Dies)X
+2402(ist)X
+2524(die)X
+2673(vierfache)X
+3063(Geschwindigkeit)X
+3746(gegen\333ber)X
+4178(mit)X
+2 f
+566 5133(Lex)N
+1 f
+735([Les75])X
+1064(generierten)X
+1528(lexikalischen)X
+2067(Analysatoren.)X
+2634(In)X
+2744(typischen)X
+3143(F\327llen)X
+3414(besitzen)X
+3760(mit)X
+2 f
+3919(Rex)X
+1 f
+4093(gene-)X
+566 5241(rierte)N
+803(Analysatoren)X
+1349(ein)X
+1500(Viertel)X
+1801(der)X
+1957(Gr\332\373e)X
+2230(derer)X
+2460(von)X
+2 f
+2636(Lex)X
+1 f
+2775(.)X
+2831(Normalerweise)X
+3451(ben\332tigt)X
+2 f
+3799(Rex)X
+1 f
+3976(nur)X
+4136(1/10)X
+566 5349(der)N
+713(Zeit)X
+893(von)X
+2 f
+1061(Lex)X
+1 f
+1224(zum)X
+1414(Generieren)X
+1866(eines)X
+2088(lexikalischen)X
+2621(Analysators.)X
+3 f
+566 5553(5.2.)N
+758(Lalr)X
+1 f
+2 f
+766 5694(Lalr)N
+1 f
+989(ist)X
+1138(ein)X
+1314(LALR\(1\))X
+1735 0.2153(Zerteiler-Generator)AX
+2543(der)X
+2724(Grammatiken,)X
+3336(die)X
+3512(in)X
+3645(erweiterter)X
+4121(BNF)X
+566 5802(geschrieben)N
+1058(sind,)X
+1274(verarbeitet)X
+1719([GrV88,)X
+2073(Gro88].)X
+2430(Die)X
+2601(Grammatikregeln)X
+3313(k\332nnen)X
+3628(mit)X
+3788(semantischen)X
+566 5910(Aktionen)N
+965(versehen)X
+1348(werden,)X
+1696(die)X
+1855(direkt)X
+2121(in)X
+2237(einer)X
+2470(Zielsprache)X
+2960(formuliert)X
+3391(sind.)X
+3639(Immer)X
+3936(wenn)X
+4184(der)X
+566 6018(erzeugte)N
+951(Zerteiler)X
+1342(eine)X
+1560(Grammatikregel)X
+2249(erkennt,)X
+2619(wird)X
+2852(die)X
+3027(zugeh\332rige)X
+3512(semantische)X
+4040(Aktion)X
+566 6126(ausgef\333hrt.)N
+1053(Der)X
+1230(Generator)X
+1648(stellt)X
+1869(einen)X
+2111(Mechanismus)X
+2678(zur)X
+2834(S-Attributierung)X
+3503(zur)X
+3659(Verf\333gung,)X
+4131(d.)X
+4235(h.)X
+
+6 p
+%%Page: 6 8
+4(Courier-Germ)xf 4 f
+12 s 0 xH 0 xS 4 f
+3 f
+4259 561(6)N
+1 f
+566 780(synthetisierte)N
+1104(Attribute)X
+1476(k\332nnen)X
+1783(w\327hrend)X
+2138(der)X
+2285(Zerteilung)X
+2711(berechnet)X
+3110(werden.)X
+766 921(Im)N
+899(Falle)X
+1118(von)X
+1288(LR-Kon\257ikten)X
+1880(liefert)X
+2 f
+2137(Lalr)X
+1 f
+2328(nicht)X
+2547(wie)X
+2712(andere)X
+2995(Generatoren)X
+3497(nur)X
+3651(Information)X
+4136(\333ber)X
+566 1029(aus)N
+731(Mengen)X
+1083(von)X
+1264(Situationen)X
+1740(bestehende)X
+2205(Zust\327nde,)X
+2619(sondern)X
+2960(druckt)X
+3243(einen)X
+3488(Ableitungsbaum,)X
+4184(der)X
+566 1137(wesentlich)N
+1018(n\333tzlicher)X
+1444(zur)X
+1607(Analyse)X
+1962(des)X
+2130(Kon\257ikts)X
+2527(ist.)X
+2682(Kon\257ikte)X
+3085(k\332nnen)X
+3408(durch)X
+3667(die)X
+3825(Angabe)X
+4163(von)X
+566 1245(Priorit\327t)N
+907(und)X
+1076(Assoziativit\327t)X
+1631(f\333r)X
+1768(Operatoren)X
+2225(und)X
+2393(Produktionen)X
+2935(gel\332st)X
+3189(werden.)X
+3520(Die)X
+3683(generierten)X
+4141(Zer-)X
+566 1353(teiler)N
+794(beinhalten)X
+1225(eine)X
+1415(automatische)X
+1953(Fehlerbehandlung)X
+2677(mit)X
+2835(Fehlermeldungen)X
+3538(und)X
+3711(-reparatur.)X
+4168(Zur)X
+566 1461(Fehlerbehandlung)N
+1320(wird)X
+1555(die)X
+1732(vollst\327ndige,)X
+2286(r\333cksetzungsfreie)X
+3024(Methode)X
+3425(von)X
+3627(R\332hrich)X
+3995([R\332h76,)X
+566 1569(R\332h80,)N
+870(R\332h82])X
+1182(verwendet.)X
+1631(Die)X
+1794(Zerteiler)X
+2151(sind)X
+2335 0.2188(tabellengesteuert)AX
+3013(und)X
+3181(wie)X
+3344(im)X
+3470(Falle)X
+3687(von)X
+2 f
+3855(Rex)X
+1 f
+4024(werden)X
+566 1677(die)N
+709(Tabellen)X
+1072(mit)X
+1225(der)X
+1372(Kammvektortechnik)X
+2188(komprimiert.)X
+2718(Der)X
+2886(Generator)X
+3295(verwendet)X
+3720(den)X
+3883(in)X
+3982([DeP82])X
+566 1785(beschriebenen)N
+1141(Algorithmus)X
+1651(zur)X
+1798(Berechnung)X
+2287(der)X
+2434(Vorschaumengen.)X
+766 1926(Mit)N
+2 f
+935(Lalr)X
+1 f
+1130(erzeugte)X
+1487(Zerteiler)X
+1850(sind)X
+2040(zwei)X
+2252(bis)X
+2394(drei)X
+2573(mal)X
+2747(schneller)X
+3124(als)X
+3260(mit)X
+2 f
+3418(Yacc)X
+1 f
+3634([Joh75])X
+3956(erzeugte.)X
+566 2034(Sie)N
+721(erreichen)X
+1112(eine)X
+1305(Geschwindigkeit)X
+1989(von)X
+2165(580.000)X
+2509(Zeilen)X
+2788(pro)X
+2947(Minute)X
+3256(ohne)X
+3474(Ber\333cksichtigung)X
+4184(der)X
+566 2142(lexikalischen)N
+1112(Analyse.)X
+1488(Die)X
+1664(Gr\332\373e)X
+1941(der)X
+2101(Zerteiler)X
+2471(ist)X
+2599(gegen\333ber)X
+2 f
+3037(Yacc)X
+1 f
+3261(leicht)X
+3512(erh\332ht,)X
+3818(denn)X
+4041(f\333r)X
+4189(die)X
+566 2250(Geschwindigkeit)N
+1242(mu\373)X
+1437(ein)X
+1579(kleiner)X
+1871(Preis)X
+2087(bezahlt)X
+2390(werden.)X
+766 2391(Die)N
+944(Eingabesprachen)X
+1641(von)X
+2 f
+1824(Rex)X
+1 f
+2008(und)X
+2 f
+2191(Lalr)X
+1 f
+2395(sind)X
+2593(hinsichtlich)X
+3081(der)X
+3242(Syntax)X
+3547(gegen\333ber)X
+2 f
+3986(Lex)X
+1 f
+4163(und)X
+2 f
+566 2499(Yacc)N
+1 f
+783(lesbarer)X
+1118(gestaltet.)X
+1494(Mit)X
+1663(Hilfe)X
+1890(zweier,)X
+2200(hier)X
+2379(nicht)X
+2601(n\327her)X
+2844(beschriebener)X
+3408(Pr\327prozessoren)X
+4024(k\332nnen)X
+2 f
+566 2607(Rex)N
+1 f
+743(und)X
+2 f
+919(Lalr)X
+1 f
+1116(auch)X
+1330(Eingaben)X
+1726(f\333r)X
+2 f
+1870(Lex)X
+1 f
+2041(und)X
+2 f
+2217(Yacc)X
+1 f
+2436(verarbeiten.)X
+2926(Dadurch)X
+3289(sind)X
+3480(unsere)X
+3762(Werkzeuge)X
+4232(in)X
+566 2715(Bezug)N
+836(auf)X
+983(die)X
+1125 0.1844(Benutzerschnittstelle)AX
+1958(kompatibel)X
+2416(mit)X
+2569(den)X
+2732(UNIX-Werkzeugen.)X
+3 f
+566 2919(5.3.)N
+758(Ell)X
+1 f
+2 f
+766 3060(Ell)N
+1 f
+909(ist)X
+1030(ein)X
+1178(LL\(1\))X
+1437 0.2039(Zerteiler-Generator,)AX
+2240(der)X
+2392(die)X
+2539(gleiche)X
+2847(Spezi\256kationssprache)X
+3715(wie)X
+2 f
+3883(Lalr)X
+1 f
+4077(verar-)X
+566 3168(beitet,)N
+855(mit)X
+1034(dem)X
+1249(Unterschied,)X
+1787(da\373)X
+1975(die)X
+2142(Grammatiken)X
+2721(die)X
+2888(LL\(1\)-Eigenschaft)X
+3654(besitzen)X
+4019(m\333ssen)X
+566 3276([GrV88,)N
+916(Gro88,)X
+1213(Gro89b].)X
+1614(W\327hrend)X
+1994(der)X
+2144(Zerteilung)X
+2573(kann)X
+2787(eine)X
+2975(L-Attributierung)X
+3644(ausgewertet)X
+4131(wer-)X
+566 3384(den.)N
+775(Die)X
+960(erzeugten)X
+1381(Zerteiler)X
+1760(beinhalten)X
+2208(eine)X
+2415(automatische)X
+2970(Fehlerbehandlung)X
+3710(mit)X
+3884(Fehlermel-)X
+566 3492(dungen)N
+878(und)X
+1051(-reparatur)X
+1459(wie)X
+2 f
+1626(Lalr)X
+1 f
+1791(.)X
+1843(Die)X
+2010(Zerteiler)X
+2371(sind)X
+2559(nach)X
+2769(dem)X
+2963(Verfahren)X
+3381(des)X
+3537(rekursiven)X
+3971(Abstiegs)X
+566 3600 0.2812(implementiert)AN
+1132(und)X
+1300(erzielen)X
+1630(eine)X
+1815(Geschwindigkeit)X
+2491(von)X
+2659(900.000)X
+2995(Zeilen)X
+3266(pro)X
+3418(Minute.)X
+3 f
+566 3804(5.4.)N
+758(Ast)X
+1 f
+2 f
+766 3945(Ast)N
+1 f
+962(ist)X
+1126(ein)X
+1317(Generator)X
+1775(f\333r)X
+1960(abtrakte)X
+2344(Syntaxb\327ume)X
+2940([Gro89d,)X
+3361(Gro89e].)X
+3801(Er)X
+3964(generiert)X
+566 4053(Programm-Module)N
+1355(oder)X
+1578(abstrakte)X
+1978(Datentypen)X
+2474(zur)X
+2649(Bearbeitung)X
+3172 0.2452(attributierter)AX
+3707(B\327ume.)X
+4056(Neben)X
+566 4161(B\327umen)N
+923(k\332nnen)X
+1242(auch)X
+1460 0.2604(attributierte)AX
+1947(Graphen)X
+2314(bearbeitet)X
+2731(werden.)X
+3074(Den)X
+3270(Knoten)X
+3588(dieser)X
+3853(Datenstruk-)X
+566 4269(turen)N
+846(k\332nnen)X
+1210(beliebig)X
+1602(viele)X
+1871(Attribute)X
+2300(von)X
+2525(beliebigem)X
+3035(Typ)X
+3271(zugeordnet)X
+3780(werden.)X
+4168(Die)X
+566 4377(Spezi\256kationen)N
+1196(f\333r)X
+1339(dieses)X
+1605(Werkzeug)X
+2032(basieren)X
+2384(auf)X
+2537(erweiterten)X
+3001(Baum-Grammatiken.)X
+3871(Sie)X
+4024(k\332nnen)X
+566 4485(als)N
+713(gemeinsame)X
+1235(Notation)X
+1612(sowohl)X
+1929(f\333r)X
+2081(konkrete)X
+2458(und)X
+2642(abstrakte)X
+3030(Syntax)X
+3337(als)X
+3484(auch)X
+3705(f\333r)X
+3856 0.2604(attributierte)AX
+566 4593(B\327ume)N
+880(und)X
+1065(Graphen)X
+1437(betrachtet)X
+1859(werden.)X
+2207(Ein)X
+2382(Erweiterungsmechanismus)X
+3460(stellt)X
+3689(einfache)X
+4056(Verer-)X
+566 4701(bung)N
+818(zur)X
+1001(Verf\333gung.)X
+1500(Intern)X
+1789(werden)X
+2131(die)X
+2308(B\327ume)X
+2640(durch)X
+2918(verzeigerte)X
+3406(Verbunde)X
+3844(gespeichert.)X
+566 4809(Zahlreiche)N
+1010(Operationen)X
+1517(f\333r)X
+1660(B\327ume)X
+1963(und)X
+2137(Graphen)X
+2498(k\332nnen)X
+2811(auf)X
+2964(Anforderung)X
+3490(von)X
+2 f
+3664(Ast)X
+1 f
+3817(erzeugt)X
+4131(wer-)X
+566 4917(den:)N
+767(Sogenannte)X
+1251(Knotenkonstruktoren)X
+2103(kombinieren)X
+2624(Aggregatschreibweise)X
+3513(mit)X
+3676(Speicherverwal-)X
+566 5025(tung.)N
+786(Lese-)X
+1025(und)X
+1194(Schreibeprozeduren)X
+1989(\333bertragen)X
+2426(Graphen)X
+2781(aus/in)X
+3035(Dateien)X
+3359(in)X
+3458(lesbarem)X
+3830(ASCII-)X
+4136(oder)X
+566 5133(internem)N
+939(Bin\327rformat.)X
+1464(Die)X
+1632(Reihenfolge)X
+2132(von)X
+2305(Teilb\327umen)X
+2795(in)X
+2899(einer)X
+3121(Liste)X
+3343(kann)X
+3559(umgekehrt)X
+4000(werden.)X
+566 5241(Es)N
+687(werden)X
+994(Prozeduren)X
+1456(f\333r)X
+1592(h\327u\256g)X
+1856(benutzte)X
+2207(Traversierungsstrategien)X
+3183(wie)X
+2 f
+3346(top)X
+3493(down)X
+1 f
+3725(oder)X
+2 f
+3920(bottom)X
+4211(up)X
+1 f
+566 5349(zur)N
+723(Verf\333gung)X
+1173(gestellt.)X
+1510(Ein)X
+1678(interaktiver)X
+2 f
+2157(Graph-Browser)X
+1 f
+2798(erlaubt)X
+3100(die)X
+3252(Inspektion)X
+3691(von)X
+3868(Graphen)X
+4232(in)X
+566 5457(lesbarer)N
+895(Weise)X
+1160(und)X
+1328(unterst\333tzt)X
+1759(so)X
+1868(den)X
+2031(Programmtest.)X
+3 f
+566 5661(5.5.)N
+758(Ag)X
+1 f
+2 f
+766 5802(Ag)N
+1 f
+901(ist)X
+1020(ein)X
+1166(Generator)X
+1579(f\333r)X
+1719(Attributauswerter)X
+2426([Gro89c,)X
+2798(Gro90].)X
+3127(Er)X
+3246(verarbeitet)X
+3686(geordnete)X
+4093(Attri-)X
+566 5910(butgrammatiken)N
+1240(\(OAGs\))X
+1589([Kas80])X
+1939(und)X
+2124(sogenannte)X
+2 f
+2598(higher)X
+2890(order)X
+1 f
+3144 0.1910(Attributgrammatiken)AX
+3999(\(HAGs\))X
+566 6018([VSK89].)N
+1003(Er)X
+1132(basiert)X
+1427(auf)X
+1588(der)X
+1749(abstrakten)X
+2183(Syntax)X
+2487(oder)X
+2695(besser)X
+2972(gesagt)X
+3255(auf)X
+3415(den)X
+3591(von)X
+2 f
+3772(Ast)X
+1 f
+3932(erzeugten)X
+566 6126(Baummodulen.)N
+1246(Deshalb)X
+1650(ist)X
+1829(die)X
+2035(Baumstruktur)X
+2652(v\332llig)X
+2965(bekannt.)X
+3382(Den)X
+3630(Terminalen)X
+4163(und)X
+
+7 p
+%%Page: 7 9
+4(Courier-Germ)xf 4 f
+12 s 0 xH 0 xS 4 f
+3 f
+4259 561(7)N
+1 f
+566 780 0.2232(Nichtterminalen)AN
+1241(k\332nnen)X
+1572(beliebig)X
+1931(viele)X
+2167(Attribute)X
+2563(zugeordnet)X
+3039(werden.)X
+3394(Diese)X
+3661(werden)X
+3992(mit)X
+4168(den)X
+566 888(Typen)N
+857(der)X
+1025(Zielsprache)X
+1520(getypt.)X
+1830(Dabei)X
+2105(sind)X
+2310(auch)X
+2537(baumwertige)X
+3085(Attribute)X
+3478(m\332glich.)X
+2 f
+3887(Ag)X
+1 f
+4039(erlaubt)X
+566 996(regellokale)N
+1036(Attribute)X
+1424(und)X
+1608(bietet)X
+1863(einen)X
+2112(Erweiterungsmechanismus)X
+3189(an,)X
+3344(welcher)X
+3689(einfache)X
+4056(Verer-)X
+566 1104(bung)N
+787(f\333r)X
+928(Attribute)X
+1304(und)X
+1476(Attributberechnungen)X
+2349(zur)X
+2500(Verf\333gung)X
+2944(stellt.)X
+3184(Dieser)X
+3463(gestattet)X
+3813(ebenfalls)X
+4189(die)X
+566 1212(Elimination)N
+1057(von)X
+1236(Kettenregeln.)X
+1793(Die)X
+1967(Attributberechnungen)X
+2847(werden)X
+3165(in)X
+3275(der)X
+3432(Zielsprache)X
+3916(formuliert)X
+566 1320(und)N
+751(sollten)X
+1049(in)X
+1165(einem)X
+1442(funktionalen)X
+1970(Stil)X
+2145(gehalten)X
+2513(sein.)X
+2733(Es)X
+2870(ist)X
+3002(m\332glich)X
+3359(externe)X
+3684(Funktionen)X
+4163(von)X
+566 1428(getrennt)N
+907(\333bersetzten)X
+1371(Modulen)X
+1743(aufzurufen.)X
+2208(Die)X
+2371(Verwendung)X
+2891(nicht-funktionaler)X
+3611(Anweisungen)X
+4163(und)X
+566 1536(von)N
+760(Seiteneffekten)X
+1367(ist)X
+1508(m\332glich,)X
+1898(verlangt)X
+2263(allerdings)X
+2692(sorgf\327ltige)X
+3153(\325berlegung.)X
+3680(Die)X
+3868(Syntax)X
+4184(der)X
+566 1644(Spezi\256kationssprache)N
+1436(ist)X
+1558(im)X
+1691(Hinblick)X
+2059(auf)X
+2213(die)X
+2361(Unterst\333tzung)X
+2936(kompakter,)X
+3402(modularer)X
+3828(und)X
+4002(lesbarer)X
+566 1752(Dokumente)N
+1049(entworfen)X
+1473(worden.)X
+1819(Eine)X
+2030 0.1914(Attributgrammatik)AX
+2787(kann)X
+3008(aus)X
+3169(mehreren)X
+3566(Modulen)X
+3946(bestehen,)X
+566 1860(wobei)N
+833(die)X
+983(kontextfreie)X
+1481(Grammatik)X
+1952(nur)X
+2112(einmal)X
+2407(spezi\256ziert)X
+2862(wird.)X
+3118(Es)X
+3246(gibt)X
+3427(Kurzschreibweisen)X
+4195(f\333r)X
+566 1968(Kopierregeln)N
+1113(and)X
+1290(gef\327delte)X
+1682(Attribute)X
+2068(womit)X
+2352(viele)X
+2578(triviale)X
+2890(Attribut-Berechnungen)X
+3821(weggelassen)X
+566 2076(werden)N
+884(k\332nnen.)X
+1250(Die)X
+1424(erzeugten)X
+1834(Attributauswerter)X
+2548(sind)X
+2743(sehr)X
+2938(ef\256zient,)X
+3313(da)X
+3438(sie)X
+3579(unter)X
+3811(Verwendung)X
+566 2184(von)N
+750(rekursiven)X
+1196(Prozeduren)X
+1673(direkt)X
+1937(codiert)X
+2244(sind.)X
+2491(Die)X
+2669(Speicherung)X
+3189(der)X
+3351(Attribute)X
+3738(wird)X
+3953(optimiert)X
+566 2292(indem)N
+847(Attribute)X
+1235(als)X
+1382(lokale)X
+1657(Variable)X
+2028(und)X
+2211(Prozedurparameter)X
+2983 0.2812(implementiert)AX
+3564(werden,)X
+3910(wenn)X
+4157(ihre)X
+566 2400(Lebenszeit)N
+1008(innerhalb)X
+1396(eines)X
+1618(Besuches)X
+2005(liegt.)X
+3 f
+566 2604(5.6.)N
+758(Estra)X
+1 f
+2 f
+766 2745(Estra)N
+1 f
+1013(ist)X
+1143(ein)X
+1299(Generator)X
+1722(f\333r)X
+1872(Transformatoren)X
+2557(von)X
+2739(abstrakten)X
+3173(Syntaxb\327umen)X
+3783([Vie89].)X
+4168(Die)X
+566 2853(erzeugten)N
+988(Transformations-Module)X
+2002(haben)X
+2279(als)X
+2433(Eingabe)X
+2796(einen)X
+3052 0.2404(attributierten)AX
+3598(Baum)X
+3875(und)X
+4066(bilden)X
+566 2961(diesen)N
+840(auf)X
+991(eine)X
+1180(Ausgabe)X
+1544(beliebiger)X
+1958(Art)X
+2114(ab.)X
+2257(Die)X
+2424(Ausgabe)X
+2788(kann)X
+3003(ein)X
+3149(neuer)X
+3391(Baum)X
+3649(sein,)X
+3856(eine)X
+4044(lineare)X
+566 3069(Zwischensprache)N
+1275(wie)X
+1455(z.)X
+1563(B.)X
+1691(P-Code,)X
+2043(ein)X
+2201(Quellprogramm)X
+2856(z.)X
+2963(B.)X
+3091(in)X
+3206(Pascal)X
+3492(oder)X
+3703(eine)X
+3904(Folge)X
+4163(von)X
+566 3177(Prozeduraufrufen.)N
+1289(In)X
+1395(jedem)X
+1657(Fall)X
+1833(bleibt)X
+2079(der)X
+2228(Eingabebaum)X
+2784(unver\327ndert,)X
+3294(um)X
+3443(das)X
+3597(Problem)X
+3949(der)X
+4098(Reat-)X
+566 3285(tributierung)N
+1054(aus)X
+1215(Konsistenzgr\333nden)X
+1989(zu)X
+2112(umgehen.)X
+2521(Jedoch)X
+2820(k\332nnen)X
+3135(Teilb\327ume)X
+3580(des)X
+3740(Eingabebaums)X
+566 3393(zur)N
+733(Konstruktion)X
+1284(eines)X
+1526(Ausgabebaums)X
+2157(wiederverwendet)X
+2864(werden.)X
+3215(Die)X
+3398(beabsichtigten)X
+3998(Anwen-)X
+566 3501(dungsgebiete)N
+1106(f\333r)X
+1250(die)X
+1400(Transformationen)X
+2122(sind)X
+2314(die)X
+2464(Erzeugung)X
+2913(von)X
+3089(Zwischensprachen)X
+3837(aus)X
+3997(abstrak-)X
+566 3609(ten)N
+710(Syntaxb\327umen)X
+1308(und)X
+1478(Optimierer)X
+1927(f\333r)X
+2065(interne)X
+2359(Baumstrukturen)X
+3005(jeden)X
+3240(Niveaus.)X
+2 f
+3629(Estra)X
+1 f
+3863(arbeitet)X
+4178(mit)X
+566 3717(dem)N
+775(Werkzeug)X
+2 f
+1214(Ast)X
+1 f
+1380(zusammen)X
+1835(in)X
+1953(der)X
+2119(Art,)X
+2314(da\373)X
+2496(die)X
+2657(Eingabeb\327ume)X
+3273(mittels)X
+3579(von)X
+2 f
+3766(Ast)X
+1 f
+3932(erzeugten)X
+566 3825(Modulen)N
+937(erstellt)X
+1224(werden.)X
+766 3966(Die)N
+932(Spezi\256kation)X
+1467(einer)X
+1687(Transformation)X
+2313(ist)X
+2431(regelbasiert.)X
+2932(Eine)X
+3136(Regel)X
+3388(besteht)X
+3688(aus)X
+3843(einem)X
+4105(Mus-)X
+566 4074(ter,)N
+766(welches)X
+1150(ein)X
+1342(Baumfragment)X
+1994(beschreibt,)X
+2488(und)X
+2706(einer)X
+2973(Aktion.)X
+3338(Aktionen)X
+3769(bestehen)X
+4179(aus)X
+566 4182(Anweisungen)N
+1135(der)X
+1299(Zielsprache.)X
+1813(Es)X
+1949(k\332nnen)X
+2272(mehrere)X
+2628(Transformationen)X
+3358(spezi\256ziert)X
+3821(werden.)X
+4168(Die)X
+566 4290(Teilb\327ume)N
+1018(eines)X
+1255(Musters)X
+1603(k\332nnen)X
+1925(in)X
+2039(beliebiger)X
+2464(Reihenfolge)X
+2974(transformiert)X
+3516(werden.)X
+3862(Sie)X
+4024(k\332nnen)X
+566 4398(mehrmals)N
+996(mit)X
+1175(der)X
+1348(selben)X
+1644(oder)X
+1865(mit)X
+2043(verschiedenen)X
+2643(Transformationen)X
+3382(bearbeitet)X
+3812(werden.)X
+4168(Die)X
+566 4506(Aktionen)N
+961(haben)X
+1228(Lesezugriff)X
+1709(auf)X
+1869(die)X
+2024(Attribute)X
+2409(des)X
+2573(Eingabebaums.)X
+3200(Zus\327tzliche)X
+3681 0.3125(abgeleitete)AX
+4136(oder)X
+566 4614(vererbte)N
+913(Attribute)X
+1292(k\332nnen)X
+1606(w\327hrend)X
+1968(der)X
+2122(Transformation)X
+2752(berechnet)X
+3158(werden.)X
+3495(Die)X
+3664(Anwendung)X
+4163(von)X
+566 4722(Regeln)N
+870(l\327\373t)X
+1046(sich)X
+1232(durch)X
+1482(Bedingungen)X
+2026(einschr\327nken.)X
+2589(Mehrdeutigkeiten)X
+3305(werden)X
+3619(mittels)X
+3912(Kostenan-)X
+566 4830(gaben)N
+820(aufgel\332st.)X
+766 4971(Zwei)N
+997 0.1992(Implementierungen)AX
+1785(f\333r)X
+1929(den)X
+2100(Algorithmus)X
+2618(zum)X
+2816(Mustervergleich)X
+3479(k\332nnen)X
+3794(gew\327hlt)X
+4131(wer-)X
+566 5079(den:)N
+859(Ein)X
+1120(direkt)X
+1472(codierter)X
+1941(dynamischer)X
+2559(Programmierungs-Algorithmus)X
+3892(oder)X
+4189(ein)X
+566 5187 0.2105(tabellen-gesteuerter)AN
+1353 0.1506(Baummuster-Vergleicher.)AX
+2382(In)X
+2488(beiden)X
+2771(F\327llen)X
+3038(besitzt)X
+3315(eine)X
+3501(Transformation)X
+4125(zwei)X
+566 5295(Phasen.)N
+903(W\327hrend)X
+1297(die)X
+1456(Erste)X
+1695(die)X
+1854(mit)X
+2024(minimalen)X
+2478(Kosten)X
+2791(passenden)X
+3227(Muster)X
+3539(bestimmt,)X
+3962(f\333hrt)X
+4189(die)X
+566 5403(Zweite)N
+858(die)X
+1000(zugeh\332rigen)X
+1500(Aktionen)X
+1882(aus.)X
+3 f
+566 5607(5.7.)N
+758(Beg)X
+1 f
+2 f
+766 5748(Beg)N
+1 f
+964(\()X
+2 f
+996(b)X
+1 f
+(ack)S
+2 f
+1225(e)X
+1 f
+1268(nd)X
+2 f
+1411(g)X
+1 f
+(enerator\))S
+1854(erzeugt)X
+2185(Module)X
+2531(zur)X
+2701(Codeauswahl)X
+3266(und)X
+3457(zur)X
+3627(Registerzuteilung)X
+566 5856([Emm89a,)N
+1025(Emm89b].)X
+1513(Codeauswahl)X
+2086(wird)X
+2317(mittels)X
+2635(Baummuster-Vergleich)X
+3593(durchgef\333hrt.)X
+4168(Die)X
+566 5964(Maschinenbefehle)N
+1303(werden)X
+1617(mit)X
+1777(Regeln)X
+2081(beschrieben)X
+2572(welche)X
+2876(Baummuster)X
+3398(enthalten.)X
+3806(Der)X
+3980(erzeugte)X
+566 6072(Codegenerator)N
+1180(hat)X
+1345(als)X
+1499(Eingabe)X
+1862(eine)X
+2070(baumf\332rmige)X
+2636(Zwischensprache.)X
+3375(Ein)X
+3555(Eingabebaum)X
+4131(wird)X
+566 6180(abgebildet)N
+995(durch)X
+1241(die)X
+1386(\325berdeckung)X
+1931(des)X
+2086(Baums)X
+2380(mit)X
+2536(Mustern)X
+2883(und)X
+3053(der)X
+3202(anschlie\373enden)X
+3822(Ausgabe)X
+4184(der)X
+
+8 p
+%%Page: 8 10
+4(Courier-Germ)xf 4 f
+12 s 0 xH 0 xS 4 f
+3 f
+4259 561(8)N
+1 f
+566 780(zugeh\332rigen)N
+1067(Maschinenbefehle.)X
+1822(Die)X
+1986(Regeln)X
+2284(sind)X
+2469(mit)X
+2622(Kosten)X
+2918(versehen,)X
+3308(wodurch)X
+3668(der)X
+3815(Codegenera-)X
+566 888(tor)N
+697(eine)X
+882(\325berdeckung)X
+1424(mit)X
+1577(Regeln)X
+1874(mit)X
+2027(minimalen)X
+2464(Kosten)X
+2760(ausw\327hlen)X
+3190(kann.)X
+766 1029(Der)N
+937(Benutzer)X
+1312(beschreibt)X
+1734(auf)X
+1883(eventuell)X
+2263(mehrdeutige)X
+2771(Art)X
+2925(und)X
+3095(Weise)X
+3362(die)X
+3506(Abbildung)X
+3943(bestimm-)X
+566 1137(ter)N
+698(Konstrukte)X
+1155(der)X
+1308(Zwischensprache.)X
+2030(Er)X
+2151(braucht)X
+2469(keinen)X
+2755(Algorithmus)X
+3270(zu)X
+3390(programmieren,)X
+4037(der)X
+4189(die)X
+566 1245(beste)N
+819(Abbildung)X
+1285(eines)X
+1538(Eingabebaums)X
+2160(ausw\327hlt.)X
+2581(Es)X
+2732(ist)X
+2878(g\333nstig)X
+3216(bei)X
+3389(der)X
+3567(Entwicklung)X
+4114(einer)X
+566 1353(Codegenerator-Beschreibung)N
+1737(erst)X
+1918(einen)X
+2169(Teil)X
+2367(der)X
+2532(Maschinenbefehle)X
+3280(zu)X
+3413(spezi\256zieren,)X
+3966(der)X
+4131(gro\373)X
+566 1461(genug)N
+842(ist,)X
+998(um)X
+1161(die)X
+1319(ganze)X
+1584(Sprache)X
+1934(zu)X
+2065(\333bersetzen.)X
+2541(Dies)X
+2757(f\333hrt)X
+2984(zu)X
+3115(einem)X
+3391(funktionsf\327higen)X
+4083(\325ber-)X
+566 1569(setzer,)N
+863(welcher)X
+1216(eventuell)X
+1617(inef\256zienten)X
+2146(Code)X
+2396(erzeugt.)X
+2751(Sp\327ter)X
+3044(k\332nnen)X
+3374(nach)X
+3603(und)X
+3794(nach)X
+4023(weitere)X
+566 1677(Regeln)N
+863(hinzugef\333gt)X
+1347(werden,)X
+1678(was)X
+1851(schlie\373lich)X
+2293(zu)X
+2408(einem)X
+2668(\325bersetzer)X
+3109(f\333hrt,)X
+3344(der)X
+3491(guten)X
+3729(Code)X
+3956(erzeugt.)X
+2 f
+766 1818(Beg)N
+1 f
+974 0.2812(implementiert)AX
+1574(die)X
+1750(Bestimmung)X
+2299(einer)X
+2549(\325berdeckung)X
+3124(mit)X
+3310(minimalen)X
+3780(Kosten)X
+4109(unter)X
+566 1926(Verwendung)N
+1108(einer)X
+1347(direkt)X
+1618(codierten)X
+2023(Version)X
+2373(des)X
+2547(dynamischen)X
+3100(Programmierungs-Algorithmus)X
+566 2034([Emm88,)N
+951(ESL89].)X
+766 2175(Die)N
+942(Generierung)X
+1460(eines)X
+1695(Registerzuteilers)X
+2380(ist)X
+2508(von)X
+2689(besonderer)X
+3148(Bedeutung,)X
+3626(da)X
+3753(hier)X
+3939(Handpro-)X
+566 2283(grammierung)N
+1114(ziemlich)X
+1475(schwer)X
+1775(und)X
+1947(l\327stig)X
+2184(ist)X
+2303(und)X
+2475(weil)X
+2669(Fehler)X
+2943(in)X
+3046(der)X
+3197(Registerzuteilung)X
+3905(manchmal)X
+566 2391(schwer)N
+870(zu)X
+993(\256nden)X
+1265(sind.)X
+1480(Innerhalb)X
+1880(der)X
+2034(Regeln)X
+2338(k\332nnen)X
+2652(die)X
+2801(Eigenschaften)X
+3378(eines)X
+3607(Maschinenbefehls)X
+566 2499(hinsichtlich)N
+1049(der)X
+1204(Registerzuteilung)X
+1916(spezi\256ziert)X
+2371(werden:)X
+2713(die)X
+2863(erlaubten)X
+3254(Register)X
+3607(f\333r)X
+3751(jeden)X
+3992(Operan-)X
+566 2607(den,)N
+754(die)X
+897(durch)X
+1141(Seiteneffekte)X
+1675(ver\327nderten)X
+2155(Register)X
+2501(und)X
+2670(ob)X
+2791(es)X
+2896(sich)X
+3076(um)X
+3224(einen)X
+3458(Zweiadre\373befehl)X
+4136(han-)X
+566 2715(delt)N
+762(oder)X
+984(nicht.)X
+1252(Zus\327tzlich)X
+1705(wird)X
+1932(der)X
+2106(Registersatz)X
+2628(der)X
+2801(Zielmaschine)X
+3371(beschrieben.)X
+3905(Sogar)X
+4179(das)X
+566 2823(Doppelregister-Problem)N
+1520(\(wie)X
+1715(z.)X
+1806(B.)X
+1918(auf)X
+2065(IBM)X
+2270(370\))X
+2470(kann)X
+2681(behandelt)X
+3080(werden.)X
+766 2964(Zwei)N
+994(Arten)X
+1243(von)X
+1417(Registerzuteilung)X
+2127(sind)X
+2317(m\332glich:)X
+2690(Die)X
+2 f
+2859(on)X
+2985(the)X
+3133(\257y)X
+1 f
+3254(Registerzuteilung)X
+3963(kann)X
+4179(nur)X
+566 3072(einfache)N
+930(Registers\327tze)X
+1481(behandeln.)X
+1938(Sie)X
+2098(ist)X
+2225(jedoch)X
+2518(sehr)X
+2714(ef\256zient)X
+3066(und)X
+3246(liefert)X
+3513(f\333r)X
+3661(viele)X
+3885(Maschinen)X
+566 3180 0.1912(zufriedenstellende)AN
+1329(Ergebisse.)X
+1782(In)X
+1917(manchen)X
+2320(F\327llen)X
+2616(ist)X
+2762(der)X
+2940(allgemeine)X
+3419 0.2083(Registerzuteiler)AX
+4085(n\332tig,)X
+566 3288(welcher)N
+895(eine)X
+1080(Art)X
+1232(von)X
+1400(Vorschau)X
+1792(durchf\333hrt)X
+2222(und)X
+2390(deshalb)X
+2708(einen)X
+2941(zus\327tzlichen)X
+3442(Pa\373)X
+3610(ben\332tigt.)X
+3 f
+566 3492(5.8.)N
+758(Reuse)X
+1 f
+2 f
+766 3633(Reuse)N
+1 f
+1036(ist)X
+1167(eine)X
+1368(Bibliothek)X
+1815(wiederverwendbarer)X
+2646(Module)X
+2984(haupts\327chlich)X
+3553(f\333r)X
+3704(den)X
+3882(Einsatz)X
+4205(im)X
+566 3741(\325bersetzerbau)N
+1151([Gro87b].)X
+1561(Sie)X
+1713(enth\327lt)X
+2005(Module)X
+2332(oder)X
+2531(abstrakte)X
+2907(Datentypen,)X
+3403(die)X
+3549(fast)X
+3716(in)X
+3819(jedem)X
+4083(\325ber-)X
+566 3849(setzer)N
+815(gebraucht)X
+1219(werden:)X
+566 3990(-)N
+766(eine)X
+951(dynamische)X
+1435(Speicherverwaltung)X
+566 4131(-)N
+766(ein)X
+908(Modul)X
+1188(f\333r)X
+1324(dynamische)X
+1808(und)X
+1976(\257exible)X
+2289(Felder)X
+566 4272(-)N
+766(ein)X
+908(Modul)X
+1188(zur)X
+1335(Speicherung)X
+1840(variabel)X
+2175(langer)X
+2440 0.2656(Zeichenketten)AX
+566 4413(-)N
+766(ein)X
+908(Modul)X
+1188(zur)X
+1335 0.2174(Zeichenkettenbearbeitung)AX
+566 4554(-)N
+766(eine)X
+952 0.2500(Bezeichnertabelle,)AX
+1693(welche)X
+1991 0.2656(Zeichenketten)AX
+2563(unter)X
+2786(Verwendung)X
+3307(eines)X
+3530(Hashverfahrens)X
+4157(ein-)X
+766 4662(deutig)N
+1031(auf)X
+1178(ganze)X
+1427(Zahlen)X
+1719(abbildet)X
+566 4803(-)N
+766(Module)X
+1103(f\333r)X
+1252(oft)X
+1396(verwendete)X
+1877(Datenstrukturen)X
+2534(wie)X
+2710(Mengen)X
+3062(von)X
+3243(ganzen)X
+3553(Zahlen)X
+3858(oder)X
+4066(bin\327re)X
+766 4911(Relationen)N
+1208(zwischen)X
+1590(ganzen)X
+1887(Zahlen)X
+2179(ohne)X
+2390(Beschr\327nkung)X
+2964(des)X
+3116(De\256nitionsbereichs.)X
+3 f
+566 5115(6.)N
+686(Erfahrungen)X
+1 f
+766 5256(Dieser)N
+1057(Abschnitt)X
+1471(berichtet)X
+1849(\333ber)X
+2060(die)X
+2218(Erfahrungen)X
+2739(des)X
+2907(Einsatzes)X
+3310(des)X
+3477(Werkzeugkastens)X
+4195(f\333r)X
+566 5364(zwei)N
+772(realistische)X
+1230(Anwendungen.)X
+3 f
+566 5568(6.1.)N
+758(Modula)X
+1102(nach)X
+1323(C)X
+1416(\325bersetzer)X
+1 f
+766 5709(Die)N
+938(bisher)X
+1206(gr\332\373te)X
+1485(Anwendung)X
+1987(des)X
+2148(Werkzeugkastens)X
+2859(war)X
+3035(die)X
+3185(Generierung)X
+3698(eines)X
+3928(Modula-2)X
+566 5817(nach)N
+784(C)X
+884(\325bersetzers)X
+1374([Mar90].)X
+1754(Das)X
+2 f
+1939(Mtc)X
+1 f
+2125(genannte)X
+2509(Programm)X
+2951(\333bersetzt)X
+3334(Modula-2)X
+3748(Programme)X
+4232(in)X
+566 5925(lesbaren)N
+913(C)X
+1003(Code)X
+1232(ohne)X
+1445(Einschr\327nkung)X
+2048(\(sogar)X
+2314(geschachtelte)X
+2860(Prozeduren)X
+3323(und)X
+3492(Module\).)X
+3872(Es)X
+3993(ist)X
+4109(weit-)X
+566 6033(gehend)N
+871(automatisch)X
+1364(generiert)X
+1734(und)X
+1905(folgt)X
+2114(dem)X
+2307(in)X
+2409(Abschnitt)X
+2809(4)X
+2883(vorgeschlagenen)X
+3556(\325bersetzer-Modell.)X
+566 6141(Anstelle)N
+913(einer)X
+1132(Zwischensprache)X
+1826(erzeugt)X
+2 f
+2136(Mtc)X
+1 f
+2312(C)X
+2401(Code)X
+2629(und)X
+2798(ben\332tigt)X
+3139(deshalb)X
+3458(keinen)X
+3740(Codegenerator)X
+
+9 p
+%%Page: 9 11
+4(Courier-Germ)xf 4 f
+12 s 0 xH 0 xS 4 f
+3 f
+4259 561(9)N
+1 f
+566 780(zur)N
+722(Ausgabe)X
+1091(von)X
+1268(Maschinencode.)X
+1928(Es)X
+2056(enth\327lt)X
+2351(so)X
+2468(viel)X
+2645(von)X
+2821(der)X
+2976(semantischen)X
+3527(Analyse)X
+3874(wie)X
+4045(f\333r)X
+4189(die)X
+566 888(Aufgabe)N
+945(gebraucht)X
+1373(wird.)X
+1621(Die)X
+1808(semantische)X
+2327(Analyse)X
+2690(ist)X
+2829(ziemlich)X
+3210(vollst\327ndig)X
+3686(und)X
+3878(enth\327lt)X
+4189(die)X
+566 996(Behandlung)N
+1104(der)X
+1300 0.1645(G\333ltigkeitsbereiche,)AX
+2152(Namensanalyse)X
+2829(und)X
+3045(Typbestimmung.)X
+3772(Es)X
+3940(fehlt)X
+4189(die)X
+566 1104(\325berpr\333fung)N
+1112(von)X
+1306(Kontextbedingungen,)X
+2187(da)X
+2328(davon)X
+2612(ausgegangen)X
+3158(wird,)X
+3407(da\373)X
+3595(nur)X
+3772(korrekte)X
+4142(Pro-)X
+566 1212(gramme)N
+911(\333bersetzt)X
+1288(werden.)X
+1624(Tabelle)X
+1943(1)X
+2019(enth\327lt)X
+2310(die)X
+2456(Gr\332\373en)X
+2772(der)X
+2923(Spezi\256kationen)X
+3550(und)X
+3722(der)X
+3873(generierten)X
+566 1320(Quell-Module.)N
+1189(Der)X
+1387(Entwurf)X
+1756(und)X
+1954(die)X
+2126(Implementierung)X
+2844(von)X
+2 f
+3041(Mtc)X
+1 f
+3244(wurden)X
+3585(im)X
+3740(Rahmen)X
+4114(einer)X
+566 1428(Diplomarbeit)N
+1113(mit)X
+1275(einem)X
+1544(Aufwand)X
+1934(von)X
+2111(6)X
+2191(Mannmonaten)X
+2779(durchgef\333hrt.)X
+3356(Das)X
+3537(Programm)X
+3975(ist)X
+4098(stabil)X
+566 1536(und)N
+734(hat)X
+876(bereits)X
+1157(mehr)X
+1379(als)X
+1510(100.000)X
+1846(Zeilen)X
+2117(Modula-2)X
+2520(nach)X
+2726(C)X
+2814(\333bersetzt.)X
+10 f
+566 1668(i)N
+603(iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii)X
+1 f
+614 1776(Phase)N
+1534(Spezi\256kation)X
+2565(Quell-Modul)X
+3637(Werkzeug)X
+10 f
+566 1788(i)N
+603(iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii)X
+1 f
+1315 1896(formal)N
+1668(Code)X
+1967(Summe)X
+2357(Def.)X
+2645(Impl.)X
+2981(Summe)X
+3371(Name)X
+3654(Referenzen)X
+10 f
+566 1908(i)N
+603(iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii)X
+1 f
+614 2016(Lex.)N
+812(Analyse)X
+1395(392)X
+1721(133)X
+2066(525)X
+2453(56)X
+2693(1320)X
+3056(1376)X
+3371(Rex)X
+3654([Gro87a,)X
+4022(Gro88])X
+614 2124(Zerteiler)N
+1395(951)X
+1769(88)X
+2018(1039)X
+2453(81)X
+2693(3007)X
+3056(3088)X
+3371(Ell)X
+3654([GrV88,)X
+4000(Gro88])X
+614 2232(Syntaxbaum)N
+1395(189)X
+1769(51)X
+2066(240)X
+2405(579)X
+2693(2992)X
+3056(3571)X
+3371(Ast)X
+3654([Gro89d])X
+614 2340(Symboltabelle)N
+1395(115)X
+1721(938)X
+2018(1053)X
+2405(413)X
+2693(1475)X
+3056(1888)X
+3371(Ast)X
+3654([Gro89d])X
+614 2448(Sem.)N
+833(Analyse)X
+1347(1886)X
+1721(151)X
+2018(2037)X
+2501(9)X
+2693(3288)X
+3056(3297)X
+3371(Ag)X
+3654([Gro89c])X
+614 2556(Codegenerator)N
+1347(2793)X
+1721(969)X
+2018(3762)X
+2453(47)X
+2693(7309)X
+3056(7356)X
+3371(Estra)X
+3654([Vie89])X
+614 2664(Wiederverw.)N
+1427(-)X
+1753(-)X
+2098(-)X
+2405(819)X
+2693(2722)X
+3056(3541)X
+3371(Reuse)X
+3654([Gro87b])X
+614 2772(Sonstiges)N
+1427(-)X
+1753(-)X
+2098(-)X
+2405(698)X
+2693(3153)X
+3056(3851)X
+10 f
+566 2784(i)N
+603(iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii)X
+1 f
+614 2892(Summe)N
+1347(6326)X
+1673(2330)X
+2018(8656)X
+2357(2702)X
+2645(25266)X
+3008(27968)X
+10 f
+566 2904(i)N
+603(iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii)X
+566(c)X
+2820(c)Y
+2724(c)Y
+2628(c)Y
+2532(c)Y
+2436(c)Y
+2340(c)Y
+2244(c)Y
+2148(c)Y
+2052(c)Y
+1956(c)Y
+1860(c)Y
+1764(c)Y
+1267 2904(c)N
+2820(c)Y
+2724(c)Y
+2628(c)Y
+2532(c)Y
+2436(c)Y
+2340(c)Y
+2244(c)Y
+2148(c)Y
+2052(c)Y
+1956(c)Y
+1860(c)Y
+1764(c)Y
+2309 2904(c)N
+2820(c)Y
+2724(c)Y
+2628(c)Y
+2532(c)Y
+2436(c)Y
+2340(c)Y
+2244(c)Y
+2148(c)Y
+2052(c)Y
+1956(c)Y
+1860(c)Y
+1764(c)Y
+3323 2904(c)N
+2820(c)Y
+2724(c)Y
+2628(c)Y
+2532(c)Y
+2436(c)Y
+2340(c)Y
+2244(c)Y
+2148(c)Y
+2052(c)Y
+1956(c)Y
+1860(c)Y
+1764(c)Y
+4347 2904(c)N
+2820(c)Y
+2724(c)Y
+2628(c)Y
+2532(c)Y
+2436(c)Y
+2340(c)Y
+2244(c)Y
+2148(c)Y
+2052(c)Y
+1956(c)Y
+1860(c)Y
+1764(c)Y
+1 f
+1095 3099(Tabelle)N
+1409(1:)X
+1508(Umfang)X
+1847(der)X
+1994(Spezi\256kationen)X
+2617(und)X
+2785(der)X
+2932(Quellmodule)X
+3459(von)X
+2 f
+3627(Mtc)X
+1 f
+766 3273(Die)N
+938(Gr\332\373e)X
+1211(des)X
+1372(Bin\327rprogramms)X
+2056(betr\327gt)X
+2356(300)X
+2532(K)X
+2633(Bytes.)X
+2932(Es)X
+3060(l\327uft)X
+3269(mit)X
+3430(einer)X
+3655(Geschwindigkeit)X
+566 3381(von)N
+743(810)X
+920(Grundsymbolen)X
+1572(\()X
+2 f
+1604(tokens)X
+1 f
+1850(\))X
+1914(pro)X
+2074(Sekunde)X
+2437(oder)X
+2640(167)X
+2816(Zeilen)X
+3095(pro)X
+3255(Sekunde)X
+3618(auf)X
+3773(einem)X
+4041(SUN/3)X
+566 3489(Arbeitsplatzrechner)N
+1369(\(MC)X
+1593(68020)X
+1876(Prozessor\).)X
+2348(Diese)X
+2610(Zahlen)X
+2920(ber\333cksichtigen)X
+3572(nur)X
+3742(die)X
+3902(Gr\332\373e)X
+4184(der)X
+566 3597(\333bersetzten)N
+1069(Module.)X
+1456(Wenn)X
+1749(man)X
+1978(zus\327tzlich)X
+2427(die)X
+2608(\(transitiv\))X
+3051(importierten)X
+3591(De\256nitionsmodule)X
+566 3705(ber\333cksichtigt,)N
+1191(die)X
+1364(ebenfalls)X
+1767(lexikalisch,)X
+2264(syntaktisch)X
+2752(und)X
+2950(semantisch)X
+3432(analysiert)X
+3861(werden,)X
+4222(so)X
+566 3813(erreicht)N
+887(man)X
+1079(1320)X
+1297(Grundsymbole)X
+1894(pro)X
+2048(Sekunde)X
+2405(oder)X
+2602(418)X
+2772(Zeilen)X
+3044(pro)X
+3197(Sekunde.)X
+3577(Zum)X
+3784(Vergleich)X
+4189(die)X
+566 3921(Zahlen)N
+859(f\333r)X
+995(zwei)X
+1201(\325bersetzer)X
+1642(des)X
+1794(Rechner-Herstellers:)X
+2615(Der)X
+2783(C-\325bersetzer)X
+3320(l\327uft)X
+3521(mit)X
+3674(einer)X
+3891(Geschwin-)X
+566 4029(digkeit)N
+870(von)X
+1050(97)X
+1182(Zeilen)X
+1465(pro)X
+1629(Sekunde)X
+1996(\(ohne)X
+2 f
+2250(Header)X
+1 f
+2538(-Dateien\))X
+2937(bzw.)X
+3156(163)X
+3335(Zeilen)X
+3617(pro)X
+3780(Sekunde)X
+4146(\(mit)X
+2 f
+566 4137(Header)N
+1 f
+854(-Dateien\))X
+1258(und)X
+1442(der)X
+1605(Modula-2-\325bersetzer)X
+2473(mit)X
+2642(48)X
+2777(Zeilen)X
+3063(pro)X
+3230(Sekunde.)X
+3624(Die)X
+3802(Laufzeit)X
+4163(von)X
+2 f
+566 4245(Mtc)N
+1 f
+740(ist)X
+855(folgenderma\373en)X
+1505(verteilt:)X
+1677 4419(lex.)N
+1843(+)X
+1921(syn.)X
+2102(Analyse)X
+2441(+)X
+2519(Baumaufbau)X
+3155(42)X
+3275(%)X
+1677 4527(semantische)N
+2172(Analyse)X
+3155(33)X
+3275(%)X
+1677 4635(C)N
+1765(Codegenerierung)X
+3155(25)X
+3275(%)X
+566 4809(Die)N
+730(semantische)X
+1226(Analyse)X
+1566(verbringt)X
+1944(95%)X
+2145(der)X
+2292(Zeit)X
+2472(mit)X
+2625(der)X
+2772(Berechnung)X
+3261(von)X
+3429(Attributen)X
+3849(mittels)X
+4136(vom)X
+566 4917(Benutzer)N
+945(spezi\256zierten)X
+1490(Anweisungen)X
+2049(und)X
+2224(nur)X
+2383(5%)X
+2541(f\333r)X
+2683(die)X
+2831(Baumtraversierung)X
+3599(bzw.)X
+3813(f\333r)X
+3955(Besuchs-)X
+566 5025(aktionen.)N
+946(F\333r)X
+1103(11)X
+1223(Knotentypen)X
+1744(sind)X
+1928(f\333nf)X
+2112(Besuche)X
+2462(notwendig.)X
+2 f
+766 5166(Mtc)N
+1 f
+971(braucht)X
+1314(ungef\327hr)X
+1710(360)X
+1908(K)X
+2031(Bytes)X
+2304(dynamischen)X
+2866(Speicher)X
+3257(pro)X
+3439(1000)X
+3685(Quellzeilen)X
+4184(zur)X
+566 5274(Speicherung)N
+1127(des)X
+1334(abstrakten)X
+1809(Syntaxbaums,)X
+2430(der)X
+2632(Attribute)X
+3059(und)X
+3282(der)X
+3484(Symboltabelle)X
+4120(ohne)X
+566 5382(Optimierung)N
+1096(der)X
+1257(Attributspeicherung.)X
+2089(Weitere)X
+2433(600)X
+2615(K)X
+2722(Bytes)X
+2979(ben\332tigt)X
+3333(der)X
+3494(von)X
+2 f
+3676(Estra)X
+1 f
+3921(generierte)X
+566 5490(Transformator.)N
+1197(Dies)X
+1424(ist)X
+1566(bei)X
+1735(den)X
+1925(heutigen)X
+2308 0.2188(Speicherkapazit\327ten)AX
+3136(ertr\327glich.)X
+3605(Es)X
+3752(zeigt,)X
+4015(da\373)X
+4205(im)X
+566 5598(Gegensatz)N
+1001(zu)X
+1126(der)X
+1283(in)X
+1392(der)X
+1549(Literatur)X
+1920(vertretenen)X
+2387(Meinung)X
+2767(m\332glich)X
+3116(ist,)X
+3264(alle)X
+3437(Attribute)X
+3818(im)X
+3953(Baum)X
+4216(zu)X
+566 5706(speichern.)N
+1003(Wir)X
+1197(tun)X
+1364(dies)X
+1563(sogar)X
+1814(mit)X
+1986(dem)X
+2195(sogenannten)X
+2719(Umgebungsattribut.)X
+3529(Dies)X
+3748(wird)X
+3967(m\332glich,)X
+566 5814(indem)N
+847(wir)X
+1015(die)X
+1173(Symboltabelle)X
+1770(als)X
+1917(abstrakten)X
+2353(Datentyp)X
+2746(in)X
+2860(der)X
+3022(Zielsprache)X
+3511(programmieren.)X
+4168(Die)X
+566 5922(Implementierung)N
+1265(ist)X
+1391(zeit-)X
+1598(und)X
+1777(speicheref\256zient)X
+2448(durch)X
+2701(die)X
+2853(Ausnutzung)X
+3351(von)X
+3529(Zeigersemantik)X
+4163(und)X
+2 f
+566 6030(structure)N
+937(sharing)X
+1 f
+1230(.)X
+
+10 p
+%%Page: 10 12
+4(Courier-Germ)xf 4 f
+12 s 0 xH 0 xS 4 f
+3 f
+4211 561(10)N
+566 780(6.2.)N
+758(Codegenerator)X
+1396(f\333r)X
+1548(Modula-2-\325bersetzer)X
+1 f
+766 921(In)N
+875(einer)X
+1097(anderen)X
+1431(Anwendung)X
+1929(wurde)X
+2198(der)X
+2350(urspr\333nglich)X
+2865(handgeschriebene)X
+3584(Codegenerator)X
+4179(des)X
+566 1029(GMD)N
+825(Modula-2-\325bersetzers)X
+2 f
+1725(Mocka)X
+1 f
+2022(durch)X
+2276(zwei)X
+2493(mit)X
+2 f
+2657(Beg)X
+1 f
+2842(erzeugte)X
+3204(Versionen)X
+3634(ersetzt.)X
+3945(Die)X
+4119(Ziel-)X
+566 1137(maschine)N
+975(war)X
+1163(ein)X
+1325(MC)X
+1518(68020)X
+1802(Prozessor.)X
+2243(Die)X
+2426(Spezi\256kation)X
+2978(des)X
+3150(Codegenerators)X
+3798(umfa\373t)X
+4115(1625)X
+566 1245(Zeilen)N
+843(und)X
+1016(enth\327lt)X
+1308(187)X
+1481(Regeln)X
+1783(und)X
+1956(99)X
+2081(Zwischensprach-Operatoren.)X
+3224(Zum)X
+3435(Vergleich)X
+3844(der)X
+3996(Qualit\327t)X
+566 1353(des)N
+782(erzeugten)X
+1245(Maschinencodes)X
+1974(haben)X
+2292(wir)X
+2507(die)X
+2712(Laufzeiten)X
+3212(f\333r)X
+3411(eine)X
+3659(Sammlung)X
+4163(von)X
+566 1461(Benchmark-Programmen)N
+1630(gemessen)X
+2095(\(siehe)X
+2416(Tabelle)X
+2797(2\).)X
+3016(Dabei)X
+3337(ist)X
+2 f
+3519(Mocka)X
+1 f
+3871(der)X
+4084(GMD)X
+566 1569(Modula-2-\325bersetzer)N
+1420(mit)X
+1574(handgeschriebenem)X
+2364(Codegenerator,)X
+2 f
+2980(Begra)X
+1 f
+3240(und)X
+2 f
+3409(Beg\257y)X
+1 f
+3675(sind)X
+3860(die)X
+4003(mit)X
+2 f
+4157(Beg)X
+1 f
+566 1677(erzeugten)N
+968(Versionen)X
+1390(mit)X
+1546(dem)X
+1739(allgemeinen)X
+2238(bzw.)X
+2449(mit)X
+2605(dem)X
+2 f
+2798(on)X
+2921(the)X
+3066(\257y)X
+1 f
+3183 0.1953(Registerzuteiler,)AX
+3844(und)X
+2 f
+4014(Sun)X
+1 f
+4184(der)X
+566 1785(SUN)N
+795(Modula-2-\325bersetzer)X
+1661(Version)X
+2003(1.0.)X
+2185(Im)X
+2330(Durchschnitt)X
+2865(ist)X
+2994(der)X
+3155(Code)X
+3396(von)X
+3578(mit)X
+2 f
+3745(Beg)X
+1 f
+3932(erzeugten)X
+566 1893(Codegeneratoren)N
+1248(genau)X
+1502(so)X
+1611(gut,)X
+1782(wie)X
+1945(der)X
+2092(des)X
+2244(handgeschriebenen)X
+3006(Codegenerators.)X
+766 2034(Tabelle)N
+1096(3)X
+1184(vergleicht)X
+1610(die)X
+1768(\325bersetzungszeiten)X
+2562(f\333r)X
+2713(ein)X
+2870(1116)X
+3101(Zeilen)X
+3387(langes)X
+3672(Programm.)X
+4141(Alle)X
+566 2142(Messungen)N
+1030(wurden)X
+1345(auf)X
+1495(einer)X
+1715(SUN)X
+1932(3/60)X
+2129(durchgef\333hrt,)X
+2676(die)X
+2820(gemessenen)X
+3311(Zeiten)X
+3584(waren)X
+2 f
+3845(user)X
+1 f
+4036(Zeiten.)X
+566 2250(Die)N
+769(Gr\332\373e)X
+1073(des)X
+1265(Codegenerators)X
+1933(nahm)X
+2211(von)X
+2419(5140)X
+2675(Zeilen)X
+2986(\(17,117)X
+3346(Grundsymbole\))X
+4013(f\333r)X
+4189(die)X
+566 2358(handgeschriebene)N
+1280(Version)X
+1608(auf)X
+1755(9574)X
+1971(Zeilen)X
+2242(\(27,044)X
+2562(Grundsymbole\))X
+3189(zu.)X
+3 f
+566 2562(7.)N
+686(Zusammenfassung)X
+1476(und)X
+1659(Ausblick)X
+1 f
+766 2703(Wir)N
+951(haben)X
+1216(einen)X
+1459(Werkzeugkasten)X
+2135(mit)X
+2298 0.1576(\325bersetzerbau-Werkzeugen)AX
+3407(vorgestellt,)X
+3872(womit)X
+4152(sich)X
+566 2811(\325bersetzer)N
+1072(f\333r)X
+1273(Programmiersprachen)X
+2212(weitgehend)X
+2745(automatisch)X
+3300(generieren)X
+3796(lassen.)X
+4168(Die)X
+566 2919 0.1648(\325bersetzerbau-Werkzeuge)AN
+1637(unterst\333tzen)X
+2151(die)X
+2312(Konstruktion)X
+2862(nahezu)X
+3178(aller)X
+3393(\325bersetzerphasen.)X
+4168(Die)X
+566 3027(Werkzeuge)N
+1045(sind)X
+1245(sehr)X
+1445(m\327chtig,)X
+1820(\257exibel)X
+2149(und)X
+2333(weitgehend)X
+2817(unabh\327ngig)X
+3305(von)X
+3488(einander.)X
+3907(Besonders)X
+566 3135(hervorzuheben)N
+1167(sind)X
+1356(die)X
+1503(praktische)X
+1928(Brauchbarkeit)X
+2503(der)X
+2655(Werkzeuge,)X
+3146(der)X
+3297(deutlich)X
+3636(reduzierte)X
+4050(Erstel-)X
+566 3243(lungsaufwand)N
+1160(f\333r)X
+1327(\325bersetzer)X
+1799(und)X
+1998(die)X
+2171(hohe)X
+2413(Qualit\327t)X
+2779(der)X
+2957(generierten)X
+3446(\325bersetzer.)X
+3965(Von)X
+4184(der)X
+566 3351(Ef\256zienz)N
+976(her)X
+1161(sind)X
+1383(die)X
+1563(Werkzeuge)X
+2064(konkurrenzf\327hig)X
+2762(zur)X
+2947(Programmierung)X
+3661(von)X
+3867(Hand.)X
+4184(Sie)X
+566 3459(unterst\333tzen)N
+1067(einen)X
+1306(breiten)X
+1604(Bereich)X
+1934(von)X
+2108(\325bersetzerstrukturen)X
+2945(und)X
+3119(erlauben)X
+3480(die)X
+3627(Konstruktion)X
+4163(von)X
+566 3567(\325bersetzern)N
+1056(mit)X
+1210(Produktionsqualit\327t.)X
+2037(Erste)X
+2260(realistische)X
+2719(Anwendungen)X
+3304(zeigen)X
+3581(die)X
+3723(ausgezeichnete)X
+566 3675(Leistungsf\327higkeit)N
+1307(der)X
+1454(Werkzeuge.)X
+766 3816(Die)N
+931 0.1648(\325bersetzerbau-Werkzeuge)AX
+1984(eignen)X
+2267(sich)X
+2448(f\333r)X
+2586(viele)X
+2800(Aufgabenstellungen,)X
+3625(die)X
+3769(\333ber)X
+3966(die)X
+4110(Kon-)X
+566 3924(struktion)N
+935(von)X
+1106(reinen)X
+1374(\325bersetzern)X
+1866(hinausgehen.)X
+2398(Sie)X
+2548(gestatten)X
+2917(beispielsweise)X
+3499(die)X
+3643(Implementierung)X
+566 4032(von)N
+748(Pr\327prozessoren,)X
+1397(die)X
+1553(Spracherweiterungen)X
+2409(und)X
+2591(Sprachdialekte)X
+3201(auf)X
+3361(Standardsprachen)X
+4082(abbil-)X
+566 4140(den.)N
+803(Wie)X
+1038(eines)X
+1310(unserer)X
+1667(Anwendungsbeispiele)X
+2590(zeigte,)X
+2919(lassen)X
+3227(sich)X
+3455(Umsetzer)X
+3897(von)X
+4114(einer)X
+566 4248(Quellsprache)N
+1104(in)X
+1209(eine)X
+1400(andere)X
+1687(erstellen.)X
+2068(Weiterhin)X
+2484(ist)X
+2605(etwa)X
+2817(die)X
+2965(Generierung)X
+3476(von)X
+3650(Pr\333fprogrammen)X
+566 4356(f\333r)N
+702(Programmierkonventionen)X
+1758(m\332glich.)X
+10 s
+10 f
+566 4495(i)N
+576(iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii)X
+1 f
+969 4585(Perm)N
+1258(Towers)X
+1619(Queens)X
+1980(Intmm)X
+2313(Mm)X
+2566(Puzzle)X
+2900(Quick)X
+3216(Tree)X
+3484(Bubble)X
+3835(FFT)X
+4092(Summe)X
+10 f
+566 4595(i)N
+576(iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii)X
+1 f
+606 4685(Mocka)N
+1013(40)X
+1338(58)X
+1699(37)X
+2046(53)X
+2319(103)X
+2613(285)X
+2958(32)X
+3250(72)X
+3559(56)X
+3843(152)X
+4154(888)X
+606 4775(Begra)N
+1013(42)X
+1338(57)X
+1699(35)X
+2046(54)X
+2319(104)X
+2613(297)X
+2958(32)X
+3250(58)X
+3559(56)X
+3843(153)X
+4154(888)X
+606 4865(Beg\257y)N
+1013(42)X
+1338(57)X
+1699(34)X
+2046(54)X
+2319(102)X
+2613(299)X
+2958(33)X
+3250(56)X
+3559(56)X
+3843(151)X
+4154(884)X
+606 4955(Sun)N
+1013(67)X
+1338(90)X
+1699(28)X
+2046(83)X
+2319(101)X
+2613(263)X
+2958(41)X
+3250(81)X
+3559(63)X
+3843(150)X
+4154(967)X
+10 f
+566 4965(i)N
+576(iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii)X
+566(c)X
+4895(c)Y
+4815(c)Y
+4735(c)Y
+4655(c)Y
+4575(c)Y
+901 4965(c)N
+4895(c)Y
+4815(c)Y
+4735(c)Y
+4655(c)Y
+4575(c)Y
+917 4965(c)N
+4895(c)Y
+4815(c)Y
+4735(c)Y
+4655(c)Y
+4575(c)Y
+1198 4965(c)N
+4895(c)Y
+4815(c)Y
+4735(c)Y
+4655(c)Y
+4575(c)Y
+1559 4965(c)N
+4895(c)Y
+4815(c)Y
+4735(c)Y
+4655(c)Y
+4575(c)Y
+1920 4965(c)N
+4895(c)Y
+4815(c)Y
+4735(c)Y
+4655(c)Y
+4575(c)Y
+2253 4965(c)N
+4895(c)Y
+4815(c)Y
+4735(c)Y
+4655(c)Y
+4575(c)Y
+2506 4965(c)N
+4895(c)Y
+4815(c)Y
+4735(c)Y
+4655(c)Y
+4575(c)Y
+2840 4965(c)N
+4895(c)Y
+4815(c)Y
+4735(c)Y
+4655(c)Y
+4575(c)Y
+3156 4965(c)N
+4895(c)Y
+4815(c)Y
+4735(c)Y
+4655(c)Y
+4575(c)Y
+3424 4965(c)N
+4895(c)Y
+4815(c)Y
+4735(c)Y
+4655(c)Y
+4575(c)Y
+3775 4965(c)N
+4895(c)Y
+4815(c)Y
+4735(c)Y
+4655(c)Y
+4575(c)Y
+4024 4965(c)N
+4895(c)Y
+4815(c)Y
+4735(c)Y
+4655(c)Y
+4575(c)Y
+4040 4965(c)N
+4895(c)Y
+4815(c)Y
+4735(c)Y
+4655(c)Y
+4575(c)Y
+4376 4965(c)N
+4895(c)Y
+4815(c)Y
+4735(c)Y
+4655(c)Y
+4575(c)Y
+12 s
+1 f
+1075 5214(Tabelle)N
+1389(2:)X
+1488(Vergleich)X
+1892(der)X
+2039(Codequalit\327t)X
+2556(\(Laufzeiten)X
+3025(in)X
+2 f
+3124(ticks)X
+1 f
+3325(=)X
+3403(1/60)X
+3598(Sek.\))X
+10 f
+2087 5355(i)N
+2114(iiiiiiiiiiiiii)X
+1 f
+2135 5463(Mocka)N
+2618(2.9)X
+2135 5571(Beg\257y)N
+2618(3.2)X
+2135 5679(Begra)N
+2618(3.9)X
+2135 5787(Sun)N
+2570(25.4)X
+10 f
+2087 5799(i)N
+2114(iiiiiiiiiiiiii)X
+2087(c)X
+5739(c)Y
+5643(c)Y
+5547(c)Y
+5451(c)Y
+2498 5799(c)N
+5739(c)Y
+5643(c)Y
+5547(c)Y
+5451(c)Y
+2786 5799(c)N
+5739(c)Y
+5643(c)Y
+5547(c)Y
+5451(c)Y
+1 f
+1400 6048(Tabelle)N
+1714(3:)X
+1813(Vergleich)X
+2217(der)X
+2364(\325bersetzungszeiten)X
+3142(\(in)X
+3273(Sek.\))X
+
+11 p
+%%Page: 11 13
+4(Courier-Germ)xf 4 f
+12 s 0 xH 0 xS 4 f
+3 f
+4211 561(11)N
+1 f
+766 780(Die)N
+934(Optimierung)X
+1455(der)X
+1607(Attributspeicherung)X
+2405(des)X
+2561(Werkzeugs)X
+2 f
+3022(Ag)X
+1 f
+3157(werden)X
+3468(wir)X
+3624(verbessern,)X
+4087(damit)X
+566 888(Attribute)N
+956(gegebenenfalls)X
+1576(auch)X
+1800(als)X
+1949(globale)X
+2275(Variable)X
+2649(und)X
+2834(globale)X
+3159(Keller)X
+3441 0.2812(implementiert)AX
+4024(werden)X
+566 996(k\332nnen.)N
+923(Au\373erdem)X
+1355(sollte)X
+1590(die)X
+1734(Transformation)X
+2359(von)X
+2529(Grammatiken,)X
+3109(die)X
+3252(nicht)X
+3470(die)X
+3613(OAG-Eigenschaft)X
+566 1104(besitzen,)N
+930(in)X
+1029(OAG-Grammatiken)X
+1822(automatisiert)X
+2350(werden.)X
+766 1245(F\333r)N
+947(das)X
+1123(Werkzeug)X
+2 f
+1567(Estra)X
+1 f
+1823(ist)X
+1962(ein)X
+2128(Redesign)X
+2533(geplant.)X
+2888(Die)X
+3074(Spezi\256kationssprache)X
+3960(l\327\373t)X
+4152(sich)X
+566 1353(vereinfachen,)N
+1121(und)X
+1298(die)X
+1449(Integration)X
+1904(des)X
+2064(Werkzeug)X
+2492(mit)X
+2 f
+2653(Ast)X
+1 f
+2808(kann)X
+3027(verbessert)X
+3449(werden.)X
+3788(Die)X
+3959(Ef\256zienz)X
+566 1461(der)N
+725(generierten)X
+1195(Transformations-Module)X
+2198(l\327\373t)X
+2379(sich)X
+2570(sowohl)X
+2883(hinsichtlich)X
+3369(Laufzeit)X
+3727(als)X
+3870(auch)X
+4088(hinsi-)X
+566 1569(chtlich)N
+853(Speicherverbrauch)X
+1599(verbessern.)X
+766 1710(Die)N
+931(Optimierungsphase)X
+1705(eines)X
+1929(\325bersetzers)X
+2409(sollte)X
+2644(selbstverst\327ndlich)X
+3360(auch)X
+3568(unterst\333tzt)X
+4000(werden.)X
+566 1818(Dies)N
+784(kann)X
+1013(entweder)X
+1408(durch)X
+1669(einen)X
+1920(wiederverwendbaren)X
+2768(sprachunabh\327ngigen)X
+3600(Optimierer,)X
+4088(durch)X
+566 1926(einen)N
+799 0.2083(parameterisierbaren)AX
+1589(Optimierer)X
+2036(oder)X
+2231(durch)X
+2474(einen)X
+2707 0.1875(Optimierergenerator)AX
+3518(geschehen.)X
+766 2067(Das)N
+945(Werkzeug)X
+2 f
+1371(Beg)X
+1 f
+1551(wird)X
+1757(in)X
+1862(folgende)X
+2229(Richtungen)X
+2703(erweitert)X
+3076(werden:)X
+3415(Generierung)X
+3925(eines)X
+4152(glo-)X
+566 2175(balen)N
+803(Registerzuteilers,)X
+1503(Unterst\333tzung)X
+2076(der)X
+2227(Befehlsumordnung)X
+2991(\()X
+2 f
+3023(instruction)X
+3467(scheduling)X
+1 f
+3884(\))X
+3943(und)X
+4114(einer)X
+566 2283(Einrichtung)N
+1045(zur)X
+1192(direkten)X
+1532(Generierung)X
+2037(von)X
+2205(bin\327rem)X
+2545(Objektcode.)X
+3 f
+566 2487(Danksagung)N
+1 f
+766 2628(Wir)N
+963(danken)X
+1288(allen)X
+1523(die)X
+1688(zur)X
+1857(Entstehung)X
+2336(des)X
+2510(Werkeugkastens)X
+3192(und)X
+3382(dieses)X
+3663(Aufsatzes)X
+4088(durch)X
+566 2736(aktive)N
+828(Mitarbeit)X
+1213(oder)X
+1410(durch)X
+1655(ihre)X
+1831(Ideen)X
+2071(beigetragen)X
+2547(haben:)X
+2830(Michael)X
+3172(Besser,)X
+3478(Carsten)X
+3798(Gerlhof,)X
+4147(Bob)X
+566 2844(Gray,)N
+817(Eduard)X
+1130(Klein,)X
+1403(Rudolf)X
+1705(Landwehr,)X
+2154(Matthias)X
+2526(Martin,)X
+2847(Thomas)X
+3192(M\333ller,)X
+3513(F.)X
+3625(W.)X
+3774(Schr\332er,)X
+4131(Dirk)X
+566 2952(Schwartz-Hertzner,)N
+1341(Doris)X
+1578(Vielsack,)X
+1963(Bertram)X
+2303(Vielsack)X
+2664(und)X
+2832(William)X
+3173(M.)X
+3306(Waite.)X
+3 f
+566 3156(Literatur)N
+1 f
+566 3297([ASU86])N
+1046(A.)X
+1184(V.)X
+1322(Aho,)X
+1556(R.)X
+1689(Sethi)X
+1932(and)X
+2116(J.)X
+2222(D.)X
+2360(Ullman,)X
+2 f
+2717(Compilers:)X
+3193(Principles,)X
+3657(Techniques,)X
+4163(and)X
+1046 3405(Tools)N
+1 f
+1259(,)X
+1307(Addison)X
+1656(Wesley,)X
+1993(Reading,)X
+2362(MA,)X
+2564(1986.)X
+566 3546([DeP82])N
+1046(F.)X
+1152(DeRemer)X
+1550(and)X
+1718(T.)X
+1830(Pennello,)X
+2219(Ef\256cient)X
+2579(Computation)X
+3110(of)X
+3218(LALR\(1\))X
+3609(Look-Ahead)X
+4123(Sets,)X
+2 f
+1046 3654(ACM)N
+1273(Trans.)X
+1544(Prog.)X
+1784(Lang.)X
+2029(and)X
+2197(Systems)X
+2525(4)X
+1 f
+(,)S
+2621(4)X
+2693(\(Oct.)X
+2912(1982\),)X
+3184(615-649.)X
+566 3795([Emm88])N
+1046(H.)X
+1265(Emmelmann,)X
+1907(Automatische)X
+2567(Erzeugung)X
+3109(ef\256zienter)X
+3625(Codegeneratoren,)X
+1046 3903(Diplomarbeit,)N
+1608(GMD)X
+1855(Forschungsstelle)X
+2525(an)X
+2640(der)X
+2787(Universit)X
+3150 3846(.)N
+3169(.)X
+3145 3903(at)N
+3239(Karlsruhe,)X
+3666(Sep.)X
+3858(1988.)X
+566 4044([ESL89])N
+1046(H.)X
+1172(Emmelmann,)X
+1722(F.)X
+1832(W.)X
+1980(Schr)X
+2161 3987(.)N
+2180(.)X
+2156 4044(oer)N
+2312(and)X
+2484(R.)X
+2605(Landwehr,)X
+3051(BEG)X
+3275(-)X
+3339(a)X
+3414(Generator)X
+3831(for)X
+3975(Ef\256cient)X
+1046 4152(Back)N
+1268(Ends,)X
+2 f
+1508(SIGPLAN)X
+1916(Notices)X
+2229(24)X
+1 f
+(,)S
+2373(7)X
+2445(\(July)X
+2661(1989\),)X
+2933(227-237.)X
+566 4293([Emm89a])N
+1046(H.)X
+1201(Emmelmann,)X
+1780(Automatische)X
+2377(Erzeugung)X
+2856(ef\256zienter)X
+3309(Codegeneratoren,)X
+4052(GMD-)X
+1046 4401(Studie)N
+1316(Nr.)X
+1465(158,)X
+1657(GMD)X
+1904(Forschungsstelle)X
+2574(an)X
+2689(der)X
+2836(Universit)X
+3199 4344(.)N
+3218(.)X
+3194 4401(at)N
+3288(Karlsruhe,)X
+3715(1989.)X
+566 4542([Emm89b])N
+1046(H.)X
+1176(Emmelmann,)X
+1730(BEG)X
+1959(-)X
+2028(A)X
+2134(Back)X
+2369(End)X
+2561(Generator)X
+2983(-)X
+3051(User)X
+3268(Manual,)X
+3622(Arbeitspapier)X
+4182(Nr.)X
+1046 4650(420,)N
+1238(GMD)X
+1485(Forschungsstelle)X
+2155(an)X
+2270(der)X
+2417(Universit)X
+2780 4593(.)N
+2799(.)X
+2775 4650(at)N
+2869(Karlsruhe,)X
+3296(Dec.)X
+3499(1989.)X
+566 4791([Gro87a])N
+1046(J.)X
+1144(Grosch,)X
+1482(Rex)X
+1673(-)X
+1741(A)X
+1846(Scanner)X
+2192(Generator,)X
+2637(Compiler)X
+3037(Generation)X
+3501(Report)X
+3799(No.)X
+3976(5,)X
+4084(GMD)X
+1046 4899(Forschungsstelle)N
+1716(an)X
+1831(der)X
+1978(Universit)X
+2341 4842(.)N
+2360(.)X
+2336 4899(at)N
+2430(Karlsruhe,)X
+2857(Dec.)X
+3060(1987.)X
+566 5040([Gro87b])N
+1046(J.)X
+1170(Grosch,)X
+1534(Reusable)X
+1950(Software)X
+2359(-)X
+2453(A)X
+2584(Collection)X
+3048(of)X
+3190(Modula-Modules,)X
+3943(Compiler)X
+1046 5148(Generation)N
+1502(Report)X
+1792(No.)X
+1961(4,)X
+2061(GMD)X
+2312(Forschungsstelle)X
+2986(an)X
+3104(der)X
+3254(Universit)X
+3617 5091(.)N
+3636(.)X
+3612 5148(at)N
+3709(Karlsruhe,)X
+4139(Sep.)X
+1046 5256(1987.)N
+566 5397([GrV88])N
+1046(J.)X
+1132(Grosch)X
+1434(and)X
+1598(B.)X
+1711(Vielsack,)X
+2097(The)X
+2272(Parser)X
+2536(Generators)X
+2982(Lalr)X
+3167(and)X
+3330(Ell,)X
+3491(Compiler)X
+3879(Generation)X
+1046 5505(Report)N
+1332(No.)X
+1497(8,)X
+1593(GMD)X
+1840(Forschungsstelle)X
+2510(an)X
+2625(der)X
+2772(Universit)X
+3135 5448(.)N
+3154(.)X
+3130 5505(at)N
+3224(Karlsruhe,)X
+3651(Apr.)X
+3848(1988.)X
+566 5646([Gro88])N
+1046(J.)X
+1144(Grosch,)X
+1482(Generators)X
+1940(for)X
+2088(High-Speed)X
+2583(Front-Ends,)X
+2 f
+3075(LNCS)X
+3340(371)X
+1 f
+(,)S
+3544(\(Oct.)X
+3775(1988\),)X
+4059(81-92,)X
+1046 5754(Springer)N
+1401(Verlag.)X
+566 5895([Gro89a])N
+1046(J.)X
+1174(Grosch,)X
+1542(Ef\256cient)X
+1941(Generation)X
+2436(of)X
+2582(Lexical)X
+2938(Analysers,)X
+2 f
+3412(Software\320Practice)X
+4232(&)X
+1046 6003(Experience)N
+1504(19)X
+1 f
+(,)S
+1648(11)X
+1768(\(Nov.)X
+2013(1989\),)X
+2285(1089-1103.)X
+
+12 p
+%%Page: 12 14
+4(Courier-Germ)xf 4 f
+12 s 0 xH 0 xS 4 f
+3 f
+4211 561(12)N
+1 f
+566 780([Gro89b])N
+1046(J.)X
+1137(Grosch,)X
+1468(Ef\256cient)X
+1830(and)X
+1999(Comfortable)X
+2516(Error)X
+2749(Recovery)X
+3148(in)X
+3253(Recursive)X
+3667(Descent)X
+4006(Parsers,)X
+1046 888(Compiler)N
+1459(Generation)X
+1936(Report)X
+2247(No.)X
+2436(19,)X
+2604(GMD)X
+2875(Forschungsstelle)X
+3569(an)X
+3708(der)X
+3879(Universit)X
+4242 831(.)N
+4261(.)X
+4237 888(at)N
+1046 996(Karlsruhe,)N
+1473(Dec.)X
+1676(1989.)X
+566 1137([Gro89c])N
+1046(J.)X
+1135(Grosch,)X
+1464(Ag)X
+1609(-)X
+1669(An)X
+1814(Attribute)X
+2190(Evaluator)X
+2593(Generator,)X
+3030(Compiler)X
+3422(Generation)X
+3877(Report)X
+4166(No.)X
+1046 1245(16,)N
+1190(GMD)X
+1437(Forschungsstelle)X
+2107(an)X
+2222(der)X
+2369(Universit)X
+2732 1188(.)N
+2751(.)X
+2727 1245(at)N
+2821(Karlsruhe,)X
+3248(Aug.)X
+3461(1989.)X
+566 1386([Gro89d])N
+1046(J.)X
+1132(Grosch,)X
+1458(Ast)X
+1616(-)X
+1673(A)X
+1767(Generator)X
+2177(for)X
+2314(Abstract)X
+2664(Syntax)X
+2955(Trees)X
+3193(\(Revised)X
+3559(Version\),)X
+3943(Compiler)X
+1046 1494(Generation)N
+1518(Report)X
+1824(No.)X
+2009(15,)X
+2173(GMD)X
+2440(Forschungsstelle)X
+3130(an)X
+3265(der)X
+3432(Universit)X
+3795 1437(.)N
+3814(.)X
+3790 1494(at)N
+3904(Karlsruhe,)X
+1046 1602(Aug.)N
+1259(1989.)X
+566 1743([Gro89e])N
+1046(J.)X
+1143(Grosch,)X
+1480(Tool)X
+1698(Support)X
+2038(for)X
+2186(Data)X
+2403(Structures,)X
+2852(Compiler)X
+3251(Generation)X
+3714(Report)X
+4011(No.)X
+4187(17,)X
+1046 1851(GMD)N
+1293(Forschungsstelle)X
+1963(an)X
+2078(der)X
+2225(Universit)X
+2588 1794(.)N
+2607(.)X
+2583 1851(at)N
+2677(Karlsruhe,)X
+3104(Nov.)X
+3317(1989.)X
+566 1992([Gro90])N
+1046(J.)X
+1169(Grosch,)X
+1532(Object-Oriented)X
+2220(Attribute)X
+2630(Grammars,)X
+3122(in)X
+2 f
+3259(Proceedings)X
+3802(of)X
+3939(the)X
+4119(Fifth)X
+1046 2100(International)N
+1590(Symposium)X
+2063(on)X
+2195(Computer)X
+2615(and)X
+2794(Information)X
+3288(Sciences)X
+3655(\(ISCIS)X
+3946(V\))X
+1 f
+4037(,)X
+4096(A.)X
+4224(E.)X
+1046 2208(Harmanci)N
+1450(and)X
+1613(E.)X
+1720(Gelenbe)X
+2065(\(ed.\),)X
+2292(Cappadocia,)X
+2795(Nevsehir,)X
+3190(Turkey,)X
+3516(Oct.)X
+3703(1990,)X
+3943(807-816.)X
+566 2349([Joh75])N
+1046(S.)X
+1181(C.)X
+1327(Johnson,)X
+1723(Yacc)X
+1979(\320)X
+2156(Yet)X
+2352(Another)X
+2724(Compiler-Compiler,)X
+3565(Computer)X
+4007(Science)X
+1046 2457(Technical)N
+1451(Report)X
+1737(32,)X
+1881(Bell)X
+2066(Telephone)X
+2497(Laboratories,)X
+3032(Murray)X
+3344(Hill,)X
+3542(NJ,)X
+3696(July)X
+3880(1975.)X
+566 2598([Kas80])N
+1046(U.)X
+1163(Kastens,)X
+1515(Ordered)X
+1854(Attribute)X
+2226(Grammars,)X
+2 f
+2680(Acta)X
+2881(Inf.)X
+3036(13)X
+1 f
+(,)S
+3180(3)X
+3252(\(1980\),)X
+3556(229-256.)X
+566 2739([Les75])N
+1046(M.)X
+1186(E.)X
+1300(Lesk,)X
+1542(LEX)X
+1760(\320)X
+1887(A)X
+1987(Lexical)X
+2308(Analyzer)X
+2692(Generator,)X
+3132(Computing)X
+3596(Science)X
+3926(Technical)X
+1046 2847(Report)N
+1332(39,)X
+1476(Bell)X
+1661(Telephone)X
+2092(Laboratories,)X
+2627(Murray)X
+2939(Hill,)X
+3137(NJ,)X
+3291(1975.)X
+566 2988([Mar90])N
+1046(M.)X
+1185(Martin,)X
+1501(Entwurf)X
+1846(und)X
+2020(Implementierung)X
+2714(eines)X
+2947 2931(.)N
+2966(.)X
+2942 2988(Ubersetzers)N
+3426(von)X
+3600(Modula-2)X
+4008(nach)X
+4219(C,)X
+1046 3096(Diplomarbeit,)N
+1608(GMD)X
+1855(Forschungsstelle)X
+2525(an)X
+2640(der)X
+2787(Universit)X
+3150 3039(.)N
+3169(.)X
+3145 3096(at)N
+3239(Karlsruhe,)X
+3666(Feb.)X
+3858(1990.)X
+566 3237([R\332h76])N
+1046(J.)X
+1141(R)X
+1210 3180(.)N
+1229(.)X
+1205 3237(ohrich,)N
+1509(Syntax-Error)X
+2044(Recovery)X
+2446(in)X
+2554(LR-Parsers,)X
+3043(in)X
+2 f
+3151(Informatik-Fachberichte)X
+1 f
+4103(,)X
+4160(vol.)X
+1046 3345(1,)N
+1142(H.-J.)X
+1352(Schneider)X
+1761(and)X
+1924(M.)X
+2057(Nagl)X
+2268(\(ed.\),)X
+2495(Springer)X
+2850(Verlag,)X
+3160(Berlin,)X
+3449(1976,)X
+3689(175-184.)X
+566 3486([R\332h80])N
+1046(J.)X
+1147(R)X
+1216 3429(.)N
+1235(.)X
+1211 3486(ohrich,)N
+1521(Methods)X
+1897(for)X
+2049(the)X
+2207(Automatic)X
+2654(Construction)X
+3191(of)X
+3311(Error)X
+3554(Correcting)X
+4006(Parsers,)X
+2 f
+1046 3594(Acta)N
+1247(Inf.)X
+1402(13)X
+1 f
+(,)S
+1546(2)X
+1618(\(1980\),)X
+1922(115-139.)X
+566 3735([R\332h82])N
+1046(J.)X
+1135(R)X
+1204 3678(.)N
+1223(.)X
+1199 3735(ohrich,)N
+1497(Behandlung)X
+1990(syntaktischer)X
+2526(Fehler,)X
+2 f
+2824(Informatik)X
+3258(Spektrum)X
+3649(5)X
+1 f
+(,)S
+3749(3)X
+3824(\(1982\),)X
+4131(171-)X
+1046 3843(184.)N
+566 3984([Vie89])N
+1046(B.)X
+1176(Vielsack,)X
+1579(Spezi\256kation)X
+2129(und)X
+2315(Implementierung)X
+3020(der)X
+3184(Transformation)X
+3824 0.2452(attributierter)AX
+1046 4092(B)N
+1115 4035(.)N
+1134(.)X
+1110 4092(aume,)N
+1385(Diplomarbeit,)X
+1965(GMD)X
+2230(Forschungsstelle)X
+2918(an)X
+3051(der)X
+3216(Universit)X
+3579 4035(.)N
+3598(.)X
+3574 4092(at)N
+3686(Karlsruhe,)X
+4131(June)X
+1046 4200(1989.)N
+566 4341([VSK89])N
+1046(H.)X
+1173(H.)X
+1300(Vogt,)X
+1550(S.)X
+1661(D.)X
+1788(Swierstra)X
+2185(and)X
+2358(M.)X
+2501(F.)X
+2612(Kuiper,)X
+2937(Higher)X
+3238(Order)X
+3496(Attribute)X
+3877(Grammars,)X
+2 f
+1046 4449(SIGPLAN)N
+1454(Notices)X
+1767(24)X
+1 f
+(,)S
+1911(7)X
+1983(\(July)X
+2199(1989\),)X
+2471(131-145.)X
+
+1 p
+%%Page: 1 15
+4(Courier-Germ)xf 4 f
+12 s 0 xH 0 xS 4 f
+3 f
+4259 561(1)N
+566 780(Inhalt)N
+1 f
+1019 1015(\325bersicht)N
+1427(............................................................................................................)X
+4259(1)X
+566 1142(1.)N
+1019(Aufbau)X
+1331(eines)X
+1553(\325bersetzers)X
+2051(..................................................................................)X
+4259(1)X
+566 1269(2.)N
+1019(Werkzeugkasten)X
+1691(.................................................................................................)X
+4259(2)X
+566 1396(3.)N
+1019(Gemeinsame)X
+1546(Eigenschaften)X
+2123(...............................................................................)X
+4259(3)X
+566 1523(4.)N
+1019(\325bersetzer-Modell)X
+1787(.............................................................................................)X
+4259(3)X
+566 1650(5.)N
+1019(Die)X
+1182(Werkzeuge)X
+1667(..................................................................................................)X
+4259(5)X
+566 1777(5.1.)N
+1019(Rex)X
+1211(.....................................................................................................................)X
+4259(5)X
+566 1904(5.2.)N
+1019(Lalr)X
+1211(.....................................................................................................................)X
+4259(5)X
+566 2031(5.3.)N
+1019(Ell)X
+1163(.......................................................................................................................)X
+4259(6)X
+566 2158(5.4.)N
+1019(Ast)X
+1187(......................................................................................................................)X
+4259(6)X
+566 2285(5.5.)N
+1019(Ag)X
+1163(.......................................................................................................................)X
+4259(6)X
+566 2412(5.6.)N
+1019(Estra)X
+1259(...................................................................................................................)X
+4259(7)X
+566 2539(5.7.)N
+1019(Beg)X
+1211(.....................................................................................................................)X
+4259(7)X
+566 2666(5.8.)N
+1019(Reuse)X
+1283(..................................................................................................................)X
+4259(8)X
+566 2793(6.)N
+1019(Erfahrungen)X
+1547(.......................................................................................................)X
+4259(8)X
+566 2920(6.1.)N
+1019(Modula)X
+1342(nach)X
+1548(C)X
+1636(\325bersetzer)X
+2099(................................................................................)X
+4259(8)X
+566 3047(6.2.)N
+1019(Codegenerator)X
+1610(f\333r)X
+1746(Modula-2-\325bersetzer)X
+2603(...........................................................)X
+4211(10)X
+566 3174(7.)N
+1019(Zusammenfassung)X
+1764(und)X
+1932(Ausblick)X
+2315(.......................................................................)X
+4211(10)X
+1019 3301(Danksagung)N
+1523(........................................................................................................)X
+4211(11)X
+1019 3428(Literatur)N
+1403(.............................................................................................................)X
+4211(11)X
+
+15 p
+%%Trailer
+xt
+
+xs

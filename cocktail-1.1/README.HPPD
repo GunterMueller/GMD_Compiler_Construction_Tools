@@ -1,0 +1,17 @@
+Package name:     cocktail
+Version number:   1.1
+Original author:  Josef Grosch <grosch@karlsruhe.gmd.de>
+Original URL:     http://www.westendlumber.com/lynx5.html
+HP-UX URL:        http://hpux.connect.org.uk/hppd/cgi-bin/search?package=&term=cocktail-
+Install tree:     /opt/cocktail
+Report bugs to:   workexp@connect.org.uk
+Tested on:        HP 9000/780/C160 running HP-UX 11.00
+C compiler used:  Version A.11.01.03
+Purpose:
+Cocktail is a Compiler-Toolbox developed at GMD Karlsruhe. The Cocktail tools
+lay emphasis on practical usability and efficiency. The tools generate compiler
+parts out of specifications that are as efficient as hand-written ones. The
+toolbox supports almost all phases of compiler construction by more or less
+independent tools that generate C, C++, Modula-2, or (in part) Eiffel source
+code.
+Date archived:    Thu 29 Jun 2000

@@ -1,0 +1,88 @@
+.TH PUMA 1 "" "GMD-Forschungsstelle-Karlsruhe"
+.SH NAME
+puma - a generator for the transformation of attributed trees
+.SH SYNOPSIS
+puma [-options] [-l dir] [file]
+.SH DESCRIPTION
+.I puma
+is a tool for the 
+transformation of attributed trees which is based on pattern matching and unification.
+It generates transformers (named \fITrafo\fP by default) that map
+attributed trees to arbitrary output. As this tool also has to know about the structure
+of the tree this information is communicated from \fIast\fP to \fIpuma\fP via a file
+with the suffix .TS. If
+.I file
+is omitted the specification is read from standard input.
+.SH OPTIONS
+.ta 3i
+.nf
+.IP a
+generate all, same as -di (default)
+.IP d
+generate definition module
+.IP i
+generate implementation module
+.IP s
+suppress warnings
+.IP m
+use procedure MakeTREE to construct nodes (default is in-line code)
+.IP p
+allow node constructors without parentheses
+.IP f
+signal a runtime error if none of the rules of a procedure matches
+.IP k
+allow non-linear patterns
+.IP n
+check parameters for NoTREE (NIL) and treat as failure (tg compatibility)
+.IP w
+surround actions by WITH statements (tg compatibility)
+.IP e
+treat undefined names as error
+.IP v
+treat undefined names as warning
+.IP o
+list undefined names on standard output
+.IP t
+print tree definitions
+.IP r
+print patterns
+.IP q
+browse internal data structure
+.IP 6
+generate # line directives
+.IP 7
+touch output files only if necessary
+.IP 8
+report storage consumption
+.IP c
+generate C code (default is Modula-2)
+.IP h
+print help information
+.IP -l\fRdir
+\fIdir\fP is the directory where puma finds its table files
+.SH FILES
+.nf
+.ta 2i
+<tree>.TS	description of the tree grammar(s)
+.sp 0.5
+if output is in C:
+.sp 0.5
+<module>.h	specification of the generated transformer module
+<module>.c	body of the generated transformer module
+.sp 0.5
+if output is in Modula-2:
+.sp 0.5
+<module>.md	definition module of the generated transformer module
+<module>.mi	implementation module of the generated transformer module
+.fi
+.SH SEE\ ALSO
+.sp 0.5
+J. Grosch:
+"Puma - A Generator for the Transformation of Attributed Trees",
+GMD Forschungsstelle an der Universit\*at Karlsruhe,
+Compiler Generation Report No. 26
+.sp 0.5
+J. Grosch:
+"Transformation of Attributed Trees Using Pattern Matching",
+GMD Forschungsstelle an der Universit\*at Karlsruhe,
+Compiler Generation Report No. 27
